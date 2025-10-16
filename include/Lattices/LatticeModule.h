@@ -7,38 +7,27 @@
 #ifndef gbLAB_LatticeMath_
 #define gbLAB_LatticeMath_
 
-namespace gbLAB
-{
+namespace oILAB {
 
-    template <int dim>
-    class Lattice;
+template <int dim> class Lattice;
 
-    template <int dim>
-    class LatticeVector;
+template <int dim> class LatticeVector;
 
-    template <int dim>
-    class ReciprocalLatticeVector;
+template <int dim> class ReciprocalLatticeVector;
 
-    template <int dim>
-    struct LatticeDirection;
-    
-    template <int dim>
-    struct ReciprocalLatticeDirection;
+template <int dim> struct LatticeDirection;
 
-    template <int dim>
-    struct RationalLatticeDirection;
+template <int dim> struct ReciprocalLatticeDirection;
 
-    template <int dim>
-    struct RationalReciprocalLatticeDirection;
+template <int dim> struct RationalLatticeDirection;
 
-    template <int dim>
-    class BiCrystal ;
+template <int dim> struct RationalReciprocalLatticeDirection;
 
-    template <int dim>
-    class Gb;
+template <int dim> class BiCrystal;
 
+template <int dim> class Gb;
 
-}
+} // namespace oILAB
 
 #include "LatticeCore.h"
 #include "../Math/RationalMatrix.h"

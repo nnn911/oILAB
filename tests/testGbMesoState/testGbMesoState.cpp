@@ -3,7 +3,7 @@
 #include <numbers>
 #include <omp.h>
 
-using namespace gbLAB;
+using namespace oILAB;
 
 // Hunter GB Details
 //

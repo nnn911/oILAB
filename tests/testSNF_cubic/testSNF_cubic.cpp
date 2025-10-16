@@ -3,7 +3,7 @@
 #include "../Utilities/range.h"
 #include <numbers>
 
-using namespace gbLAB;
+using namespace oILAB;
 int main()
 {
     const int m_max=10;

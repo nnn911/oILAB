@@ -21,9 +21,9 @@ namespace pyoilab{
     {
         using PyLatticeVector = pyoilab::PyLatticeVector<dim>;
 
-        using Lattice = gbLAB::Lattice<dim>;
-        using LatticeDirection = gbLAB::LatticeDirection<dim>;
-        using LatticeVector = gbLAB::LatticeVector<dim>;
+        using Lattice = oILAB::Lattice<dim>;
+        using LatticeDirection = oILAB::LatticeDirection<dim>;
+        using LatticeVector = oILAB::LatticeVector<dim>;
 
         using IntScalarType = long long int;
         using MatrixDimD = Eigen::Matrix<double, dim, dim>;
@@ -60,9 +60,9 @@ namespace pyoilab{
         using VectorDimD = Eigen::Matrix<double, dim, 1>;
         using VectorDimI = Eigen::Matrix<long long int, dim, 1>;
 
-        using Lattice = gbLAB::Lattice<dim>;
-        using LatticeDirection = gbLAB::LatticeDirection<dim>;
-        using LatticeVector = gbLAB::LatticeVector<dim>;
+        using Lattice = oILAB::Lattice<dim>;
+        using LatticeDirection = oILAB::LatticeDirection<dim>;
+        using LatticeVector = oILAB::LatticeVector<dim>;
 
         using PyLatticeDirection = PyLatticeDirection<dim>;
         using PyLatticeVector = PyLatticeVector<dim>;

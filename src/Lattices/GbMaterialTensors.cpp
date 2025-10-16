@@ -4,11 +4,12 @@
 #include "../../include/Lattices/GbMaterialTensors.h"
 #include <numbers>
 
-namespace gbLAB {
+namespace oILAB {
 
-    double GbMaterialTensors::tensorC(const int& k, const int& p, const int& l, const int& q)
-    {
-        return lambda*(k==p)*(l==q) + mu*(k==l)*(p==q) + mu*(k==q)*(p==l);
+double GbMaterialTensors::tensorC(const int &k, const int &p, const int &l,
+                                  const int &q) {
+  return lambda * (k == p) * (l == q) + mu * (k == l) * (p == q) +
+         mu * (k == q) * (p == l);
     }
 
     std::complex<double> GbMaterialTensors::tensorFhat(const int& k, const int& l, const int& i, const int& j, const Eigen::Vector3d& xi)
@@ -73,5 +74,4 @@ namespace gbLAB {
 
     double GbMaterialTensors::lambda;
     double GbMaterialTensors::mu;
-}
-
+    } // namespace oILAB

@@ -5,7 +5,7 @@
 //
 // Sigma 3 [110]; theta = 70.52878
 // GB normal: {1 - 1 2}
-using namespace gbLAB;
+using namespace oILAB;
 int main() {
   /*! [Types] */
   using VectorDimI = LatticeCore<3>::VectorDimI;

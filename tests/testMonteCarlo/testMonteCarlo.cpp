@@ -5,7 +5,7 @@
 #include <numbers>
 #include <omp.h>
 
-using namespace gbLAB;
+using namespace oILAB;
 
 void runMonteCarlo(const double &a0, const double &temperature,
                    const int &iterations, const std::string filename = "") {

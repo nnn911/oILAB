@@ -13,9 +13,7 @@
 #include "../../include/Math/GramMatrix.h"
 #include <iomanip>
 
-namespace gbLAB
-{
-
+namespace oILAB {
 
 //    /**********************************************************************/
 //    template <int dim>
@@ -686,5 +684,5 @@ namespace gbLAB
 
     template class Lattice<4>;
     template class Lattice<5>;
-}
+    } // namespace oILAB
 #endif

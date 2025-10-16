@@ -1,8 +1,7 @@
 #include "../../include/Math/IntegerMath.h"
 #include <random>
 
-
-using namespace gbLAB;
+using namespace oILAB;
 int main()
 {
     typedef long long int IntScalarType;

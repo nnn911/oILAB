@@ -4,7 +4,7 @@
 #include "old/MesoState.h"
 #include "old/MesoStateEnsemble.h"
 
-using namespace gbLAB;
+using namespace oILAB;
 
 int main() {
   /*! [Types] */

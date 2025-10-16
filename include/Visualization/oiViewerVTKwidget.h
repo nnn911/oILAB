@@ -22,11 +22,7 @@
 #include "../IO/TextFileParser.h"
 #include "BicrystalActor.h"
 
-namespace gbLAB
-{
-    
-
-    
+namespace oILAB {
 
 struct oiViewerVTKwidget : public QWidget
 //public QVTKOpenGLStereoWidget
@@ -71,8 +67,7 @@ public:
 
 };
 
-
-} // namespace model
+} // namespace oILAB
 
 #endif
 

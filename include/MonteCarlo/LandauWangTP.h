@@ -9,7 +9,7 @@
 #include <Eigen/Eigen>
 #include <fstream>
 
-namespace gbLAB {
+namespace oILAB {
 
 // LandauWangTP is an EvolutionAlgorithm with an evolving transition probability
 // include a switch which indicates whether the transition probability is allowed to evolve
@@ -61,7 +61,7 @@ namespace gbLAB {
 
 
     };
-}
+    } // namespace oILAB
 
 #include "LandauWangTPImplementation.h"
 #endif //OILAB_LANDAUWANGTP_H

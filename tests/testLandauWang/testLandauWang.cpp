@@ -4,7 +4,7 @@
 #include "../../include/MonteCarlo/MonteCarlo.h"
 #include <numbers>
 
-using namespace gbLAB;
+using namespace oILAB;
 
 // Hunter GB Details
 //

@@ -77,7 +77,7 @@ Step height of non-glide disconnection 2= 0.19755258845548662183
 
 */
 
-using namespace gbLAB;
+using namespace oILAB;
 int main() {
   const int dim = 3;
   /*! [lattice1] */

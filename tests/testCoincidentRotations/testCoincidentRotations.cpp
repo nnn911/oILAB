@@ -2,7 +2,7 @@
 #include "../../include/Lattices/LatticeModule.h"
 #include <numbers>
 
-using namespace gbLAB;
+using namespace oILAB;
 
 int main()
 {

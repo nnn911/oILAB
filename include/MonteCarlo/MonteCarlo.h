@@ -12,26 +12,27 @@
 #include <cmath>
 #include "EvolutionAlgorithm.h"
 
-namespace gbLAB {
-    template<typename StateType, typename SystemType, typename EnsembleType, typename EvolveType>
-    class MonteCarlo : public EvolutionAlgorithm<StateType, SystemType, EvolveType> {
-    public:
+namespace oILAB {
+template <typename StateType, typename SystemType, typename EnsembleType,
+          typename EvolveType>
+class MonteCarlo
+    : public EvolutionAlgorithm<StateType, SystemType, EvolveType> {
+public:
+  StateType currentState;
 
-        StateType currentState;
+  const EnsembleType &ensemble;
 
-        const EnsembleType& ensemble;
+  MonteCarlo(const EnsembleType &ensemble, const EvolveType &evolve);
 
-        MonteCarlo(const EnsembleType& ensemble, const EvolveType &evolve);
+  MonteCarlo(const EnsembleType &ensemble, const EvolveType &evolve,
+             const StateType &state);
 
-        MonteCarlo(const EnsembleType& ensemble, const EvolveType &evolve, const StateType& state);
-
-        void evolve(const int &maxIterations);
+  void evolve(const int &maxIterations);
     };
 
 
 /* ---------------------------------------------------*/
 
-
-}
+    } // namespace oILAB
 #include "MonteCarloImplementation.h"
 #endif //OILAB_DOS_H

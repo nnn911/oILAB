@@ -4,7 +4,7 @@
 #include <chrono>
 #include <numbers>
 
-using namespace gbLAB;
+using namespace oILAB;
 
 int main() {
   auto start = std::chrono::system_clock::now();

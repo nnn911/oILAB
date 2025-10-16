@@ -2,7 +2,7 @@
 #include "../../include/Lattices/LatticeModule.h"
 #include <random>
 
-using namespace gbLAB;
+using namespace oILAB;
 int main() {
   using IntScalarType = long long int;
 

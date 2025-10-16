@@ -1,7 +1,7 @@
 #include "../../include/IO/TextFileParser.h"
 #include "../../include/Lattices/LatticeModule.h"
 
-using namespace gbLAB;
+using namespace oILAB;
 int main() {
   /*! [Lattice] */
   const auto A(

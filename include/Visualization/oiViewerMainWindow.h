@@ -19,9 +19,8 @@
 
 #include "oiViewerVTKwidget.h"
 
-namespace gbLAB
-{
-    
+namespace oILAB {
+
 struct oiViewerMainWindow : public QMainWindow
 {
     // https://kitware.github.io/vtk-examples/site/Cxx/Qt/RenderWindowNoUiFile/
@@ -47,7 +46,7 @@ struct oiViewerMainWindow : public QMainWindow
 
 };
 
-} // namespace model
+} // namespace oILAB
 #endif
 
 

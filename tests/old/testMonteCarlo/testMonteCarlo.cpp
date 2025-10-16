@@ -5,7 +5,7 @@
 #include "old/MesoStateEnsemble.h"
 #include <randomInteger.h>
 
-using namespace gbLAB;
+using namespace oILAB;
 
 int main()
 {

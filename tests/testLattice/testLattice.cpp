@@ -2,7 +2,7 @@
 #include <fstream>
 #include <vector>
 
-using namespace gbLAB;
+using namespace oILAB;
 int main() {
   /*! [Lattice] */
   Eigen::Matrix3d A;

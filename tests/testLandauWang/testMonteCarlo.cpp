@@ -3,7 +3,7 @@
 #include "../../include/MonteCarlo/LandauWangTP.h"
 #include "../../include/MonteCarlo/MonteCarlo.h"
 
-using namespace gbLAB;
+using namespace oILAB;
 
 // Hunter GB Details
 //

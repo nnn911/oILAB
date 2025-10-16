@@ -11,10 +11,7 @@
 #include "../../include/Math/BestRationalApproximation.h"
 #include <Eigen/Dense>
 
-namespace gbLAB
-{
-
-
+namespace oILAB {
 
 template <int dim>
 typename LatticeCore<dim>::VectorDimI LatticeCore<dim>::rationalApproximation(VectorDimD nd)
@@ -73,5 +70,5 @@ typename LatticeCore<dim>::VectorDimI LatticeCore<dim>::integerCoordinates(const
     template struct LatticeCore<3>;
     template struct LatticeCore<4>;
     template struct LatticeCore<5>;
-} // end namespace
+    } // namespace oILAB
 #endif
