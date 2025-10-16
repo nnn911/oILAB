@@ -5,10 +5,10 @@
 #ifndef OILAB_DIFF_H
 #define OILAB_DIFF_H
 
-#include <Operator.h>
-#include <LatticeModule.h>
+#include "Operator.h"
+#include "../Lattices/LatticeModule.h"
 #include <unsupported/Eigen/CXX11/Tensor>
-#include <FFT.h>
+#include "FFT.h"
 
 
 namespace gbLAB {

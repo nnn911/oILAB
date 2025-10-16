@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <numeric>
-#include <GbMesoState.h>
+#include "../Lattices/GbMesoState.h"
 #include <iomanip>
 
 namespace gbLAB {

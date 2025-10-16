@@ -5,7 +5,7 @@
 #ifndef OILAB_GBCONTINUUMIMPLEMENTATION_H
 #define OILAB_GBCONTINUUMIMPLEMENTATION_H
 
-#include<Diff.h>
+#include "Diff.h"
 #include <numbers>
 
 namespace gbLAB {

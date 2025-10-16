@@ -10,7 +10,7 @@
 #include <iostream>
 #include <cfloat> // FLT_EPSILON
 #include <Eigen/Dense>
-#include <IntegerMath.h>
+#include "../Math/IntegerMath.h"
 
 
 namespace gbLAB

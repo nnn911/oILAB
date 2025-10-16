@@ -7,12 +7,12 @@
 #ifndef gbLAB_RationalMatrix_cpp_
 #define gbLAB_RationalMatrix_cpp_
 
-#include "RationalMatrix.h"
-#include <iostream>
-#include <iomanip>
-#include "IntegerMath.h"
-#include "BestRationalApproximation.h"
+#include "../../include/Math/RationalMatrix.h"
+#include "../../include/Math/BestRationalApproximation.h"
+#include "../../include/Math/IntegerMath.h"
 #include <cfloat> // FLT_EPSILON
+#include <iomanip>
+#include <iostream>
 
 namespace gbLAB
 {

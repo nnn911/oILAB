@@ -7,21 +7,21 @@
 #ifndef gbLAB_Lattice_h_
 #define gbLAB_Lattice_h_
 
-#include <IntegerLattice.h>
-#include <LatticeModule.h>
-#include <StaticID.h>
-#include <BestRationalApproximation.h>
-#include <vector>
-#include <range.h>
-#include <map>
-#include <unordered_map>
-#include "RLLL.h"
-#include <Rational.h>
-#include <Farey.h>
-#include <RationalApproximations.h>
+#include "../Math/BestRationalApproximation.h"
+#include "../Math/Farey.h"
+#include "../Math/RLLL.h"
+#include "../Math/Rational.h"
+#include "../Math/RationalApproximations.h"
+#include "../Utilities/StaticID.h"
+#include "../Utilities/range.h"
+#include "IntegerLattice.h"
+#include "LatticeCore.h"
+#include "LatticeModule.h"
 #include <algorithm>
 #include <fstream>
-
+#include <map>
+#include <unordered_map>
+#include <vector>
 
 namespace gbLAB
 {

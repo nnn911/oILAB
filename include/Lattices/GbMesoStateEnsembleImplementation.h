@@ -5,7 +5,7 @@
 #ifndef OILAB_GBMESOSTATEENSEMBLEIMPLEMENTATION_H
 #define OILAB_GBMESOSTATEENSEMBLEIMPLEMENTATION_H
 
-#include <randomInteger.h>
+#include "../Utilities/randomInteger.h"
 
 namespace gbLAB {
     template<int dim>

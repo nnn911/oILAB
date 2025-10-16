@@ -4,10 +4,10 @@
 #ifndef OILAB_MONTECARLOIMPLEMENTATION_H
 #define OILAB_MONTECARLOIMPLEMENTATION_H
 
-#include <OrderedTuplet.h>
-#include <GbMesoStateEnsemble.h>
-#include <LandauWangTP.h>
-#include <CanonicalTP.h>
+#include "../Lattices/OrderedTuplet.h"
+#include "../Lattices/GbMesoStateEnsemble.h"
+#include "LandauWangTP.h"
+#include "CanonicalTP.h"
 
 namespace gbLAB {
     template<typename StateType, typename SystemType, typename EnsembleType, typename EvolveType>

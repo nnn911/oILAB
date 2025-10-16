@@ -4,8 +4,8 @@
 
 #ifndef OILAB_ORDEREDTUPLET_H
 #define OILAB_ORDEREDTUPLET_H
-#include<Eigen/Eigen>
-#include<LatticeCore.h>
+#include <Eigen/Eigen>
+#include "LatticeCore.h"
 
 namespace gbLAB {
     template <int dim>

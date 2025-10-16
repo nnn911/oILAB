@@ -5,7 +5,7 @@
 #define OILAB_CANONICALTPIMPLEMENTATION_H
 
 #include <algorithm>
-#include <OrderedTuplet.h>
+#include "../Lattices/OrderedTuplet.h"
 
 namespace gbLAB {
 

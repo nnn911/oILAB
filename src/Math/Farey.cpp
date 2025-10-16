@@ -1,4 +1,4 @@
-#include "Farey.h"
+#include "../../include/Math/Farey.h"
 
 namespace gbLAB
 {

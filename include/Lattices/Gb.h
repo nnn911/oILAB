@@ -5,9 +5,9 @@
 #ifndef OILAB_GB_H
 #define OILAB_GB_H
 
+#include "../Utilities/Rotation.h"
 #include "BiCrystal.h"
 #include "ReciprocalLatticeDirection.h"
-#include "Rotation.h"
 
 namespace gbLAB
 {

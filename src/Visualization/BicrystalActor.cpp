@@ -35,8 +35,8 @@
 #include <vtkProperty2D.h>
 #include <vtkRenderer.h>
 
-#include <TerminalColors.h>
-#include <BicrystalActor.h>
+#include "../../include/IO/TerminalColors.h"
+#include "../../include/Visualization/BicrystalActor.h"
 
 namespace gbLAB
 {

@@ -6,7 +6,7 @@
 #define OILAB_BICRYSTAL_BINDINGS_H
 
 #include <pybind11/pybind11.h>
-#include <LatticeModule.h>
+#include "../Lattices/LatticeModule.h"
 #include <pybind11/stl.h>
 namespace py = pybind11;
 

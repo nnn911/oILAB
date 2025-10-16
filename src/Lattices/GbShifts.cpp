@@ -1,8 +1,8 @@
 //
 // Created by Nikhil Chandra Admal on 2/4/24.
 //
-#include <GbShifts.h>
-#include <randomInteger.h>
+#include "../../include/Lattices/GbShifts.h"
+#include "../../include/Utilities/randomInteger.h"
 
 namespace gbLAB
 {

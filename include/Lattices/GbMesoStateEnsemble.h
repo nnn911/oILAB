@@ -5,11 +5,11 @@
 #ifndef OILAB_GBMESOSTATES_H
 #define OILAB_GBMESOSTATES_H
 
-#include <GbShifts.h>
+#include "GbShifts.h"
 #include <deque>
-#include <GbMesoState.h>
-#include <GbContinuum.h>
-#include <Ensemble.h>
+#include "GbMesoState.h"
+#include "GbContinuum.h"
+#include "Ensemble.h"
 
 namespace gbLAB {
     /*! Class template that aids in the construction of an ensemble of GB mesostates.
@@ -83,5 +83,5 @@ namespace gbLAB {
 
 }
 
-#include <GbMesoStateEnsembleImplementation.h>
+#include "GbMesoStateEnsembleImplementation.h"
 #endif //OILAB_GBMESOSTATES_H

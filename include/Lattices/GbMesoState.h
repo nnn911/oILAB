@@ -5,11 +5,11 @@
 #ifndef OILAB_GBMESOSTATE_H
 #define OILAB_GBMESOSTATE_H
 
-#include <Gb.h>
-#include <GbContinuum.h>
-#include <LatticeCore.h>
-#include <OrderedTuplet.h>
-#include <PeriodicFunction.h>
+#include "Gb.h"
+#include "GbContinuum.h"
+#include "LatticeCore.h"
+#include "OrderedTuplet.h"
+#include "PeriodicFunction.h"
 
 namespace gbLAB {
 
@@ -117,5 +117,5 @@ namespace gbLAB {
     };
 }
 
-#include <GbMesoStateImplementation.h>
+#include "GbMesoStateImplementation.h"
 #endif //OILAB_GBMESOSTATE_H

@@ -7,7 +7,7 @@
 #ifndef gbLAB_RLLL_cpp_
 #define gbLAB_RLLL_cpp_
 
-#include "RLLL.h"
+#include "../../include/Math/RLLL.h"
 #include <vector>
 
 namespace gbLAB

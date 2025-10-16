@@ -1,6 +1,6 @@
-#include <LatticeModule.h>
-#include <TextFileParser.h>
-#include <BiCrystal.h>
+#include "../../include/Lattices/LatticeModule.h"
+#include "../../include/IO/TextFileParser.h"
+#include "../../include/Lattices/BiCrystal.h"
 #include "old/MesoState.h"
 #include "old/MesoStateEnsemble.h"
 #include <randomInteger.h>

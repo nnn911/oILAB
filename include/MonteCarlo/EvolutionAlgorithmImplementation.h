@@ -5,11 +5,11 @@
 #ifndef OILAB_EVOLUTIONALGORITHMIMPLEMENTATION_H
 #define OILAB_EVOLUTIONALGORITHMIMPLEMENTATION_H
 
-#include <randomInteger.h>
-#include <OrderedTuplet.h>
-#include <CanonicalTP.h>
-#include <LandauWangTP.h>
-#include <GbMesoState.h>
+#include "../Utilities/randomInteger.h"
+#include "../Lattices/OrderedTuplet.h"
+#include "CanonicalTP.h"
+#include "LandauWangTP.h"
+#include "../Lattices/GbMesoState.h"
 
 namespace gbLAB {
     template<typename StateType, typename SystemType, typename TransitionProbabilityType>

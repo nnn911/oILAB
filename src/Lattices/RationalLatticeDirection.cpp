@@ -7,8 +7,8 @@
 #ifndef gbLAB_RationalLatticeDirection_cpp_
 #define gbLAB_RationalLatticeDirection_cpp_
 
-#include <LatticeModule.h>
-#include <RationalLatticeDirection.h>
+#include "../../include/Lattices/RationalLatticeDirection.h"
+#include "../../include/Lattices/LatticeModule.h"
 
 namespace gbLAB
 {

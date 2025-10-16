@@ -7,7 +7,7 @@
 #ifndef gbLAB_ReciprocalLatticeDirection_cpp_
 #define gbLAB_ReciprocalLatticeDirection_cpp_
 
-#include <LatticeModule.h>
+#include "../../include/Lattices/LatticeModule.h"
 
 namespace gbLAB
 {

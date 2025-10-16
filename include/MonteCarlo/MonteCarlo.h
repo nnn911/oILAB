@@ -8,9 +8,9 @@
 #include <vector>
 #include <map>
 #include <Eigen/Eigen>
-#include <randomInteger.h>
+#include "../Utilities/randomInteger.h"
 #include <cmath>
-#include <EvolutionAlgorithm.h>
+#include "EvolutionAlgorithm.h"
 
 namespace gbLAB {
     template<typename StateType, typename SystemType, typename EnsembleType, typename EvolveType>
@@ -33,5 +33,5 @@ namespace gbLAB {
 
 
 }
-#include <MonteCarloImplementation.h>
+#include "MonteCarloImplementation.h"
 #endif //OILAB_DOS_H

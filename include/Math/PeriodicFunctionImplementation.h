@@ -4,7 +4,7 @@
 #ifndef OILAB_PERIODICFUNCTIONIMPLEMENTATION_H
 #define OILAB_PERIODICFUNCTIONIMPLEMENTATION_H
 //#include <PeriodicFunction.h>
-#include <FFT.h>
+#include "FFT.h"
 
 namespace gbLAB
 {

@@ -7,7 +7,7 @@
 #ifndef gbLAB_IntegerLattice_h_
 #define gbLAB_IntegerLattice_h_
 
-#include <DiophantineSolver.h>
+#include "../Math/DiophantineSolver.h"
 
 namespace gbLAB
 {

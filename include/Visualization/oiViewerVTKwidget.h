@@ -18,9 +18,9 @@
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkRenderer.h>
 
-#include <BiCrystal.h>
-#include <TextFileParser.h>
-#include <BicrystalActor.h>
+#include "../Lattices/BiCrystal.h"
+#include "../IO/TextFileParser.h"
+#include "BicrystalActor.h"
 
 namespace gbLAB
 {

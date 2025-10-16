@@ -7,7 +7,7 @@
 #ifndef gbLAB_LatticeVector_cpp_
 #define gbLAB_LatticeVector_cpp_
 
-#include<LatticeModule.h>
+#include "../../include/Lattices/LatticeModule.h"
 
 namespace gbLAB
 {

@@ -7,10 +7,10 @@
 #ifndef gbLAB_RationalReciprocalLatticeDirection_h_
 #define gbLAB_RationalReciprocalLatticeDirection_h_
 
-#include <LatticeVector.h>
-#include <ReciprocalLatticeVector.h>
-#include <Rational.h>
-#include <BestRationalApproximation.h>
+#include "LatticeVector.h"
+#include "ReciprocalLatticeVector.h"
+#include "../Math/Rational.h"
+#include "../Math/BestRationalApproximation.h"
 
 namespace gbLAB
 {

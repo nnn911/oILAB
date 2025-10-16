@@ -6,7 +6,7 @@
 #ifndef gbLAB_ReciprocalLatticeVectorBase_h_
 #define gbLAB_ReciprocalLatticeVectorBase_h_
 
-#include <LatticeModule.h>
+#include "LatticeModule.h"
 
 namespace gbLAB
 {

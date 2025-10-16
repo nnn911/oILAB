@@ -7,8 +7,8 @@
 #ifndef gbLAB_ReciprocalLatticeVector_cpp_
 #define gbLAB_ReciprocalLatticeVector_cpp_
 
+#include "../../include/Lattices/LatticeModule.h"
 #include <iostream>
-#include <LatticeModule.h>
 
 namespace gbLAB
 {

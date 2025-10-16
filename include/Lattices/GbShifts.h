@@ -5,7 +5,7 @@
 #ifndef OILAB_MESOSTATE_H
 #define OILAB_MESOSTATE_H
 
-#include <Gb.h>
+#include "Gb.h"
 
 namespace gbLAB {
 

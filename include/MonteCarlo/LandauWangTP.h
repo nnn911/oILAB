@@ -4,9 +4,9 @@
 
 #ifndef OILAB_LANDAUWANGTP_H
 #define OILAB_LANDAUWANGTP_H
-#include<EvolutionAlgorithm.h>
-#include<vector>
-#include<Eigen/Eigen>
+#include "EvolutionAlgorithm.h"
+#include <vector>
+#include <Eigen/Eigen>
 #include <fstream>
 
 namespace gbLAB {
@@ -63,5 +63,5 @@ namespace gbLAB {
     };
 }
 
-#include <LandauWangTPImplementation.h>
+#include "LandauWangTPImplementation.h"
 #endif //OILAB_LANDAUWANGTP_H

@@ -8,7 +8,7 @@
 #define gbLAB_Rational_h_
 
 #include <Eigen/Core>
-#include <IntegerMath.h>
+#include "IntegerMath.h"
 
 namespace gbLAB
 {

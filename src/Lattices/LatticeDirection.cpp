@@ -7,7 +7,7 @@
 #ifndef gbLAB_LatticeDirection_cpp_
 #define gbLAB_LatticeDirection_cpp_
 
-#include <LatticeModule.h>
+#include "../../include/Lattices/LatticeModule.h"
 namespace gbLAB
 {
     template <int dim>

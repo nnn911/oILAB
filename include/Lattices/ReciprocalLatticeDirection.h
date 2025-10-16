@@ -7,7 +7,7 @@
 #ifndef gbLAB_ReciprocalLatticeDirection_h_
 #define gbLAB_ReciprocalLatticeDirection_h_
 
-#include <LatticeModule.h>
+#include "LatticeModule.h"
 
 namespace gbLAB
 {
@@ -51,7 +51,9 @@ namespace gbLAB
 
     };
 
-    template<int dim>
-    basic_ostream<char>& operator<<(basic_ostream<char>& s, const ReciprocalLatticeDirection<dim>& m);
+    template <int dim>
+    std::basic_ostream<char> &
+    operator<<(std::basic_ostream<char> &s,
+               const ReciprocalLatticeDirection<dim> &m);
 } // end namespace
 #endif

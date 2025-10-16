@@ -5,13 +5,13 @@
 #ifndef OILAB_GBPLASTICITY_H
 #define OILAB_GBPLASTICITY_H
 
-#include <LatticeCore.h>
+#include "LatticeCore.h"
 #include "Eigen/Dense"
-#include <PeriodicFunction.h>
-#include <LatticeFunction.h>
-#include <Function.h>
-#include <GbMaterialTensors.h>
-#include <OrderedTuplet.h>
+#include "PeriodicFunction.h"
+#include "LatticeFunction.h"
+#include "../Math/Function.h"
+#include "GbMaterialTensors.h"
+#include "OrderedTuplet.h"
 
 namespace gbLAB {
 
@@ -134,5 +134,5 @@ namespace gbLAB {
 
 }
 
-#include <GbContinuumImplementation.h>
+#include "GbContinuumImplementation.h"
 #endif //OILAB_GBPLASTICITY_H

@@ -5,9 +5,9 @@
 #ifndef OILAB_RATIONALAPPROXIMATIONS_H
 #define OILAB_RATIONALAPPROXIMATIONS_H
 
-#include <IntegerMath.h>
-#include <Rational.h>
-#include <Farey.h>
+#include "IntegerMath.h"
+#include "Rational.h"
+#include "Farey.h"
 
 namespace gbLAB {
     template<typename IntScalarType>

@@ -11,8 +11,7 @@
 
 #include <QFileDialog>
 
-#include <oiViewerVTKwidget.h>
-
+#include "../../include/Visualization/oiViewerVTKwidget.h"
 
 namespace gbLAB
 {

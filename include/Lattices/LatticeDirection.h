@@ -7,7 +7,7 @@
 #ifndef gbLAB_LatticeDirection_h_
 #define gbLAB_LatticeDirection_h_
 
-#include <LatticeModule.h>
+#include "LatticeModule.h"
 
 namespace gbLAB
 {

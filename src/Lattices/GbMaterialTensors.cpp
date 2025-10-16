@@ -1,7 +1,7 @@
 //
 // Created by Nikhil Chandra Admal on 6/18/24.
 //
-#include <GbMaterialTensors.h>
+#include "../../include/Lattices/GbMaterialTensors.h"
 #include <numbers>
 
 namespace gbLAB {

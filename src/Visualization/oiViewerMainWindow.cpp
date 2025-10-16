@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-#include <oiViewerMainWindow.h>
+#include "../../include/Visualization/oiViewerMainWindow.h"
 #include <QMenu>
 #include <QMenuBar>
 

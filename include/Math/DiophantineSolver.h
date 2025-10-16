@@ -10,10 +10,10 @@
 #define gbLAB_DiophantineSolver_h_
 
 #include <Eigen/Dense>
-#include <IntegerMath.h>
+#include "IntegerMath.h"
 #include <climits>
 #include <cmath>
-#include <sortIndices.h>
+#include "../Utilities/sortIndices.h"
 namespace gbLAB
 {
     template<typename IntScalarType>

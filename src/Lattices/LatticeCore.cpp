@@ -7,8 +7,8 @@
 #ifndef gbLAB_LatticeCore_cpp_
 #define gbLAB_LatticeCore_cpp_
 
-#include <LatticeCore.h>
-#include <BestRationalApproximation.h>
+#include "../../include/Lattices/LatticeCore.h"
+#include "../../include/Math/BestRationalApproximation.h"
 #include <Eigen/Dense>
 
 namespace gbLAB

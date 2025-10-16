@@ -5,7 +5,7 @@
 #ifndef OILAB_OPERATOR_H
 #define OILAB_OPERATOR_H
 
-#include <LatticeModule.h>
+#include "../Lattices/LatticeModule.h"
 #include <unsupported/Eigen/CXX11/Tensor>
 
 namespace gbLAB {

@@ -4,7 +4,7 @@
 #ifndef OILAB_GB_CPP
 #define OILAB_GB_CPP
 
-#include "Gb.h"
+#include "../../include/Lattices/Gb.h"
 
 namespace gbLAB
 {

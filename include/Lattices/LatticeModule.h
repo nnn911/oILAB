@@ -40,17 +40,17 @@ namespace gbLAB
 
 }
 
-#include <LatticeCore.h>
-#include <Lattice.h>
-#include <LatticeVector.h>
-#include <ReciprocalLatticeVector.h>
-#include <LatticeDirection.h>
-#include <ReciprocalLatticeDirection.h>
-#include <RationalLatticeDirection.h>
-#include <RationalReciprocalLatticeDirection.h>
-#include "RationalMatrix.h"
-#include <SmithDecomposition.h>
-#include <BiCrystal.h>
-#include <Gb.h>
+#include "LatticeCore.h"
+#include "../Math/RationalMatrix.h"
+#include "BiCrystal.h"
+#include "Gb.h"
+#include "Lattice.h"
+#include "LatticeDirection.h"
+#include "LatticeVector.h"
+#include "RationalLatticeDirection.h"
+#include "RationalReciprocalLatticeDirection.h"
+#include "ReciprocalLatticeDirection.h"
+#include "ReciprocalLatticeVector.h"
+#include "../Math/SmithDecomposition.h"
 
 #endif

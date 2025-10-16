@@ -37,7 +37,7 @@
 #include <vtkLabeledDataMapper.h>
 #include <vtkFloatArray.h>
 
-#include <BiCrystal.h>
+#include "../Lattices/BiCrystal.h"
 
 
 namespace gbLAB

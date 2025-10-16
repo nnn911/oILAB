@@ -7,8 +7,8 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
-#include <LatticeModule.h>
-#include <PyLatticeModule.h>
+#include "../Lattices/LatticeModule.h"
+#include "PyLatticeModule.h"
 #include <pybind11/numpy.h>
 #include <pybind11/eigen.h>
 

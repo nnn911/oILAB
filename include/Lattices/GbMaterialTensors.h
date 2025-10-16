@@ -2,7 +2,7 @@
 // Created by Nikhil Chandra Admal on 6/17/24.
 //
 #include <unsupported/Eigen/CXX11/Tensor>
-#include <LatticeFunction.h>
+#include "LatticeFunction.h"
 #include <list>
 
 #ifndef OILAB_MATERIALTENSORS_H

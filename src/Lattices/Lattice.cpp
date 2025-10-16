@@ -9,8 +9,8 @@
 
 #include <Eigen/Eigenvalues>
 
-#include <LatticeModule.h>
-#include <GramMatrix.h>
+#include "../../include/Lattices/LatticeModule.h"
+#include "../../include/Math/GramMatrix.h"
 #include <iomanip>
 
 namespace gbLAB

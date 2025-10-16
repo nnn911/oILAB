@@ -4,7 +4,7 @@
 
 #ifndef OILAB_CANONICALTP_H
 #define OILAB_CANONICALTP_H
-#include <EvolutionAlgorithm.h>
+#include "EvolutionAlgorithm.h"
 #include <utility>
 #include <map>
 #include <fstream>
@@ -34,5 +34,5 @@ namespace gbLAB {
 
 }
 
-#include <CanonicalTPImplementation.h>
+#include "CanonicalTPImplementation.h"
 #endif //OILAB_CANONICALTP_H
