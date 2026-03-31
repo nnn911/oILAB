@@ -119,8 +119,8 @@ int main() {
         gb.bc.csl.latticeDirection(gb.nA.cartesian()).latticeVector());
     cslVectors.push_back(periodScaling * gb.getPeriodVector(rAxisA));
     cslVectors.push_back(axisScaling * axisC);
-    gb.box(cslVectors, 1, 1, "gb.txt", true);
-    bc.box(cslVectors, 1, 1, "bcOriented.txt", true);
+    gb.box(cslVectors, 1, "gb.txt", true);
+    bc.box(cslVectors, 1, "bcOriented.txt", true);
 
     // material parameter
     // source:

@@ -74,8 +74,10 @@ int main() {
     cslVectors.push_back(5 * basis[0].latticeVector());
     cslVectors.push_back(4 * gbCslVectors[0]);
     cslVectors.push_back(4 * gbCslVectors[1]);
-    auto points = gb.bc.box(cslVectors, 0.5, 1);
-    gb.box(cslVectors, 1, 1, "ex.txt");
+    gb.bc.updateBoxVectors(cslVectors,0.5);
+    auto points = gb.bc.box(cslVectors, 1);
+    gb.bc.updateBoxVectors(cslVectors,1.0);
+    gb.box(cslVectors, 1, "ex.txt");
 
     std::ofstream config;
 

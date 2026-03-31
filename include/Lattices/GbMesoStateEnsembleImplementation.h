@@ -42,7 +42,8 @@ GbMesoStateEnsemble<dim>::GbMesoStateEnsemble(
     GbMesoStateEnsemble<dim>::getBicrystalConfig(const GbShifts<dim>& gbs,
                                                  std::vector<LatticeVector<dim>>& ensembleCslVectors)
     {
-        auto allLatticeVectors= gbs.gb.bc.box(ensembleCslVectors,1,1,"bc.txt");
+        //auto allLatticeVectors= gbs.gb.bc.box(ensembleCslVectors,1,1,"bc.txt");
+        auto allLatticeVectors= gbs.gb.bc.box(ensembleCslVectors,1,"bc.txt");
         std::vector<LatticeVector<dim>> output;
 
         // include only lattice vectors in A and B
