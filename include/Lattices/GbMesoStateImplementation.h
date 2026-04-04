@@ -7,34 +7,28 @@
 
 #include "../IO/Lammps.h"
 #include <iostream>
-//#include <Python.h>
-#include "../Math/PeriodicFunctionImplementation.h"
+#include <set>
+#include "GbMesoState.h"
+#include "OrderedTuplet.h"
 
 namespace oILAB {
 template <int dim>
 GbMesoState<dim>::GbMesoState(
-    const Gb<dim> &gb, const ReciprocalLatticeVector<dim> &axis,
-    const std::deque<std::tuple<LatticeVector<dim>, VectorDimD, int>> &bs,
-    const std::vector<LatticeVector<dim>> &mesoStateCslVectors,
-    const BicrystalLatticeVectors &bicrystalConfig) try
-    : GbContinuum
-  <dim>(getMesoStateGbDomain(mesoStateCslVectors),
-        get_xuPairs(gb, mesoStateCslVectors, bs),
-        discretize(mesoStateCslVectors, gb),
-        bicrystalCoordsMap(gb, bicrystalConfig)),
-      gb(gb), axis(axis), mesoStateCslVectors(mesoStateCslVectors),
-      bicrystalConfig(bicrystalConfig), bs(bs) {
-    // check
-    /*
-    auto xuPairs= get_xuPairs(bs);
-    for(const auto& pair : xuPairs)
-        std::cout << (pair.second-this->displacement(pair.first)).norm() <<
-    std::endl;
-        */
-  }
+    const Gb<dim> &gb,
+    const ReciprocalLatticeVector<dim> &axis,
+    const std::deque<std::pair<LatticeVector<dim>, VectorDimD>>& engagedTsPairs,
+    const std::vector<LatticeVector<dim>> &mesoStateCslVectors) try:
+    /*init*/ GbContinuum<dim>(getMesoStateGbDomain(mesoStateCslVectors),
+                              getFacetedSurfaces(gb,mesoStateCslVectors,engagedTsPairs),
+                              gb.nA.cartesian(),
+                              true),
+    /*init*/ gb(gb),
+    /*init*/ axis(axis),
+    /*init*/ mesoStateCslVectors(mesoStateCslVectors),
+    /*init*/ engagedTsPairs(engagedTsPairs) {}
     catch(std::runtime_error& e)
     {
-        //throw(std::runtime_error("GB Mesostate construction failed"));
+        throw;
     }
 
 
@@ -48,129 +42,61 @@ GbMesoState<dim>::GbMesoState(
     }
 
     template<int dim>
-    std::map<OrderedTuplet<dim+1>, typename GbMesoState<dim>::VectorDimD>
-          GbMesoState<dim>::get_xuPairs(const Gb<dim>& gb,
-                                        const std::vector<LatticeVector<dim>>& mesoStateCslVectors,
-                                        const std::deque<std::tuple<LatticeVector<dim>,VectorDimD,int>>& bs)
+    std::pair<typename GbMesoState<dim>::XuPairs, typename GbMesoState<dim>::XuPairs>
+    GbMesoState<dim>::getFacetedSurfaces(const Gb<dim>& gb,
+                                 const std::vector<LatticeVector<dim>>& mesoStateCslVectors,
+                                 const std::deque<std::pair<LatticeVector<dim>,VectorDimD>>& engagedTsPairs)
     {
-        auto normal= gb.nA.cartesian().normalized();
-        std::map<OrderedTuplet<dim+1>,VectorDimD> xuPairs;
+        XuPairs xuPairsA, xuPairsB;
+
         std::vector<LatticeVector<dim>> bicrystalBoxVectors(mesoStateCslVectors);
         bicrystalBoxVectors[0]= 2*mesoStateCslVectors[0];
         VectorDimD shift;
         shift << -0.5-FLT_EPSILON,-FLT_EPSILON,-FLT_EPSILON;
 
-
-        for(const auto& [b,s,include] : bs)
+        std::set<OrderedTuplet<dim>> xAIntegerCoordsSet, xBIntegerCoordsSet;
+        for(const auto& [t,s] : engagedTsPairs)
         {
-            OrderedTuplet<dim+1> keyx;
-            VectorDimD valueu;
-            // value = b/2
-            valueu= b.cartesian()/2;
-            VectorDimD tempx= s-valueu;
+            VectorDimD u= t.cartesian()/2;
+            VectorDimD xA= s-u;
+            VectorDimD xB= s+u;
 
-
-            /*
-            if(tempx.dot(normal)<FLT_EPSILON) // tempx is in lattice A
-            {
-                // modulo tempx w.r.t the bicrystal box
-                LatticeVector<dim>::modulo(tempx,bicrystalBoxVectors,shift);
-                try {
-                    keyx << gb.bc.getLatticeVectorInD(gb.bc.A.latticeVector(tempx)),1;
-                }
-                catch(std::runtime_error& e)
-                {
-                    std::cout << e.what() << std::endl;
-                    std::cout << "x key = " << keyx.transpose() << ";   " << tempx.transpose() << std::endl;
-                    std::cout << "b = " << b.cartesian().transpose()  << " ; s= " << s.transpose() << std::endl;
-                    exit(0);
-                }
-
-            }
-            else    // tempx is in lattice B
-            {
-                tempx= tempx + 2*valueu.dot(normal) * normal;
-                // modulo tempx w.r.t the bicrystal box
-                LatticeVector<dim>::modulo(tempx,bicrystalBoxVectors,shift);
-
-                try {
-                    keyx << gb.bc.getLatticeVectorInD(gb.bc.B.latticeVector(tempx)),2;
-                }
-                catch(std::runtime_error& e)
-                {
-                    std::cout << e.what() << std::endl;
-                    std::cout << "x key = " << keyx.transpose() << ";   " << tempx.transpose() << std::endl;
-                    std::cout << "b = " << b.cartesian().transpose()  << " ; s= " << s.transpose() << std::endl;
-                    exit(0);
-                }
-
-            }
-             */
             // modulo tempx w.r.t the bicrystal box
-            LatticeVector<dim>::modulo(tempx,bicrystalBoxVectors,shift);
+            LatticeVector<dim>::modulo(xA,bicrystalBoxVectors,shift);
+            LatticeVector<dim>::modulo(xB,bicrystalBoxVectors,shift);
+
+            OrderedTuplet<dim> xAIntegerCoords, xBIntegerCoords;
             try {
-                if (tempx.dot(normal) < FLT_EPSILON) // tempx is in lattice A
-                    keyx << gb.bc.getLatticeVectorInD(gb.bc.A.latticeVector(tempx)), 1;
-                else    // tempx is in lattice B region
-                    keyx << gb.bc.getLatticeVectorInD(gb.bc.A.latticeVector(tempx)), -1;
+                xAIntegerCoords<< gb.bc.A.latticeVector(xA);
             }
             catch(std::runtime_error& e) {
                 std::cout << e.what() << std::endl;
-                std::cout << "x key = " << keyx.transpose() << ";   " << tempx.transpose() << std::endl;
-                std::cout << "b = " << b.cartesian().transpose()  << " ; s= " << s.transpose() << std::endl;
+                std::cout << "xA not a lattice vector of A" << std::endl;
                 exit(0);
             }
-            xuPairs[keyx]=valueu;
-        }
-        if(xuPairs.size() != bs.size())
-            throw(std::runtime_error("Clash in constraints."));
-        return xuPairs;
-    }
-
-    template<int dim>
-    std::array<Eigen::Index,dim-1> GbMesoState<dim>::discretize(const std::vector<LatticeVector<dim>>& mesoStateCslVectors, const Gb<dim>& gb)
-    {
-        std::array<Eigen::Index,dim-1> n{};
-        for(int i=1; i<dim; ++i)
-            n[i-1]= 10*ceil(mesoStateCslVectors[i].cartesian().norm()/gb.bc.A.latticeBasis.col(0).norm());
-            //n[i-1]= 4*IntegerMath<int>::gcd(gb.bc.getLatticeVectorInD(mesoStateCslVectors[i]));
-        return n;
-
-    }
-
-
-    template<int dim>
-    std::map<OrderedTuplet<dim+1>,typename GbMesoState<dim>::VectorDimD> GbMesoState<dim>::bicrystalCoordsMap(const Gb<dim>& gb, const BicrystalLatticeVectors& bicrystalConfig)
-    {
-        std::map<OrderedTuplet<dim+1>,VectorDimD> idCoordsMap;
-
-        for(const auto& latticeVector : bicrystalConfig) {
-            auto latticeVectorInD= gb.bc.getLatticeVectorInD(latticeVector);
-            OrderedTuplet<dim+1> key;
-            if (&latticeVector.lattice == &gb.bc.A) {
-                if (latticeVector.dot(gb.nA) <= 0)
-                    key << latticeVectorInD, 1;
-                else
-                    key << latticeVectorInD, -1;
+            try {
+                xBIntegerCoords << gb.bc.B.latticeVector(xB);
             }
-            else if (&latticeVector.lattice == &gb.bc.B) {
-                if (latticeVector.dot(gb.nB) <= 0)
-                    key << latticeVectorInD, 2;
-                else
-                    key << latticeVectorInD, -2;
+            catch(std::runtime_error& e) {
+                std::cout << e.what() << std::endl;
+                std::cout << "xB not a lattice vector of B" << std::endl;
+                exit(0);
             }
-            idCoordsMap[key]= latticeVectorInD.cartesian();
-        }
-        return idCoordsMap;
+            const bool insertedA= xAIntegerCoordsSet.insert(xAIntegerCoords).second;
+            const bool insertedB= xBIntegerCoordsSet.insert(xBIntegerCoords).second;
+            if(!insertedA || !insertedB)
+                throw std::runtime_error("Clash in constraints.");
 
+            xuPairsA.emplace_back(xA,u);
+            xuPairsB.emplace_back(xB,-u);
+        }
+        return std::make_pair(xuPairsA,xuPairsB);
     }
 
     /*-------------------------------------*/
     template<int dim>
-    std::tuple<double,double,PeriodicFunction<double,dim>> GbMesoState<dim>::densityEnergy(const std::string& lmpLocation,
-                                                             const std::string& potentialName,
-                                                             bool relax,
-                                                             const std::array<Eigen::Index,dim>& n) const
+    std::tuple<double,double> GbMesoState<dim>::densityEnergy(const std::string& lmpLocation,
+                                                             const std::string& potentialName) const
     {
         box("temp" + std::to_string(omp_get_thread_num()));
         std::pair<double,double> densityEnergyPair= energy(lmpLocation,
@@ -178,202 +104,72 @@ GbMesoState<dim>::GbMesoState(
                                                            potentialName);
 
 
-        // the columns of rhoCell defined the box in which rho is calculated
-        Eigen::Matrix3d rhoCell;
-        PeriodicFunction<double,dim> rho(n,rhoCell);
-        for (int i=0; i<n[0]; ++i)
-        {
-            for (int j=0; j<n[1]; ++j) {
-                for (int k = 0; k < n[2]; ++k)
-                {
-                    Eigen::Vector<double,Eigen::Dynamic> x= i*rho.unitCell.col(0)/n[0] +
-                                                            j*rho.unitCell.col(1)/n[1] +
-                                                            k*rho.unitCell.col(2)/n[2];
-                    // rho(i,j,k) is the density at point x
-                    // calculate rho by first reading the relaxed configuration
-
-                }
-            }
-
-        }
-
-        return {densityEnergyPair.first,densityEnergyPair.second,rho};
+        return {densityEnergyPair.first,densityEnergyPair.second};
 
     }
 
 
-    /*-------------------------------------*/
-    /*
- template<int dim>
- std::pair<double,double> GbMesoState<dim>::densityEnergyPython() const
- {
-     // form box
-     // run a python script to calculate energy
+    template<int dim>
+    typename std::enable_if<dim==3,void>::type
+    GbMesoState<dim>::box(const std::string& name) const
+    {
+        const auto& config= gb.bc.box(mesoStateCslVectors,0);
+        std::vector<LatticeVector<3>> boxVectors;
+        boxVectors.push_back(this->mesoStateCslVectors[0]);
+        boxVectors.push_back(this->mesoStateCslVectors[1]);
+        boxVectors.push_back(this->mesoStateCslVectors[2]);
 
-     setenv("PYTHONPATH", ".", 1);
-     if(!Py_IsInitialized()) {
-         std::cout << "Initializing Python Interpreter" << std::endl;
-         Py_Initialize();
-     }
+        std::vector<VectorDimD> referenceConfigA, deformedConfigA;
+        std::vector<VectorDimD> referenceConfigB, deformedConfigB;
 
-     box("temp");
-     PyObject* pyModuleString = PyUnicode_FromString((char*)"lammps");
-     PyObject* pyModule = PyImport_Import(pyModuleString);
-     if (pyModule == nullptr)
-     {
-         PyErr_Print();
-         std::cout << "cannot import python script" << std::endl;
-         std::exit(0);
-     }
-     PyObject* pDict = PyModule_GetDict(pyModule);
-     PyObject* pyFunction= PyDict_GetItemString(pDict, (char*)"energy");
-     //PyObject* pyEnergy= PyObject_CallObject(pyFunction,NULL);
-     PyObject* pyValue= PyObject_CallObject(pyFunction,NULL);
-     double energy, density;
+        for (const auto &latticeVector: config) {
+            VectorDimD x;
+            if (&(latticeVector.lattice) == &(gb.bc.A) && this->inGrainA(latticeVector.cartesian())) {
+                x= latticeVector.cartesian() + this->displacement(latticeVector.cartesian(),1);
+                referenceConfigA.push_back(latticeVector.cartesian());
+                deformedConfigA.push_back(x);
+            }
+            else if (&(latticeVector.lattice) == &(gb.bc.B) && this->inGrainB(latticeVector.cartesian())) {
+                x= latticeVector.cartesian() + this->displacement(latticeVector.cartesian(),2);
+                referenceConfigB.push_back(latticeVector.cartesian());
+                deformedConfigB.push_back(x);
+            }
+        }
 
-     PyArg_ParseTuple(pyValue, "dd", &energy, &density);
-     //double energy= PyFloat_AsDouble(pyEnergy);
+        int nAtoms= referenceConfigA.size()+referenceConfigB.size();
 
-     Py_DECREF(pyModule);
-     Py_DECREF(pyModuleString);
+        std::string referenceFile= name + "_reference0.txt";
+        std::string deformedFile= name + "_reference1.txt";
 
-     return std::make_pair(density,energy);
- }
- */
+        std::ofstream reference, deformed;
+        reference.open(referenceFile);
+        deformed.open(deformedFile);
+        if (!reference || !deformed) std::cerr << "Unable to open files";
+        reference << nAtoms << std::endl; deformed << nAtoms << std::endl;
+        reference << "Lattice=\" "; deformed << "Lattice=\" ";
 
- template<int dim>
- //template<int dm=dim>
- typename std::enable_if<dim==3,void>::type
- GbMesoState<dim>::box(const std::string& name) const
- {
-     const auto& config= this->bicrystalConfig;
-     std::vector<LatticeVector<3>> boxVectors;
-     boxVectors.push_back(this->mesoStateCslVectors[0]);
-     boxVectors.push_back(this->mesoStateCslVectors[1]);
-     boxVectors.push_back(this->mesoStateCslVectors[2]);
+        reference << std::setprecision(15) << (2*boxVectors[0].cartesian()).transpose() << " ";
+        deformed << std::setprecision(15) << (2*boxVectors[0].cartesian()).transpose() << " ";
+        reference << std::setprecision(15) << (boxVectors[1].cartesian()).transpose() << " ";
+        deformed << std::setprecision(15) << (boxVectors[1].cartesian()).transpose() << " ";
+        reference << std::setprecision(15) << (boxVectors[2].cartesian()).transpose();
+        deformed << std::setprecision(15) << (boxVectors[2].cartesian()).transpose();
+        reference << "\" Properties=atom_types:I:1:pos:R:3:radius:R:1 PBC=\"F T T\" origin=\" "; deformed << "\" Properties=atom_types:I:1:pos:R:3:radius:R:1 PBC=\" F T T\" origin=\" ";
+        reference << std::setprecision(15) << (-1 * boxVectors[0].cartesian()).transpose() << "\"" << std::endl;
+        deformed << std::setprecision(15) << (-1 * boxVectors[0].cartesian()).transpose() << "\"" << std::endl;
 
-     std::vector<VectorDimD> referenceConfigA, deformedConfigA;
-     std::vector<VectorDimD> referenceConfigB, deformedConfigB;
-     std::vector<VectorDimD> configDscl;
+        for(const auto& position : referenceConfigA)
+            reference << 1 << " " << std::setprecision(15) << position.transpose() << "  " << 0.05 << std::endl;
+        for(const auto& position : referenceConfigB)
+            reference << 2 << " " << std::setprecision(15) << position.transpose() << "  " << 0.05 << std::endl;
+        for(const auto& position : deformedConfigA)
+            deformed << 1 << " " << std::setprecision(15) << position.transpose() << "  " << 0.05 << std::endl;
+        for(const auto& position : deformedConfigB)
+            deformed << 2 << " " << std::setprecision(15) << position.transpose() << "  " << 0.05 << std::endl;
 
-     double bmax= 0.0;
-     for(const auto& [b,s,include] : bs)
-         bmax= max(bmax,b.cartesian().norm());
-
-     int numberOfIgnoredPoints= 0;
-     for (const auto &latticeVector: config) {
-         VectorDimD x;
-         OrderedTuplet<dim+1> temp;
-         if (&(latticeVector.lattice) == &(this->gb.bc.A)) {
-             double height= latticeVector.cartesian().dot(gb.nA.cartesian().normalized());
-             if (height<FLT_EPSILON)
-                 temp <<  gb.bc.getLatticeVectorInD(latticeVector),1;
-             else
-                 temp <<  gb.bc.getLatticeVectorInD(latticeVector),-1;
-         }
-         else if (&(latticeVector.lattice) == &(this->gb.bc.B)) {
-             double height = latticeVector.cartesian().dot(gb.nB.cartesian().normalized());
-             if (height<FLT_EPSILON)
-                 temp <<  gb.bc.getLatticeVectorInD(latticeVector),2;
-             else
-                 temp <<  gb.bc.getLatticeVectorInD(latticeVector),-2;
-         }
-
-         //x = latticeVector.cartesian() + this->displacement(latticeVector.cartesian());
-
-         if (&(latticeVector.lattice) == &(this->gb.bc.A)) {
-             x = latticeVector.cartesian() + this->displacement(temp) + this->uAverage;
-         }
-         else if (&(latticeVector.lattice) == &(this->gb.bc.B) )
-             x = latticeVector.cartesian() + this->displacement(temp) - this->uAverage;
-         else
-             x = latticeVector.cartesian() + this->displacement(temp);
-
-         // ignore x if it occupies a deleted CSL position
-         bool ignore= false;
-         VectorDimD cslShift;
-         cslShift << -0.5, -FLT_EPSILON, -FLT_EPSILON;
-         VectorDimD xModulo= x;
-         std::vector<LatticeVector<3>> localBoxVectors(boxVectors);
-         localBoxVectors[0]=5*boxVectors[0];
-         LatticeVector<dim>::modulo(xModulo, localBoxVectors, cslShift);
-         for(const auto& [b,s, include] : bs) {
-             if (include == 2 && (s - xModulo).norm() < 1e-6) {
-                 ignore = true;
-                 numberOfIgnoredPoints++;
-                 break;
-             }
-         }
-         if (ignore==true) {
-             continue;
-         }
-
-
-         if (&(latticeVector.lattice) == &(this->gb.bc.A) && x.dot(this->gb.nA.cartesian().normalized()) <= 1e-6)
-         //if (&(latticeVector.lattice) == &(this->gb.bc.A) && x.dot(this->gb.nA.cartesian().normalized()) <= FLT_EPSILON)
-         //if (&(latticeVector.lattice) == &(this->gb.bc.A))
-         {
-             referenceConfigA.push_back(latticeVector.cartesian());
-             deformedConfigA.push_back(x);
-         }
-         else if (&(latticeVector.lattice) == &(this->gb.bc.B) && x.dot(this->gb.nB.cartesian().normalized()) <= 1e-6)
-         //else if (&(latticeVector.lattice) == &(this->gb.bc.B) && x.dot(this->gb.nB.cartesian().normalized()) <= FLT_EPSILON)
-         //else if (&(latticeVector.lattice) == &(this->gb.bc.B))
-         {
-             referenceConfigB.push_back(latticeVector.cartesian());
-             deformedConfigB.push_back(x);
-         }
-
-     }
-
-
-     int numberOfIgnoredCSLPoints= 0;
-     for(const auto& [b,s, include] : bs)
-     {
-         if (include==2) numberOfIgnoredCSLPoints++;
-     }
-     if(numberOfIgnoredPoints != 2*numberOfIgnoredCSLPoints)
-         throw(std::runtime_error("GB Mesostate construction failed: incorrect number of points"));
-
-
-     int nAtoms= referenceConfigA.size()+referenceConfigB.size()+configDscl.size();
-
-     std::string referenceFile= name + "_reference0.txt";
-     std::string deformedFile= name + "_reference1.txt";
-
-     std::ofstream reference, deformed;
-     reference.open(referenceFile);
-     deformed.open(deformedFile);
-     if (!reference || !deformed) std::cerr << "Unable to open files";
-     reference << nAtoms << std::endl; deformed << nAtoms << std::endl;
-     reference << "Lattice=\" "; deformed << "Lattice=\" ";
-
-     reference << std::setprecision(15) << (2*boxVectors[0].cartesian()).transpose() << " ";
-     deformed << std::setprecision(15) << (2*boxVectors[0].cartesian()).transpose() << " ";
-     reference << std::setprecision(15) << (boxVectors[1].cartesian()).transpose() << " ";
-     deformed << std::setprecision(15) << (boxVectors[1].cartesian()).transpose() << " ";
-     reference << std::setprecision(15) << (boxVectors[2].cartesian()).transpose();
-     deformed << std::setprecision(15) << (boxVectors[2].cartesian()).transpose();
-     reference << "\" Properties=atom_types:I:1:pos:R:3:radius:R:1 PBC=\"F T T\" origin=\" "; deformed << "\" Properties=atom_types:I:1:pos:R:3:radius:R:1 PBC=\" F T T\" origin=\" ";
-     reference << std::setprecision(15) << (-1 * boxVectors[0].cartesian()).transpose() << "\"" << std::endl;
-     deformed << std::setprecision(15) << (-1 * boxVectors[0].cartesian()).transpose() << "\"" << std::endl;
-
-     for(const auto& position : referenceConfigA)
-         reference << 1 << " " << std::setprecision(15) << position.transpose() << "  " << 0.05 << std::endl;
-     for(const auto& position : referenceConfigB)
-         reference << 2 << " " << std::setprecision(15) << position.transpose() << "  " << 0.05 << std::endl;
-     for(const auto& position : deformedConfigA)
-         deformed << 1 << " " << std::setprecision(15) << position.transpose() << "  " << 0.05 << std::endl;
-     for(const auto& position : deformedConfigB)
-         deformed << 2 << " " << std::setprecision(15) << position.transpose() << "  " << 0.05 << std::endl;
-     for(const auto& position : configDscl) {
-         reference << 4 << " " << std::setprecision(15) << position.transpose() << "  " << 0.01 << std::endl;
-         deformed << 4 << " " << std::setprecision(15) << position.transpose() << "  " << 0.01 << std::endl;
-     }
-
-     reference.close();
-     deformed.close();
- }
+        reference.close();
+        deformed.close();
+    }
 
  } // namespace oILAB
 

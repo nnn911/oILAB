@@ -7,6 +7,7 @@
 
 #include<Eigen/Eigen>
 #include<numbers>
+#include<cfloat>
 
 template<int dim>
 class Rotation : public Eigen::Matrix<double,dim,dim>

@@ -12,8 +12,7 @@ add_library(oILAB SHARED    Lattices/BiCrystal.cpp
                             Lattices/RationalReciprocalLatticeDirection.cpp
                             Lattices/ReciprocalLatticeVector.cpp
                             Math/Farey.cpp
-                            Lattices/GbShifts.cpp
-                            Lattices/GbMaterialTensors.cpp)
+                            Lattices/GbShifts.cpp)
 
 
 # Conditionally apply the export property for MSVC on Windows

@@ -19,16 +19,18 @@ protected:
   static std::vector<std::pair<LatticeVector<dim>, VectorDimD>>
   getbShiftPairs(const Gb<dim> &gb,
                  const std::vector<LatticeVector<dim>> &gbCslVectors,
-                 const double &bhalfMax);
+                 const double& tMax,
+                 const double& sPerpMax);
 
 public:
   const Gb<dim> &gb;
   const ReciprocalLatticeVector<dim> &axis;
   const std::vector<LatticeVector<dim>> gbCslVectors;
-  std::vector<std::pair<LatticeVector<dim>, VectorDimD>> bShiftPairs;
+  std::vector<std::pair<LatticeVector<dim>, VectorDimD>> tShiftPairs;
   explicit GbShifts(const Gb<dim> &gb, const ReciprocalLatticeVector<dim> &axis,
                     const std::vector<LatticeVector<dim>> &gbCslVectors,
-                    const double &bhalfMax = 1);
+                    const double& tMax= 1,
+                    const double& sPerpMax= 1);
 
     };
     } // namespace oILAB
