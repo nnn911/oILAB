@@ -578,8 +578,8 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
                         std::string filename,
                         bool orient) const
     {
-        assert(dsclFactor>=1 &&
-               "The \"dsclFactor\" should be greater than 1.");
+        assert(dsclFactor>=0 &&
+               "The \"dsclFactor\" should be non-negative integer.");
         assert(boxVectors.size()==dim);
         for(const auto& boxVector : boxVectors)
         {
@@ -634,7 +634,7 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
         // prepare boxVectors for D
         auto dsclVector=getLatticeDirectionInD(boxVectors[0]).latticeVector();
         auto nD= getReciprocalLatticeDirectionInD(nC.reciprocalLatticeVector());
-        if(abs((dsclFactor*dsclVector).dot(nD)) < abs(boxVectorsInD[0].dot(nD)))
+        if(dsclFactor!=0 && abs((dsclFactor*dsclVector).dot(nD)) < abs(boxVectorsInD[0].dot(nD)))
             boxVectorsInD[0]= dsclFactor*dsclVector;
 
         std::vector<LatticeVector<dim>> boxVectorsForA(boxVectorsInA),
@@ -649,7 +649,8 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
         configurationA= A.box(boxVectorsForA);
         configurationB= B.box(boxVectorsForB);
         configurationC= csl.box(boxVectorsForC);
-        configurationD= dscl.box(boxVectorsForD);
+        if (dsclFactor!=0)
+            configurationD= dscl.box(boxVectorsForD);
 
         LatticeVector<dim> origin(-1*boxVectors[0]);
         for(auto& vector : configurationA)
@@ -737,4 +738,3 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
 
     } // namespace oILAB
 #endif
-
