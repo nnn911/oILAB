@@ -520,7 +520,7 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
     BiCrystal<dim>::updateBoxVectors(std::vector<LatticeVector<dim>>& boxVectors,
                                           const double& orthogonality) const
     {
-        assert(orthogonality>=0.0 && orthogonality<=1.0 &&
+        assert(orthogonality<=1.0 &&
            "The \"orthogonality\" parameter should be between 0.0 and 1.0");
         assert(boxVectors.size()==dim);
         for(const auto& boxVector : boxVectors)
@@ -538,7 +538,11 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
             nC= boxVectors[1].cross(boxVectors[2]);
         auto basis= csl.planeParallelLatticeBasis(nC,true);
 
-        int planesToExplore= nC.stacking();
+        int planesToExplore;
+        if (abs(orthogonality)<FLT_EPSILON)
+            planesToExplore= 1;
+        else
+            planesToExplore= nC.stacking();
         MatrixDimI boxLatticeIndices;
         boxLatticeIndices.col(0)= boxVectors[0];
         for (int i=1; i<dim; ++i)

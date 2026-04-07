@@ -224,7 +224,7 @@ namespace oILAB {
         template<int dm=dim>
         typename std::enable_if<dm==2 || dm==3,void>::type
         updateBoxVectors(std::vector<LatticeVector<dim>>& boxVectors,
-                              const double& orthogonality) const;
+                              const double& orthogonality=0.0) const;
 
         /*! This function outputs/prints a 2D bicrystal (two lattices that form the GB and
          * the CSL) bounded by a box defined using
