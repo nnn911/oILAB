@@ -154,20 +154,12 @@ int main() {
       std::cout << "Estimated number of atoms in the smallest possible GB: "
               << 2*abs(bc.sigma*boxVectorsIntegerCoords.template cast<double>().determinant()) << std::endl;
 
-    // Now try to scale boxVector0 to improve the orthogonality
-    auto boxVectorsOriginal= boxVectors;
-      for (int i =1; i<100; i=i+10) {
-        boxVectors[0]=i*boxVectorsOriginal[0];
-          // updateBoxVectors without the orthogonality parameter does not scale the boxVectors[0]. Instead
-          // it updates boxVectors[0] to make it as orthogonal as possible while keeping the volume
-        gb.bc.updateBoxVectors(boxVectors);
-        for (int i=0; i<dim; ++i) {
-            boxVectorsIntegerCoords.col(i) = boxVectors[i];
-        }
-        std::cout << "Estimated number of atoms : "
-                  << 2*abs(bc.sigma*boxVectorsIntegerCoords.template cast<double>().determinant()) << std::endl;
-          gb.box(boxVectors, 0, "gb"+std::to_string(i)+".txt", true);
-    }
+      gb.bc.updateBoxVectors(boxVectors,0.8);
+      for (int i=0; i<dim; ++i)
+          boxVectorsIntegerCoords.col(i) = boxVectors[i];
+      std::cout << "Estimated number of atoms : "
+                << 2*abs(bc.sigma*boxVectorsIntegerCoords.template cast<double>().determinant()) << std::endl;
+      gb.box(boxVectors, 0, "gb.txt", true);
     /*! [box vectors] */
 
   } catch (std::runtime_error &e) {
