@@ -8,6 +8,7 @@
 #define gbLAB_LatticeCore_cpp_
 
 #include "../../include/Lattices/LatticeCore.h"
+#include "../../include/IO/Logger.h"
 #include "../../include/Math/BestRationalApproximation.h"
 #include <Eigen/Dense>
 
@@ -55,10 +56,10 @@ typename LatticeCore<dim>::VectorDimI LatticeCore<dim>::integerCoordinates(const
     const VectorDimD rd(nd.array().round());
     if ((nd - rd).norm() > roundTol)
     {
-        std::cout << "nd=" << nd.transpose() << std::endl;
-        std::cout << "rd=" << rd.transpose() << std::endl;
-        std::cout << "rounding error = |nd-rd| = " << (nd-rd).norm() << std::endl;
-        throw(std::runtime_error("Input vector is not a lattice vector"));
+      Logger::debug() << "nd=" << nd.transpose();
+      Logger::debug() << "rd=" << rd.transpose();
+      Logger::debug() << "rounding error = |nd-rd| = " << (nd - rd).norm();
+      throw(std::runtime_error("Input vector is not a lattice vector"));
     }
     return rd.template cast<IntScalarType>();
 }

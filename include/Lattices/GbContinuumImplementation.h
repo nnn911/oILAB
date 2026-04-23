@@ -5,6 +5,7 @@
 #ifndef OILAB_GBCONTINUUMIMPLEMENTATION_H
 #define OILAB_GBCONTINUUMIMPLEMENTATION_H
 
+#include "../IO/Logger.h"
 #include "Diff.h"
 #include <numbers>
 
@@ -28,22 +29,18 @@ GbContinuum<dim>::GbContinuum(
     uAverage = uAverage / xuPairs.size();
 
   if (verbosity) {
-    std::cout << "-------------------------------------------------------------"
-                 "-----------------"
-              << std::endl;
-    std::cout << "Constraints: " << std::endl;
+    Logger::debug() << "-------------------------------------------------------"
+                       "--------------------------";
+    Logger::debug() << "Constraints:";
   }
   for (const auto &[x, u] : xuPairs) {
     if (verbosity)
-      std::cout << "x = " << atoms.at(x).transpose()
-                << "; displacement = " << u.transpose() << std::endl;
+      Logger::debug() << "x = " << atoms.at(x).transpose()
+                      << "; displacement = " << u.transpose();
     if ((u - displacement(x) - uAverage).norm() > FLT_EPSILON)
       throw std::runtime_error(
           "GBContinuum construction failed - unable to impose constraints.");
   }
-  if (verbosity)
-    std::cout << std::endl;
-
    }
 
     template<int dim>

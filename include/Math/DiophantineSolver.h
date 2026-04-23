@@ -51,7 +51,7 @@ public:
               if (n==2)
               {
                   IntScalarType g= extended_gcd(p(0),p(1),out(0),out(1));
-                  std::cout << p(0) << "   " << p(1) << std::endl;
+                  Logger::info() << p(0) << "   " << p(1);
                   if (g<0) out= -out;
                   return out;
               }
@@ -156,9 +156,9 @@ public:
     IntScalarType g = extended_gcd(a, b, x, y);
 
     if (c % g != 0) {
-      std::cout << a << "  " << b << "  " << c << "   " << g << std::endl;
-      puts("Impossible");
-      exit(0);
+      Logger::debug() << a << "  " << b << "  " << c << "   " << g;
+      throw std::runtime_error(
+          "Unexpected error in solveBezout::solveDiophantine2vars");
     }
 
     c /= g;

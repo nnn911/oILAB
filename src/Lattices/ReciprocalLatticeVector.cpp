@@ -7,8 +7,8 @@
 #ifndef gbLAB_ReciprocalLatticeVector_cpp_
 #define gbLAB_ReciprocalLatticeVector_cpp_
 
+#include "../../include/IO/Logger.h"
 #include "../../include/Lattices/LatticeModule.h"
-#include <iostream>
 
 namespace oILAB {
 
@@ -123,9 +123,14 @@ ReciprocalLatticeVector<dim>::base() {
     template <int dim>
     typename ReciprocalLatticeVector<dim>::IntScalarType ReciprocalLatticeVector<dim>::closestPlaneIndexOfPoint(const VectorDimD &P) const
     {
-        assert(this->squaredNorm() > 0 && "A null ReciprocalLatticeVector cannot be used to compute planeIndexOfPoint");
-        const double hd(cartesian().dot(P));
-        return std::lround(hd);
+      if (this->squaredNorm() == 0) {
+        Logger::debug() << "A null ReciprocalLatticeVector cannot be "
+                           "used to compute planeIndexOfPoint";
+        assert(false && "A null ReciprocalLatticeVector cannot be "
+                        "used to compute planeIndexOfPoint");
+      }
+      const double hd(cartesian().dot(P));
+      return std::lround(hd);
     }
 
     template <int dim>
@@ -136,11 +141,13 @@ ReciprocalLatticeVector<dim>::base() {
         const IntScalarType h(std::lround(hd));
         if (fabs(hd - h) > FLT_EPSILON)
         {
-            std::cout << "P=" << P.transpose() << std::endl;
-            std::cout << "r=" << this->cartesian().transpose() << std::endl;
-            std::cout << "hd=" << std::setprecision(15) << std::scientific << hd << std::endl;
-            std::cout << "h=" << h << std::endl;
-            assert(0 && "P in not on a lattice plane.");
+          Logger::debug() << "P=" << P.transpose();
+          Logger::debug() << "r=" << this->cartesian().transpose();
+          Logger::debug() << "hd=" << std::setprecision(15) << std::scientific
+                          << hd;
+          Logger::debug() << "h=" << h;
+          Logger::debug() << "P in not on a lattice plane.";
+          assert(false && "P in not on a lattice plane.");
         }
         return h;
     }
@@ -148,8 +155,13 @@ ReciprocalLatticeVector<dim>::base() {
     template <int dim>
     typename ReciprocalLatticeVector<dim>::IntScalarType ReciprocalLatticeVector<dim>::planeIndexOfPoint(const LatticeVector<dim> &P) const
     {
-        assert(this->squaredNorm() > 0 && "A null ReciprocalLatticeVector cannot be used to compute planeIndexOfPoint");
-        return dot(P);
+      if (this->squaredNorm() == 0) {
+        Logger::debug() << "A null ReciprocalLatticeVector cannot be "
+                           "used to compute planeIndexOfPoint";
+        assert(false && "A null ReciprocalLatticeVector cannot be "
+                        "used to compute planeIndexOfPoint");
+      }
+      return dot(P);
     }
 
 

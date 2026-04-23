@@ -9,6 +9,7 @@
 
 #include <Eigen/Eigenvalues>
 
+#include "../../include/IO/Logger.h"
 #include "../../include/Lattices/LatticeModule.h"
 #include "../../include/Math/GramMatrix.h"
 #include <iomanip>
@@ -17,7 +18,8 @@ namespace oILAB {
 
 //    /**********************************************************************/
 //    template <int dim>
-//    typename Lattice<dim>::MatrixDimD Lattice<dim>::getLatticeBasis(const MatrixDimD &A, const MatrixDimD &Q)
+//    typename Lattice<dim>::MatrixDimD Lattice<dim>::getLatticeBasis(const
+//    MatrixDimD &A, const MatrixDimD &Q)
 //    {
 //
 //        // Check that Q is orthogonal
@@ -25,56 +27,60 @@ namespace oILAB {
 //        const double QQTerror((QQT - MatrixDimD::Identity()).norm());
 //        if (QQTerror > 10.0 * DBL_EPSILON * dim * dim)
 //        {
-//            throw std::runtime_error("The rotation matrix Q is not orthogonal: norm(Q*Q^T-I)="+std::to_string(QQTerror)+"\n");
+//            throw std::runtime_error("The rotation matrix Q is not orthogonal:
+//            norm(Q*Q^T-I)="+std::to_string(QQTerror)+"");
 //        }
 //
 //        const double Qdet(Q.determinant());
 //        if (std::fabs(Q.determinant() - 1.0)>FLT_EPSILON)
 //        {
-//            throw std::runtime_error("The rotation matrix is not proper: det(Q)="+std::to_string(Qdet)+"\n");
+//            throw std::runtime_error("The rotation matrix is not proper:
+//            det(Q)="+std::to_string(Qdet)+"");
 //        }
-//        
+//
 //        return Q * A;
 //    }
 
+/**********************************************************************/
+/**********************************************************************/
+template <int dim>
+Lattice<dim>::Lattice(const MatrixDimD &A, const MatrixDimD &Fin)
+    : /* init */ latticeBasis(Fin * A)
+      /* init */,
+      reciprocalBasis(latticeBasis.inverse().transpose())
+      /* init */,
+      F(Fin) {}
 
-    /**********************************************************************/
-        /**********************************************************************/
-    template <int dim>
-    Lattice<dim>::Lattice(const MatrixDimD& A,const MatrixDimD& Fin) :
-    /* init */ latticeBasis(Fin*A)
-    /* init */,reciprocalBasis(latticeBasis.inverse().transpose())
-    /* init */,F(Fin)
-    {
+/**********************************************************************/
+template <int dim>
+LatticeDirection<dim> Lattice<dim>::latticeDirection(const VectorDimD &d,
+                                                     const double &tol) const {
+  RLLL rlll(latticeBasis, 0.75);
+  auto structureMatrix = rlll.reducedBasis();
+  auto U = rlll.unimodularMatrix();
+  Lattice<dim> reducedLattice(structureMatrix);
+  VectorDimD nd;
+  nd = reducedLattice.reciprocalBasis.transpose() * d;
+  LatticeVector<dim> tempReduced(LatticeCore<dim>::rationalApproximation(nd),
+                                 reducedLattice);
+  VectorDimI tempRecovered = U * tempReduced;
+  LatticeVector<dim> temp(tempRecovered, *this);
 
-    }
-
-    /**********************************************************************/
-    template <int dim>
-    LatticeDirection<dim> Lattice<dim>::latticeDirection(const VectorDimD &d, const double& tol) const
-    {
-        RLLL rlll(latticeBasis,0.75);
-        auto structureMatrix= rlll.reducedBasis();
-        auto U= rlll.unimodularMatrix();
-        Lattice<dim> reducedLattice(structureMatrix);
-        VectorDimD nd;
-        nd= reducedLattice.reciprocalBasis.transpose()*d;
-        LatticeVector<dim> tempReduced(LatticeCore<dim>::rationalApproximation(nd),reducedLattice);
-        VectorDimI tempRecovered= U*tempReduced;
-        LatticeVector<dim> temp(tempRecovered, *this);
-
-        const GramMatrix<double,2> G(std::array<VectorDimD,2>{temp.cartesian().normalized(),d.normalized()});
-        const double crossNorm(sqrt(G.determinant()));
-        if(crossNorm>tol)
-        {
-            std::cout<<"input direction="<<d.normalized().transpose()<<std::endl;
-            std::cout<<"lattice direction="<<temp.cartesian().normalized().transpose()<<std::endl;
-            std::cout<<"cross product norm="<<std::setprecision(15)<<std::scientific<<crossNorm<<std::endl;
-            std::cout<<"tolerance="<<std::setprecision(15)<<std::scientific<<tol<<std::endl;
-            throw std::runtime_error("LATTICE DIRECTION NOT FOUND\n");
-        }
-        return LatticeDirection<dim>(temp);
-    }
+  const GramMatrix<double, 2> G(
+      std::array<VectorDimD, 2>{temp.cartesian().normalized(), d.normalized()});
+  const double crossNorm(sqrt(G.determinant()));
+  if (crossNorm > tol) {
+    Logger::debug() << "input direction=" << d.normalized().transpose();
+    Logger::debug() << "lattice direction="
+                    << temp.cartesian().normalized().transpose();
+    Logger::debug() << "cross product norm=" << std::setprecision(15)
+                    << std::scientific << crossNorm;
+    Logger::debug() << "tolerance=" << std::setprecision(15) << std::scientific
+                    << tol;
+    throw std::runtime_error("LATTICE DIRECTION NOT FOUND");
+  }
+  return LatticeDirection<dim>(temp);
+}
 
     /**********************************************************************/
     template <int dim>
@@ -94,11 +100,16 @@ namespace oILAB {
         const double crossNorm(sqrt(abs(G.determinant())));
         if(crossNorm>tol)
         {
-            std::cout<<"input direction="<<std::setprecision(15)<<std::scientific<<d.normalized().transpose()<<std::endl;
-            std::cout<<"reciprocal lattice direction="<<std::setprecision(15)<<std::scientific<<temp.cartesian().normalized().transpose()<<std::endl;
-            std::cout<<"cross product norm="<<std::setprecision(15)<<std::scientific<<crossNorm<<std::endl;
-            std::cout<<"tolerance="<<std::setprecision(15)<<std::scientific<<tol<<std::endl;
-            throw std::runtime_error("RECIPROCAL LATTICE DIRECTION NOT FOUND\n");
+          Logger::debug() << "input direction=" << std::setprecision(15)
+                          << std::scientific << d.normalized().transpose();
+          Logger::debug() << "reciprocal lattice direction="
+                          << std::setprecision(15) << std::scientific
+                          << temp.cartesian().normalized().transpose();
+          Logger::debug() << "cross product norm=" << std::setprecision(15)
+                          << std::scientific << crossNorm;
+          Logger::debug() << "tolerance=" << std::setprecision(15)
+                          << std::scientific << tol;
+          throw std::runtime_error("RECIPROCAL LATTICE DIRECTION NOT FOUND");
         }
         return ReciprocalLatticeDirection<dim>(temp);
     }
@@ -116,11 +127,12 @@ namespace oILAB {
         const RationalLatticeDirection<dim> rld(rat, ld);
         if ((rld.cartesian() - d).squaredNorm() > magnitudeTol)
         {
-            std::cout << "input vector=" << d.transpose() << std::endl;
-            std::cout << "lattice direction=" << ld.cartesian().transpose() << std::endl;
-            std::cout << "rational=" << rat << std::endl;
-            std::cout << "d.norm()/ld.cartesian().norm()=" << d.norm() / ld.latticeVector().norm() << std::endl;
-            throw std::runtime_error("Rational Lattice DirectionType NOT FOUND\n");
+          Logger::debug() << "input vector=" << d.transpose();
+          Logger::debug() << "lattice direction=" << ld.cartesian().transpose();
+          Logger::debug() << "rational=" << rat;
+          Logger::debug() << "d.norm()/ld.cartesian().norm()="
+                          << d.norm() / ld.latticeVector().norm();
+          throw std::runtime_error("Rational Lattice DirectionType NOT FOUND");
         }
         return rld;
     }
@@ -139,11 +151,14 @@ namespace oILAB {
         const RationalReciprocalLatticeDirection<dim> rrld(rat, rld);
         if ((rrld.cartesian() - d).squaredNorm() > magnitudeTol)
         {
-            std::cout << "input reciprocal vector=" << d.transpose() << std::endl;
-            std::cout << "reciprocal lattice direction=" << rld.cartesian().transpose() << std::endl;
-            std::cout << "rational=" << rat << std::endl;
-            std::cout << "d.norm()/rld.cartesian().norm()=" << d.norm() / rld.reciprocalLatticeVector().norm() << std::endl;
-            throw std::runtime_error("Rational Reciprocal Lattice DirectionType NOT FOUND\n");
+          Logger::debug() << "input reciprocal vector=" << d.transpose();
+          Logger::debug() << "reciprocal lattice direction="
+                          << rld.cartesian().transpose();
+          Logger::debug() << "rational=" << rat;
+          Logger::debug() << "d.norm()/rld.cartesian().norm()="
+                          << d.norm() / rld.reciprocalLatticeVector().norm();
+          throw std::runtime_error(
+              "Rational Reciprocal Lattice DirectionType NOT FOUND");
         }
         return rrld;
     }
@@ -442,7 +457,7 @@ namespace oILAB {
 
                             output.push_back( F );
                             numberOfConfigurations++;
-                            std::cout << numberOfConfigurations << std::endl;
+                            Logger::info() << numberOfConfigurations;
                             if (numberOfConfigurations == maxConfigurations)
                                 return output;
                         }
