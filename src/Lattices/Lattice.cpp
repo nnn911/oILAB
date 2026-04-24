@@ -320,9 +320,9 @@ LatticeDirection<dim> Lattice<dim>::latticeDirection(const VectorDimD &d,
         return 1.0/r.cartesian().norm();
     }
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==3,std::vector<typename Lattice<dim>::MatrixDimD>>::type
-    Lattice<dim>::generateCoincidentLattices(const ReciprocalLatticeDirection<dim>& rd, const double& maxDen, const int& N) const
+    template<int dim>
+    std::vector<typename Lattice<dim>::MatrixDimD>
+    Lattice<dim>::generateCoincidentLattices(const ReciprocalLatticeDirection<dim>& rd, const double& maxDen, const int& N) const requires (dim==3)
     {
         std::vector<MatrixDimD> output;
         std::map<IntScalarType,MatrixDimD> temp;
@@ -369,21 +369,21 @@ LatticeDirection<dim> Lattice<dim>::latticeDirection(const VectorDimD &d,
     }
 
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==2,std::vector<typename Lattice<dim>::MatrixDimD>>::type
-    Lattice<dim>::generateCoincidentLattices(const double& maxStrain, const int& maxDen, const int& N) const
+    template<int dim>
+    std::vector<typename Lattice<dim>::MatrixDimD>
+    Lattice<dim>::generateCoincidentLattices(const double& maxStrain, const int& maxDen, const int& N) const requires (dim==2)
     {
         std::vector<MatrixDimD> output(generateCoincidentLattices(*this,maxStrain,maxDen,N));
         return output;
     }
 
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==2,std::vector<typename Lattice<dim>::MatrixDimD>>::type
+    template<int dim>
+    std::vector<typename Lattice<dim>::MatrixDimD>
     Lattice<dim>::generateCoincidentLattices(const Lattice<dim>& undeformedLattice,
                                              const double& maxStrain,
                                              const int& maxDen,
-                                             const int& N) const
+                                             const int& N) const requires (dim==2)
     {
         int numberOfConfigurations= 0;
         const int maxConfigurations= 80;
@@ -399,7 +399,7 @@ LatticeDirection<dim> Lattice<dim>::latticeDirection(const VectorDimD &d,
         {
             VectorDimI pIndices;
             pIndices << pair1.first, pair1.second;
-            LatticeVector<dm> q2(pIndices,undeformedLattice);
+            LatticeVector<dim> q2(pIndices,undeformedLattice);
             double ratio= q2.cartesian().norm() / latticeBasis.col(0).norm();
 
 
@@ -425,7 +425,7 @@ LatticeDirection<dim> Lattice<dim>::latticeDirection(const VectorDimD &d,
                 RationalApproximations <IntScalarType> alphaSequence(ratio, maxDen, ratio*maxStrain);
                 for (const auto& alpha: alphaSequence.approximations)
                 {
-                    RationalLatticeDirection<dm> q2ByAlpha(Rational<IntScalarType>(alpha.d, alpha.n), q2);
+                    RationalLatticeDirection<dim> q2ByAlpha(Rational<IntScalarType>(alpha.d, alpha.n), q2);
 
                     mn.col(0) = q2 * alpha.d;
                     md.col(0).setConstant(alpha.n);
@@ -438,11 +438,11 @@ LatticeDirection<dim> Lattice<dim>::latticeDirection(const VectorDimD &d,
                     for (const auto &pair2: coPrimePairs) {
                         VectorDimI qIndices;
                         qIndices << pair2.first, pair2.second;
-                        LatticeVector<dm> r2(qIndices, undeformedLattice);
+                        LatticeVector<dim> r2(qIndices, undeformedLattice);
                         double ratio2= r2.cartesian().norm() / latticeBasis.col(1).norm();
                         RationalApproximations<IntScalarType> betaSequence(ratio2, maxDen,maxStrain*ratio2);
                         for(const auto& beta : betaSequence.approximations) {
-                            RationalLatticeDirection<dm> r2ByBeta(Rational<IntScalarType>(beta.d, beta.n), r2);
+                            RationalLatticeDirection<dim> r2ByBeta(Rational<IntScalarType>(beta.d, beta.n), r2);
                             double s2 = (r2ByBeta.cartesian().squaredNorm() - latticeBasis.col(1).squaredNorm()) /
                                         latticeBasis.col(1).squaredNorm();
                             double s3 = (q2ByAlpha.cartesian().dot(r2ByBeta.cartesian()) -
@@ -475,9 +475,9 @@ LatticeDirection<dim> Lattice<dim>::latticeDirection(const VectorDimD &d,
         return output;
     }
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==3,std::vector<LatticeVector<dim>>>::type
-    Lattice<dim>::box(const std::vector<LatticeVector<dim>>& boxVectors, const std::string& filename) const
+    template<int dim>
+    std::vector<LatticeVector<dim>>
+    Lattice<dim>::box(const std::vector<LatticeVector<dim>>& boxVectors, const std::string& filename) const requires (dim==3)
     {
         for(const LatticeVector<dim>& boxVector : boxVectors)
         {
@@ -587,9 +587,9 @@ LatticeDirection<dim> Lattice<dim>::latticeDirection(const VectorDimD &d,
     }
 
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==2,std::vector<LatticeVector<dim>>>::type
-    Lattice<dim>::box(const std::vector<LatticeVector<dim>>& boxVectors, const std::string& filename) const
+    template<int dim>
+    std::vector<LatticeVector<dim>>
+    Lattice<dim>::box(const std::vector<LatticeVector<dim>>& boxVectors, const std::string& filename) const requires (dim==2)
     {
         for(const LatticeVector<dim>& boxVector : boxVectors)
         {
@@ -683,19 +683,8 @@ LatticeDirection<dim> Lattice<dim>::latticeDirection(const VectorDimD &d,
     template class Lattice<1>;
 
     template class Lattice<2>;
-    template std::vector<typename Lattice<2>::MatrixDimD> Lattice<2>::generateCoincidentLattices<2>(
-            const double &maxStrain, const int &maxDen, const int &N) const;
-    template std::vector<typename Lattice<2>::MatrixDimD> Lattice<2>::generateCoincidentLattices<2>(
-            const Lattice<2> &undeformedLattice, const double &maxStrain, const int &maxDen, const int &N) const;
-    template std::vector<LatticeVector<2>> Lattice<2>::box<2>(const std::vector<LatticeVector<2>> &boxVectors,
-                                                           const std::string &filename) const;
-
 
     template class Lattice<3>;
-    template std::vector<typename Lattice<3>::MatrixDimD> Lattice<3>::generateCoincidentLattices<3>(
-            const ReciprocalLatticeDirection<3> &rd, const double &maxDen, const int& N) const;
-    template std::vector<LatticeVector<3>> Lattice<3>::box<3>(const std::vector<LatticeVector<3>> &boxVectors,
-                                                              const std::string &filename) const;
 
     template class Lattice<4>;
     template class Lattice<5>;

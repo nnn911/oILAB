@@ -62,12 +62,12 @@ Gb<dim>::Gb(const BiCrystal<dim> &bc,
         return std::remainder(step,cslPlaneSpacing);
     }
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==2 || dm==3,std::vector<LatticeVector<dim>>>::type
+    template<int dim>
+    std::vector<LatticeVector<dim>>
     Gb<dim>::box(const std::vector<LatticeVector<dim>>& boxVectors,
                  const int& dsclFactor,
                  std::string filename,
-                 bool orient) const
+                 bool orient) const requires (dim==2 || dim==3)
     {
         for (auto iter= std::next(boxVectors.begin()); iter < boxVectors.end(); iter++)
             assert((*iter).dot(bc.getReciprocalLatticeDirectionInC(nA.reciprocalLatticeVector())) == 0 &&
@@ -154,22 +154,22 @@ Gb<dim>::Gb(const BiCrystal<dim> &bc,
         return configuration;
     }
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==2,LatticeVector<dim>>::type
-    Gb<dim>::getPeriodVector(const ReciprocalLatticeVector<dim>& axis) const
+    template<int dim>
+    LatticeVector<dim>
+    Gb<dim>::getPeriodVector(const ReciprocalLatticeVector<dim>& axis) const requires (dim==2)
     {
-        LatticeVector<dm> axisAxnA(nA.reciprocalLatticeVector().cross().latticeVector());
-        return (LatticeVector<dm>(bc.getLatticeDirectionInC(axisAxnA).latticeVector()));
+        LatticeVector<dim> axisAxnA(nA.reciprocalLatticeVector().cross().latticeVector());
+        return (LatticeVector<dim>(bc.getLatticeDirectionInC(axisAxnA).latticeVector()));
     }
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==3,LatticeVector<dim>>::type
-    Gb<dim>::getPeriodVector(const ReciprocalLatticeVector<dm>& axis) const
+    template<int dim>
+    LatticeVector<dim>
+    Gb<dim>::getPeriodVector(const ReciprocalLatticeVector<dim>& axis) const requires (dim==3)
     {
         assert(abs(nA.cartesian().dot(axis.cartesian())) < FLT_EPSILON);
-        ReciprocalLatticeDirection<dm> axisA(bc.A.reciprocalLatticeVector(axis.cartesian()));
-        LatticeVector<dm> axisAxnA(axisA.reciprocalLatticeVector().cross(nA.reciprocalLatticeVector()).latticeVector());
-        return (LatticeVector<dm>(bc.getLatticeDirectionInC(axisAxnA).latticeVector()));
+        ReciprocalLatticeDirection<dim> axisA(bc.A.reciprocalLatticeVector(axis.cartesian()));
+        LatticeVector<dim> axisAxnA(axisA.reciprocalLatticeVector().cross(nA.reciprocalLatticeVector()).latticeVector());
+        return (LatticeVector<dim>(bc.getLatticeDirectionInC(axisAxnA).latticeVector()));
     }
 
 
@@ -243,18 +243,8 @@ Gb<dim>::Gb(const BiCrystal<dim> &bc,
     }
 
     template class Gb<2>;
-    template LatticeVector<2> Gb<2>::getPeriodVector<2>(const ReciprocalLatticeVector<2> &axis) const;
-    template std::vector<LatticeVector<2>> Gb<2>::box<2>(const std::vector<LatticeVector<2>>& boxVectors,
-                                                         const int& dsclFactor,
-                                                         std::string filename,
-                                                         bool orient) const;
 
     template class Gb<3>;
-    template LatticeVector<3> Gb<3>::getPeriodVector<3>(const ReciprocalLatticeVector<3> &axis) const;
-    template std::vector<LatticeVector<3>> Gb<3>::box<3>(const std::vector<LatticeVector<3>>& boxVectors,
-                                                         const int& dsclFactor,
-                                                         std::string filename,
-                                                         bool orient) const;
 
     template class Gb<4>;
     template class Gb<5>;

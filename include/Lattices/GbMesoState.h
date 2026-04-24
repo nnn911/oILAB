@@ -129,8 +129,7 @@ public:
   /*! This function outputs/prints a grain boundary mesostate
    * @param filename name of the file to be written to
    */
-  typename std::enable_if<dim == 3, void>::type
-  box(const std::string &filename) const;
+  void box(const std::string &filename) const requires (dim == 3);
     };
     } // namespace oILAB
 

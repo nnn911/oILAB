@@ -52,10 +52,8 @@ public:
   Triplet insertRandomDislocation();
   std::set<int> getOrthogonalPlaneIndices(const int &parallelPlaneIndex) const;
 
-  // template<int dm=dim>
-  typename std::enable_if<dim == 3, void>::type
-  box(const int &heightFactor, const int &dsclFactor,
-      const std::string &name) const;
+  void box(const int &heightFactor, const int &dsclFactor,
+           const std::string &name) const requires (dim == 3);
 
   template <typename T> int sgn(T val) const;
   bool operator<(const MesoState &rhs) const;

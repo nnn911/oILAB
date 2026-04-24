@@ -11,18 +11,16 @@
 template<int dim>
 class Rotation : public Eigen::Matrix<double,dim,dim>
 {
-    template<int dm=dim>
-    typename std::enable_if<dm==2, Eigen::Matrix<double,dim,dim>  >::type
-    static  getMatrix(const Eigen::Matrix<double,dim,dim-1>& orthogonalVectors)
+    static Eigen::Matrix<double,dim,dim>
+    getMatrix(const Eigen::Matrix<double,dim,dim-1>& orthogonalVectors) requires (dim==2)
     {
         Eigen::Matrix<double,dim,dim> output;
         output.row(0)= orthogonalVectors.col(0).normalized();
         output.row(1)=Eigen::Rotation2D<double>(std::numbers::pi/2)*orthogonalVectors.col(0).normalized();
         return output;
     }
-    template<int dm=dim>
-    typename std::enable_if<dm==3, Eigen::Matrix<double,dim,dim>  >::type
-    static  getMatrix(const Eigen::Matrix<double,dim,dim-1>& orthogonalVectors)
+    static Eigen::Matrix<double,dim,dim>
+    getMatrix(const Eigen::Matrix<double,dim,dim-1>& orthogonalVectors) requires (dim==3)
     {
         assert(abs(orthogonalVectors.col(0).dot(orthogonalVectors.col(1))) < FLT_EPSILON);
         Eigen::Matrix<double,dim,dim> output;

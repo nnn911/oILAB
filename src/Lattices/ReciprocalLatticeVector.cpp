@@ -177,34 +177,34 @@ ReciprocalLatticeVector<dim>::base() {
         return L * scalar;
     }
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==2,LatticeDirection<dim>>::type
-    ReciprocalLatticeVector<dim>::cross(const ReciprocalLatticeVector<dim>& other) const
+    template<int dim>
+    LatticeDirection<dim>
+    ReciprocalLatticeVector<dim>::cross(const ReciprocalLatticeVector<dim>& other) const requires (dim==2)
     {
         assert(&lattice == &other.lattice && "LatticeVectors belong to different Lattices.");
-        return LatticeDirection<dm>(
-                LatticeVector<dm>((VectorDimI() << 0,0).finished(), lattice));
+        return LatticeDirection<dim>(
+                LatticeVector<dim>((VectorDimI() << 0,0).finished(), lattice));
     }
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==2,LatticeDirection<dim>>::type
-    ReciprocalLatticeVector<dim>::cross() const {
-        return LatticeDirection<dm>(
-                LatticeVector<dm>((VectorDimI() << -(*this)(1), (*this)(0)).finished(), lattice));
+    template<int dim>
+    LatticeDirection<dim>
+    ReciprocalLatticeVector<dim>::cross() const requires (dim==2) {
+        return LatticeDirection<dim>(
+                LatticeVector<dim>((VectorDimI() << -(*this)(1), (*this)(0)).finished(), lattice));
     }
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==3,LatticeDirection<dim>>::type
-    ReciprocalLatticeVector<dim>::cross(const ReciprocalLatticeVector<dim>& other) const
+    template<int dim>
+    LatticeDirection<dim>
+    ReciprocalLatticeVector<dim>::cross(const ReciprocalLatticeVector<dim>& other) const requires (dim==3)
     {
         assert(&lattice == &other.lattice && "LatticeVectors belong to different Lattices.");
         return LatticeDirection<dim>(LatticeVector<dim>(static_cast<VectorDimI>(*this).cross(static_cast<VectorDimI>(other)), lattice));
     }
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==3,LatticeDirection<dim>>::type
-    ReciprocalLatticeVector<dim>::cross() const {
-        return LatticeDirection<dm>(
-                LatticeVector<dm>((VectorDimI() << -(*this)(1), (*this)(0), 0).finished(), lattice));
+    template<int dim>
+    LatticeDirection<dim>
+    ReciprocalLatticeVector<dim>::cross() const requires (dim==3) {
+        return LatticeDirection<dim>(
+                LatticeVector<dim>((VectorDimI() << -(*this)(1), (*this)(0), 0).finished(), lattice));
     }
 
 template class ReciprocalLatticeVector<1>;
@@ -217,10 +217,6 @@ template ReciprocalLatticeVector<2> operator*(const int& scalar, const Reciproca
 template class ReciprocalLatticeVector<3>;
 template ReciprocalLatticeVector<3> operator*(const typename ReciprocalLatticeVector<3>::IntScalarType& scalar, const ReciprocalLatticeVector<3> &L);
 template ReciprocalLatticeVector<3> operator*(const int& scalar, const ReciprocalLatticeVector<3> &L);
-template LatticeDirection<2> ReciprocalLatticeVector<2>::cross<2>(const ReciprocalLatticeVector<2>& other) const;
-template LatticeDirection<2> ReciprocalLatticeVector<2>::cross<2>() const;
-template LatticeDirection<3> ReciprocalLatticeVector<3>::cross<3>(const ReciprocalLatticeVector<3>& other) const;
-template LatticeDirection<3> ReciprocalLatticeVector<3>::cross<3>() const;
 
 template class ReciprocalLatticeVector<4>;
 template ReciprocalLatticeVector<4> operator*(const typename ReciprocalLatticeVector<4>::IntScalarType& scalar, const ReciprocalLatticeVector<4> &L);

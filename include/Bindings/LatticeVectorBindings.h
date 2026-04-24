@@ -81,29 +81,25 @@ namespace pyoilab{
             return lv.dot(other.rlv);
         }
 
-        template<int dm=dim>
-        typename std::enable_if<dm==2,PyReciprocalLatticeDirection>::type
-        cross(const PyLatticeVector<dim>& other) const
+        PyReciprocalLatticeDirection
+        cross(const PyLatticeVector<dim>& other) const requires (dim==2)
         {
             return PyReciprocalLatticeDirection(lv.cross(other.lv));
         }
 
-        template<int dm=dim>
-        typename std::enable_if<dm==3,PyReciprocalLatticeDirection>::type
-        cross(const PyLatticeVector<dm>& other) const
+        PyReciprocalLatticeDirection
+        cross(const PyLatticeVector<dim>& other) const requires (dim==3)
         {
             return PyReciprocalLatticeDirection(lv.cross(other.lv));
         }
 
-        template<int dm=dim>
-        typename std::enable_if<dm==2,PyReciprocalLatticeDirection>::type
-        cross() const
+        PyReciprocalLatticeDirection
+        cross() const requires (dim==2)
         {
             return PyReciprocalLatticeDirection(lv.cross());
         }
-        template<int dm=dim>
-        typename std::enable_if<dm==3,PyReciprocalLatticeDirection>::type
-        cross() const
+        PyReciprocalLatticeDirection
+        cross() const requires (dim==3)
         {
             return PyReciprocalLatticeDirection(lv.cross());
         }
