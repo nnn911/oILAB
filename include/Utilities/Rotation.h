@@ -6,6 +6,7 @@
 #define OILAB_ROTATION_H
 
 #include<Eigen/Eigen>
+#include<cfloat>
 #include<numbers>
 
 template<int dim>
