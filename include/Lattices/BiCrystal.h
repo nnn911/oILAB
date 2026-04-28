@@ -11,6 +11,7 @@
 #include "../Math/SmithDecomposition.h"
 #include "LatticeModule.h"
 #include <map>
+
 namespace oILAB {
     /*!Class template that computes the coincident-site-lattice (CSL) of two
      * parent lattices using the Smith Normal Form [1].

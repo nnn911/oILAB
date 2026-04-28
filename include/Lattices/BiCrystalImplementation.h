@@ -476,7 +476,7 @@ std::map<typename BiCrystal<dim>::IntScalarType, Gb<dim>> BiCrystal<dim>::genera
     int count = -1;
     IntScalarType keyScale = 1e6;
     auto basis = d.lattice.directionOrthogonalReciprocalLatticeBasis(d, true);
-    if(dim == 3) {
+    if constexpr(dim == 3) {
         for(int i = -div; i <= div; ++i) {
             for(int j = -div; j <= div; ++j) {
                 if(i == 0 && j == 0) continue;
@@ -494,7 +494,7 @@ std::map<typename BiCrystal<dim>::IntScalarType, Gb<dim>> BiCrystal<dim>::genera
             }
         }
     }
-    else if(dim == 2) {
+    else if constexpr(dim == 2) {
         auto rv = basis[0].reciprocalLatticeVector();
         gbVec.push_back(Gb<dim>(*this, rv));
     }
@@ -525,8 +525,8 @@ void BiCrystal<dim>::updateBoxVectors(std::vector<LatticeVector<dim>>& boxVector
     // Adjust boxVector[0] such that it is as orthogonal as possible to boxVector[1]
     auto boxVectorTemp = boxVectors[0];
     ReciprocalLatticeDirection<dim> nC(csl);
-    if(dim == 2) nC = boxVectors[1].cross();
-    if(dim == 3) nC = boxVectors[1].cross(boxVectors[2]);
+    if constexpr(dim == 2) nC = boxVectors[1].cross();
+    if constexpr(dim == 3) nC = boxVectors[1].cross(boxVectors[2]);
     auto basis = csl.planeParallelLatticeBasis(nC, true);
 
     int planesToExplore;
@@ -583,19 +583,19 @@ std::vector<LatticeVector<dim>> BiCrystal<dim>::box(const std::vector<LatticeVec
     assert(abs(C.determinant()) > FLT_EPSILON && "Box volume is equal to zero.");
 
     ReciprocalLatticeDirection<dim> nC(csl);
-    if(dim == 2) nC = boxVectors[1].cross();
-    if(dim == 3) nC = boxVectors[1].cross(boxVectors[2]);
+    if constexpr(dim == 2) nC = boxVectors[1].cross();
+    if constexpr(dim == 3) nC = boxVectors[1].cross(boxVectors[2]);
 
     // form the rotation matrix used to orient the system
     MatrixDimD rotation = Eigen::Matrix<double, dim, dim>::Identity();
     ;
     Eigen::Matrix<double, dim, dim - 1> orthogonalVectors;
     if(orient) {
-        if(dim == 3) {
+        if constexpr(dim == 3) {
             orthogonalVectors.col(0) = C.col(1).normalized();
             orthogonalVectors.col(1) = C.col(2).normalized();
         }
-        else if(dim == 2)
+        else if constexpr(dim == 2)
             orthogonalVectors.col(0) = C.col(1).normalized();
 
         rotation = Rotation<dim>(orthogonalVectors);
@@ -652,7 +652,7 @@ std::vector<LatticeVector<dim>> BiCrystal<dim>::box(const std::vector<LatticeVec
         file << configuration.size() << std::endl;
         file << "Lattice=\"";
 
-        if(dim == 2) {
+        if constexpr(dim == 2) {
             file << (rotation * boxVectorsForC[0].cartesian()).transpose() << " 0 ";
             file << (rotation * boxVectorsForC[1].cartesian()).transpose() << " 0 ";
             file << " 0 0 1 ";
@@ -667,7 +667,7 @@ std::vector<LatticeVector<dim>> BiCrystal<dim>::box(const std::vector<LatticeVec
             for(const auto& vector : configurationD)
                 file << 4 << " " << (rotation * vector.cartesian()).transpose() << " " << 0.0 << "  " << 0.01 << std::endl;
         }
-        else if(dim == 3) {
+        else if constexpr(dim == 3) {
             file << (rotation * boxVectorsForC[0].cartesian()).transpose() << " ";
             file << (rotation * boxVectorsForC[1].cartesian()).transpose() << " ";
             file << (rotation * boxVectorsForC[2].cartesian()).transpose() << " ";

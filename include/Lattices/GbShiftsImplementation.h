@@ -10,7 +10,6 @@
 #define OILAB_GB_SHIFTS_IMPL_H
 
 #include "GbShifts.h"
-#include "../Utilities/randomInteger.h"
 #include "../IO/Logger.h"
 
 namespace oILAB {
@@ -35,7 +34,7 @@ GbShifts<dim>::GbShifts(const Gb<dim>& gb,
     Logger::info() << "Maximum b < " << 2 * bhalfMax * gb.bc.A.latticeBasis.col(0).norm();
 
     VectorDimD normal;
-    if(dim == 3)
+    if constexpr(dim == 3)
         normal = gbCslVectors[0].cross(gbCslVectors[1]).cartesian().normalized();
     else
         normal = gbCslVectors[0].cross().cartesian().normalized();

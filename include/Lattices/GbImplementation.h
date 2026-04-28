@@ -84,11 +84,11 @@ std::vector<LatticeVector<dim>> Gb<dim>::box(const std::vector<LatticeVector<dim
     ;
     Eigen::Matrix<double, dim, dim - 1> orthogonalVectors;
     if(orient) {
-        if(dim == 3) {
+        if constexpr(dim == 3) {
             orthogonalVectors.col(0) = boxVectors[1].cartesian().normalized();
             orthogonalVectors.col(1) = boxVectors[2].cartesian().normalized();
         }
-        else if(dim == 2)
+        else if constexpr(dim == 2)
             orthogonalVectors.col(0) = boxVectors[1].cartesian().normalized();
 
         rotation = Rotation<dim>(orthogonalVectors);
@@ -105,11 +105,11 @@ std::vector<LatticeVector<dim>> Gb<dim>::box(const std::vector<LatticeVector<dim
         file << "Lattice=\"";
 
         LatticeVector<dim> origin(-1 * boxVectors[0]);
-        if(dim == 2) {
+        if constexpr(dim == 2) {
             file << (rotation * 2 * boxVectors[0].cartesian()).transpose() << " 0 ";
             file << (rotation * boxVectors[1].cartesian()).transpose() << " 0 ";
             file << " 0 0 1 ";
-            file << "\" Properties=atom_types:I:1:pos:R:3:radius:R:1 PBC=\"F T T\" origin=\"";
+            file << R"(" Properties=atom_types:I:1:pos:R:3:radius:R:1 PBC="F T T" origin=")";
             file << (rotation * origin.cartesian()).transpose() << " 0.0\"" << std::endl;
             for(const auto& vector : configuration)
                 if(&(vector.lattice) == &bc.A)
@@ -121,11 +121,11 @@ std::vector<LatticeVector<dim>> Gb<dim>::box(const std::vector<LatticeVector<dim
                 else
                     file << 4 << " " << (rotation * vector.cartesian()).transpose() << " " << 0.0 << "  " << 0.01 << std::endl;
         }
-        else if(dim == 3) {
+        else if constexpr(dim == 3) {
             file << (rotation * 2 * boxVectors[0].cartesian()).transpose() << " ";
             file << (rotation * boxVectors[1].cartesian()).transpose() << " ";
             file << (rotation * boxVectors[2].cartesian()).transpose() << " ";
-            file << "\" Properties=atom_types:I:1:pos:R:3:radius:R:1 PBC=\"F T T\" origin=\"";
+            file << R"(" Properties=atom_types:I:1:pos:R:3:radius:R:1 PBC="F T T" origin=")";
             file << (rotation * origin.cartesian()).transpose() << "\"" << std::endl;
 
             for(const auto& vector : configuration)
