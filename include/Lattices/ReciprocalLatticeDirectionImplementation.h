@@ -9,7 +9,7 @@
 #ifndef OILAB_RECIPROCAL_LATTICE_DIRECTION_IMPL_H
 #define OILAB_RECIPROCAL_LATTICE_DIRECTION_IMPL_H
 
-#include "LatticeModule.h"
+#include "ReciprocalLatticeDirection.h"
 #include <ostream>
 
 namespace oILAB {

@@ -9,7 +9,7 @@
 #ifndef OILAB_LATTICE_DIRECTION_IMPL_H
 #define OILAB_LATTICE_DIRECTION_IMPL_H
 
-#include "LatticeModule.h"
+#include "LatticeDirection.h"
 
 namespace oILAB {
 template<int dim>

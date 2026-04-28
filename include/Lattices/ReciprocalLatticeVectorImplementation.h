@@ -10,7 +10,7 @@
 #define OILAB_RECIPROCAL_LATTICE_VECTOR_IMPL_H
 
 #include "../IO/Logger.h"
-#include "LatticeModule.h"
+#include "ReciprocalLatticeVector.h"
 
 namespace oILAB {
 

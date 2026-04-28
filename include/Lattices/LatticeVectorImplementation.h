@@ -9,7 +9,7 @@
 #ifndef OILAB_LATTICE_VECTOR_IMPL_H
 #define OILAB_LATTICE_VECTOR_IMPL_H
 
-#include "LatticeModule.h"
+#include "LatticeVector.h"
 
 namespace oILAB {
 

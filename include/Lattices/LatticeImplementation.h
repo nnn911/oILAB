@@ -10,10 +10,10 @@
 #define OILAB_LATTICE_IMPL_H
 
 #include <Eigen/Eigenvalues>
-
-#include "../../include/IO/Logger.h"
-#include "../../include/Lattices/LatticeModule.h"
-#include "../../include/Math/GramMatrix.h"
+#include "Lattice.h"
+#include "../IO/Logger.h"
+#include "../Lattices/LatticeModule.h"
+#include "../Math/GramMatrix.h"
 #include <iomanip>
 
 namespace oILAB {

@@ -9,9 +9,9 @@
 #ifndef OILAB_LATTICE_CORE_IMPL_H
 #define OILAB_LATTICE_CORE_IMPL_H
 
-#include "../../include/Lattices/LatticeCore.h"
-#include "../../include/IO/Logger.h"
-#include "../../include/Math/BestRationalApproximation.h"
+#include "LatticeCore.h"
+#include "../IO/Logger.h"
+#include "../Math/BestRationalApproximation.h"
 #include <Eigen/Dense>
 
 namespace oILAB {

@@ -3,6 +3,8 @@
 //
 #ifndef OILAB_LATTICEFUNCTIONIMPLEMENTATION_H
 #define OILAB_LATTICEFUNCTIONIMPLEMENTATION_H
+
+#include "LatticeFunction.h"
 #include "../../include/Math/FFT.h"
 #include <iostream>
 #include <numeric>

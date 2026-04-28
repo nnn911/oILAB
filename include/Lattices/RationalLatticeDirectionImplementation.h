@@ -10,7 +10,6 @@
 #define OILAB_RATIONAL_LATTICE_DIRECTION_IMPL_H
 
 #include "RationalLatticeDirection.h"
-#include "LatticeModule.h"
 
 namespace oILAB {
 /**********************************************************************/

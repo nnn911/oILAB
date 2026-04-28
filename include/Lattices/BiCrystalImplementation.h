@@ -9,7 +9,7 @@
 #ifndef OILAB_BICRYSTAL_IMPL_H
 #define OILAB_BICRYSTAL_IMPL_H
 
-#include "../../include/IO/Logger.h"
+#include "../IO/Logger.h"
 #include "BiCrystal.h"
 #include <numbers>
 #include <fstream>
