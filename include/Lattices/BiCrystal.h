@@ -45,6 +45,7 @@ namespace oILAB {
                                        const MatrixDimI& N);
 
     public:
+        template<IntScalarType keyScale>
         class GBKey
         {
         public:
@@ -58,11 +59,10 @@ namespace oILAB {
 
             [[nodiscard]] constexpr static IntScalarType minKey() noexcept { return 0; };
             [[nodiscard]] constexpr static IntScalarType maxKey() noexcept { return 2 * keyScale; };
-            [[nodiscard]] constexpr static IntScalarType numKeys() noexcept { return 2 * keyScale + 1; };
+            [[nodiscard]] constexpr static IntScalarType numKeys() noexcept { return maxKey() + 1; };
 
         private:
             ReciprocalLatticeVector<dim>::VectorDimD _referenceVector;
-            constexpr static IntScalarType keyScale = 1e6;
         };
 
     public:

@@ -474,7 +474,11 @@ void BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int
 
     constexpr IntScalarType keyScale = 1e6;
 
-    std::optional<GBKey> gbKey;
+    std::optional<GBKey<keyScale>> gbKey;
+
+    // Mask used to filter duplicates
+    std::bitset<decltype(gbKey)::value_type::numKeys()> seenGBs;
+    seenGBs.reset();
 
     const auto basis = d.lattice.directionOrthogonalReciprocalLatticeBasis(d, true);
     if constexpr(dim == 3) {
@@ -488,6 +492,11 @@ void BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int
                         gbKey.emplace(gb);
                     }
                     const IntScalarType key = (*gbKey)(gb);
+                    // Filter duplicates
+                    if(seenGBs.test(key)) {
+                        continue;
+                    }
+                    seenGBs.set(key);
                     std::invoke(callback, key, std::move(gb));
                 }
                 catch(std::runtime_error& e) {
