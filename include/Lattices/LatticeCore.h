@@ -41,4 +41,6 @@ template <int dim> struct LatticeCore {
                                        const MatrixDimD &invA);
     };
     } // namespace oILAB
+
+#include "LatticeCoreImplementation.h"
 #endif

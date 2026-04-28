@@ -52,4 +52,6 @@ public:
     RationalLatticeDirection<dim> operator*(const typename RationalLatticeDirection<dim>::IntScalarType& scalar, const RationalLatticeDirection<dim>& L);
 
     } // namespace oILAB
+
+#include "RationalLatticeDirectionImplementation.h"
 #endif

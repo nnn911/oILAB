@@ -68,4 +68,6 @@ public:
     ReciprocalLatticeVector<dim> operator*(const int& scalar, const ReciprocalLatticeVector<dim>& L);
 
     } // namespace oILAB
+
+#include "ReciprocalLatticeVectorImplementation.h"
 #endif

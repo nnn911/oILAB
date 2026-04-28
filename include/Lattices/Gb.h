@@ -240,4 +240,6 @@ public:
  */
     } // namespace oILAB
 
-#endif //OILAB_GB_H
+#include "GbImplementation.h"
+
+#endif  // OILAB_GB_H

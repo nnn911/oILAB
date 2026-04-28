@@ -123,4 +123,7 @@ public:
     template<int dim>
     LatticeVector<dim> operator*(const int& scalar, const LatticeVector<dim>& L);
     } // namespace oILAB
+
+#include "LatticeVectorImplementation.h"
+
 #endif
