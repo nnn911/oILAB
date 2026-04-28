@@ -40,4 +40,6 @@ public:
     };
 
     } // namespace oILAB
+
+#include "LLLImplementation.h"
 #endif

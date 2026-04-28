@@ -81,13 +81,11 @@ public:
    */
   Gb(const BiCrystal<dim> &bc, const ReciprocalLatticeDirection<dim> &n);
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 2, LatticeVector<dim>>::type
-  getPeriodVector(const ReciprocalLatticeVector<dim> &axis) const;
+  LatticeVector<dim>
+  getPeriodVector(const ReciprocalLatticeVector<dim> &axis) const requires (dim == 2);
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 3, LatticeVector<dim>>::type
-  getPeriodVector(const ReciprocalLatticeVector<dm> &axis) const;
+  LatticeVector<dim>
+  getPeriodVector(const ReciprocalLatticeVector<dim> &axis) const requires (dim == 3);
 
   /*! This function outputs/prints a grain boundary (two lattices that form the
    * GB, CSL, and the DSCL) bounded by a box defined using input box vectors.
@@ -102,7 +100,6 @@ public:
    * The function outputs DSCL lattice points in the GBs neighborhood, which can
    * be controlled by the \p dsclFactor parameter.
    *
-   * @tparam dm dimension (int)
    * @param boxVectors three linearly independent lattice vectors. The first box
    * vector is not parallel to the boundary plane, while the remaining box
    * vectors span the GB plane.
@@ -118,12 +115,10 @@ public:
    * @return lattice points of the grain boundary bounded by the box
    * (std::vector<LatticeVector<dim>>).
    */
-  template <int dm = dim>
-  typename std::enable_if<dm == 2 || dm == 3,
-                          std::vector<LatticeVector<dim>>>::type
+  std::vector<LatticeVector<dim>>
   box(const std::vector<LatticeVector<dim>> &boxVectors,
       const int &dsclFactor, std::string filename = "",
-      bool orient = false) const;
+      bool orient = false) const requires (dim == 2 || dim == 3);
 
     };
 
@@ -245,4 +240,6 @@ public:
  */
     } // namespace oILAB
 
-#endif //OILAB_GB_H
+#include "GbImplementation.h"
+
+#endif  // OILAB_GB_H

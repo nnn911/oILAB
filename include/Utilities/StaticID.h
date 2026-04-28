@@ -64,7 +64,7 @@ public:
   /**********************************************************************/
   static void set_increment(const size_t &newIncrement) {
     if (newIncrement < 1) {
-      throw std::runtime_error("StaticID error: newIncrement MUST BE >=1\n");
+      throw std::runtime_error("StaticID error: newIncrement MUST BE >=1");
     }
     if (count_used) {
       count -= increment;

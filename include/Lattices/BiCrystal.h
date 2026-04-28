@@ -7,13 +7,10 @@
 #ifndef gbLAB_BiCrystal_h_
 #define gbLAB_BiCrystal_h_
 
-#include "../Math/LLL.h"
-#include "../Math/RLLL.h"
 #include "../Math/RationalMatrix.h"
 #include "../Math/SmithDecomposition.h"
-#include "../Utilities/Rotation.h"
 #include "LatticeModule.h"
-#include <unordered_set>
+#include <map>
 
 namespace oILAB {
     /*!Class template that computes the coincident-site-lattice (CSL) of two
@@ -212,19 +209,16 @@ namespace oILAB {
         /*!
          * \brief Given a tilt axis \f$\textbf d\f$, that belongs to lattices \f$\mathcal A\f$ or \f$\mathcal B\f$, this
          * function generate a set of tilt GBs. CURRENTLY ONLY WORDS FOR DIMENSION 3
-         * @tparam dm
          * @param d - LatticeDirection that describes the tilt axis
          * @param div - parameter to span the GBs
          * @return A data structure that stores GBs sorted in increasing order of their inclination angle.
          */
-        template<int dm=dim>
-        typename std::enable_if<dm==2 || dm==3,std::map<IntScalarType,Gb<dm>>>::type
-        generateGrainBoundaries(const LatticeDirection<dim>& d, int div=30) const;
+        std::map<IntScalarType,Gb<dim>>
+        generateGrainBoundaries(const LatticeDirection<dim>& d, int div=30) const requires (dim==2 || dim==3);
 
-        template<int dm=dim>
-        typename std::enable_if<dm==2 || dm==3,void>::type
+        void
         updateBoxVectors(std::vector<LatticeVector<dim>>& boxVectors,
-                              const double& orthogonality=0.0) const;
+                              const double& orthogonality=0.0) const requires (dim==2 || dim==3);
 
         /*! This function outputs/prints a 2D bicrystal (two lattices that form the GB and
          * the CSL) bounded by a box defined using
@@ -233,7 +227,6 @@ namespace oILAB {
          * to make the box as orthogonal as possible depending on the \p orthogonality parameter.
          *
          *
-         * @tparam dm dimension (int)
          * @param boxVectors two linearly independent lattice vectors.
          * @param orthogonality (double) a value in the interval \f$[0,1]\f$.
          * @param filename (optional) name of the output file
@@ -242,15 +235,17 @@ namespace oILAB {
          * influence the returning configuration, only the configuration printed to the file.
          * @return lattice points of the bicrystal (along with the CSL) bounded by the box (std::vector<LatticeVector<2>>).
          */
-        template<int dm=dim>
-        typename std::enable_if<dm==2 || dm==3,std::vector<LatticeVector<dim>>>::type
+        std::vector<LatticeVector<dim>>
         box(const std::vector<LatticeVector<dim>>& boxVectors,
             const int& dsclFactor,
             std::string filename= "",
-            bool orient=false) const;
+            bool orient=false) const requires (dim==2 || dim==3);
     };
     
     
 } // end namespace
+
+#include "BiCrystalImplementation.h"
+
 #endif
 

@@ -3,6 +3,8 @@
 //
 #ifndef OILAB_LATTICEFUNCTIONIMPLEMENTATION_H
 #define OILAB_LATTICEFUNCTIONIMPLEMENTATION_H
+
+#include "LatticeFunction.h"
 #include "../../include/Math/FFT.h"
 #include <iostream>
 #include <numeric>
@@ -17,10 +19,10 @@ LatticeFunction<Scalar, dim>::LatticeFunction(
     }
 
     template<typename Scalar, int dim>
-    template<typename T, typename, typename, int dm, typename>
+    template<typename T>
     LatticeFunction<Scalar,dim>::LatticeFunction(const Eigen::array<Eigen::Index, dim> &n,
                     const Eigen::Matrix<double, Eigen::Dynamic, dim> &_basisVectors,
-                    const Function<T,Scalar>& fun) :
+                    const Function<T,Scalar>& fun) requires (dim == 1) :
             values(n), basisVectors(_basisVectors) {
         for (int i = 0; i < n[0]; i++) {
             int in= i > n[0]/2 ? i-n[0] : i;
@@ -29,10 +31,10 @@ LatticeFunction<Scalar, dim>::LatticeFunction(
     }
 
     template<typename Scalar, int dim>
-    template<typename T, typename, int dm, typename>
+    template<typename T>
     LatticeFunction<Scalar,dim>::LatticeFunction(const Eigen::array<Eigen::Index, dim> &n,
                                                  const Eigen::Matrix<double,Eigen::Dynamic,dim>& _basisVectors,
-                                                 const Function<T,Scalar>& fun) :
+                                                 const Function<T,Scalar>& fun) requires (dim == 2) :
             values(n), basisVectors(_basisVectors) {
         for (int i = 0; i < n[0]; i++) {
             for (int j = 0; j < n[1]; j++) {
@@ -45,10 +47,10 @@ LatticeFunction<Scalar, dim>::LatticeFunction(
     }
 
     template<typename Scalar, int dim>
-    template<typename T, int dm, typename>
+    template<typename T>
     LatticeFunction<Scalar,dim>::LatticeFunction(const Eigen::array<Eigen::Index, dim> &n,
                     const Eigen::Matrix<double, Eigen::Dynamic, dim> &_basisVectors,
-                    const Function<T, Scalar> &fun) :
+                    const Function<T, Scalar> &fun) requires (dim == 3) :
             values(n), basisVectors(_basisVectors) {
         for (int i = 0; i < n[0]; i++) {
             for (int j = 0; j < n[1]; j++) {

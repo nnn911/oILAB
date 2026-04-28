@@ -25,4 +25,6 @@ public:
 
     } // namespace oILAB
 
-#endif //OILAB_MATERIALTENSORS_H
+#include "GbMaterialTensorsImplementation.h"
+
+#endif  // OILAB_MATERIALTENSORS_H

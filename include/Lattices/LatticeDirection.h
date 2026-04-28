@@ -37,4 +37,7 @@ template <int dim> struct LatticeDirection : protected LatticeVector<dim> {
     basic_ostream<char> &operator<<(basic_ostream<char> &s, const LatticeDirection<dim>& m);
 
     } // namespace oILAB
+
+#include "LatticeDirectionImplementation.h"
+
 #endif
