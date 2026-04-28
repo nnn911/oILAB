@@ -466,25 +466,29 @@ LatticeVector<dim> BiCrystal<dim>::shiftTensorB(const LatticeVector<dim>& d) con
 }
 
 template<int dim>
-std::map<typename BiCrystal<dim>::IntScalarType, Gb<dim>> BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d,
-                                                                                                  int div) const
+template<typename Callback>
+void BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int div, Callback&& callback) const
     requires(dim == 2 || dim == 3)
 {
     if(&d.lattice != &A && &d.lattice != &B) throw std::runtime_error("The tilt axis does not belong to lattices A and B  ");
-    std::vector<Gb<dim>> gbVec;
-    double epsilon = 1e-8;
-    int count = -1;
-    IntScalarType keyScale = 1e6;
-    auto basis = d.lattice.directionOrthogonalReciprocalLatticeBasis(d, true);
+
+    constexpr IntScalarType keyScale = 1e6;
+
+    std::optional<GBKey> gbKey;
+
+    const auto basis = d.lattice.directionOrthogonalReciprocalLatticeBasis(d, true);
     if constexpr(dim == 3) {
         for(int i = -div; i <= div; ++i) {
             for(int j = -div; j <= div; ++j) {
                 if(i == 0 && j == 0) continue;
-                count++;
-                ReciprocalLatticeVector<dim> rv = i * basis[1].reciprocalLatticeVector() + j * basis[2].reciprocalLatticeVector();
+                const ReciprocalLatticeVector<dim> rv = i * basis[1].reciprocalLatticeVector() + j * basis[2].reciprocalLatticeVector();
                 try {
                     Gb<dim> gb(*this, rv);
-                    gbVec.push_back(gb);
+                    if(!gbKey) {
+                        gbKey.emplace(gb);
+                    }
+                    const IntScalarType key = (*gbKey)(gb);
+                    std::invoke(callback, key, std::move(gb));
                 }
                 catch(std::runtime_error& e) {
                     Logger::warn() << e.what();
@@ -496,19 +500,19 @@ std::map<typename BiCrystal<dim>::IntScalarType, Gb<dim>> BiCrystal<dim>::genera
     }
     else if constexpr(dim == 2) {
         auto rv = basis[0].reciprocalLatticeVector();
-        gbVec.push_back(Gb<dim>(*this, rv));
+        Gb<dim> gb = Gb<dim>(*this, rv);
+        constexpr IntScalarType key = 0;
+        std::invoke(callback, key, std::move(gb));
     }
-    std::map<IntScalarType, Gb<dim>> gbSet;
-    for(const Gb<dim>& gb : gbVec) {
-        double cosAngle;
-        cosAngle = gb.nA.cartesian().normalized().dot(gbVec[0].nA.cartesian().normalized());
-        if(cosAngle - 1 > -epsilon) cosAngle = 1.0;
-        if(cosAngle + 1 < epsilon) cosAngle = -1.0;
+}
 
-        double angle = acos(cosAngle);
-        IntScalarType key = angle * keyScale;
-        gbSet.insert(std::pair<IntScalarType, Gb<dim>>(key, gb));
-    }
+template<int dim>
+std::map<typename BiCrystal<dim>::IntScalarType, Gb<dim>> BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d,
+                                                                                                  int div) const
+    requires(dim == 2 || dim == 3)
+{
+    std::map<IntScalarType, Gb<dim>> gbSet;
+    generateGrainBoundaries(d, div, [&](IntScalarType key, Gb<dim>&& gb) { gbSet.emplace(key, std::move(gb)); });
     return gbSet;
 }
 
