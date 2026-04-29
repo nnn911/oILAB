@@ -477,7 +477,7 @@ void BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int
     std::optional<GBKey<keyScale>> gbKey;
 
     // Mask used to filter duplicates
-    std::bitset<decltype(gbKey)::value_type::numKeys()> seenGBs;
+    std::bitset<GBKey<keyScale>::numKeys()> seenGBs;
     seenGBs.reset();
 
     const auto basis = d.lattice.directionOrthogonalReciprocalLatticeBasis(d, true);
