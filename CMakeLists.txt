@@ -55,6 +55,7 @@ configure_package_config_file(
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/oILAB
 )
 
+set(OILAB_VERSION_NUMBER "${PROJECT_VERSION}")
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/oILABConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
