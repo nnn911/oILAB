@@ -9,8 +9,8 @@
 #ifndef OILAB_GB_IMPL_H
 #define OILAB_GB_IMPL_H
 
-#include "../../include/Lattices/Gb.h"
-#include "../../include/IO/Logger.h"
+#include "Gb.h"
+#include "../IO/Logger.h"
 
 namespace oILAB {
 template<int dim>

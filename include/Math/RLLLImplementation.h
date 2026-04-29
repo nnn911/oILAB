@@ -9,9 +9,8 @@
 #ifndef OILAB_RLLL_IMPL_H
 #define OILAB_RLLL_IMPL_H
 
-#include "../../include/Math/RLLL.h"
-#include "../../include/IO/Logger.h"
-#include <vector>
+#include "RLLL.h"
+#include "../IO/Logger.h"
 
 namespace oILAB {
 
