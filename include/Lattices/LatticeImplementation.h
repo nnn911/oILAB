@@ -508,11 +508,11 @@ std::vector<LatticeVector<dim>> Lattice<dim>::box(const std::vector<LatticeVecto
                 LatticeVector<dim> vector((mat * vectorIn_l).eval(), *this);
                 // LatticeDirection<dim> v1(MatrixDimIExt<IntScalarType,dim>::adjoint(mat)*boxVectors[1],l);
 
-                int c0 = IntegerMath<IntScalarType>::positive_modulo(vector.dot(r0), boxVectors[0].dot(r0)) - vector.dot(r0);
+                IntScalarType c0 = IntegerMath<IntScalarType>::positive_modulo(vector.dot(r0), boxVectors[0].dot(r0)) - vector.dot(r0);
                 c0 = c0 / boxVectors[0].dot(r0);
-                int c1 = IntegerMath<IntScalarType>::positive_modulo(vector.dot(r1), boxVectors[1].dot(r1)) - vector.dot(r1);
+                IntScalarType c1 = IntegerMath<IntScalarType>::positive_modulo(vector.dot(r1), boxVectors[1].dot(r1)) - vector.dot(r1);
                 c1 = c1 / boxVectors[1].dot(r1);
-                int c2 = IntegerMath<IntScalarType>::positive_modulo(vector.dot(r2), boxVectors[2].dot(r2)) - vector.dot(r2);
+                IntScalarType c2 = IntegerMath<IntScalarType>::positive_modulo(vector.dot(r2), boxVectors[2].dot(r2)) - vector.dot(r2);
                 c2 = c2 / boxVectors[2].dot(r2);
                 vector = vector + c0 * boxVectors[0] + c1 * boxVectors[1] + c2 * boxVectors[2];
                 output.push_back(vector);
