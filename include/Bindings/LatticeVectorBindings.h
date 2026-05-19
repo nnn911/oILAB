@@ -81,6 +81,19 @@ namespace pyoilab{
             return lv.dot(other.rlv);
         }
 
+
+        PyReciprocalLatticeDirection
+        cross(const PyLatticeVector<dim>& other) const requires (dim==2 || dim==3)
+        {
+            return PyReciprocalLatticeDirection(lv.cross(other.lv));
+        }
+
+        PyReciprocalLatticeDirection
+        cross() const requires (dim==2 || dim==3)
+        {
+            return PyReciprocalLatticeDirection(lv.cross());
+        }
+        /*
         PyReciprocalLatticeDirection
         cross(const PyLatticeVector<dim>& other) const requires (dim==2)
         {
@@ -103,6 +116,7 @@ namespace pyoilab{
         {
             return PyReciprocalLatticeDirection(lv.cross());
         }
+        */
 
     };
 
@@ -161,12 +175,27 @@ namespace pyoilab{
               py::is_operator())
           .def(py::self -= py::self)
           .def(py::self += py::self)
+
+          .def("cross",
+               [](const PyLatticeVector& self,
+                  const PyLatticeVector& other) {
+                    return self.cross(other); 
+                    }
+              )
+          .def("cross",
+               [](const PyLatticeVector& self) {
+                    return self.cross();
+                    }
+              );
+
+      /*
           .def("cross",
                static_cast<PyReciprocalLatticeDirection (PyLatticeVector::*)(
                    const PyLatticeVector &) const>(&PyLatticeVector::cross))
           .def("cross",
                static_cast<PyReciprocalLatticeDirection (PyLatticeVector::*)()
                                const>(&PyLatticeVector::cross));
+                               */
     }
 }
 #endif //OILAB_LATTICEVECTORBINDINGS_H

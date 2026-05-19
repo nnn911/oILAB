@@ -93,6 +93,11 @@ namespace pyoilab {
         }
 
         PyLatticeDirection<dim>
+        cross(const PyReciprocalLatticeVector<dim>& other) const requires (dim==2 || dim==3) {
+            return PyLatticeDirection(rlv.cross(other.rlv));
+        }
+        /*
+        PyLatticeDirection<dim>
         cross(const PyReciprocalLatticeVector<dim>& other) requires (dim==2) {
             return PyLatticeDirection(rlv.cross(other.rlv));
         }
@@ -100,6 +105,7 @@ namespace pyoilab {
         cross(const PyReciprocalLatticeVector<dim>& other) requires (dim==3) {
             return PyLatticeDirection(rlv.cross(other.rlv));
         }
+        */
     };
 
     template<int dim>
@@ -146,7 +152,13 @@ namespace pyoilab {
           .def("dot", &PyReciprocalLatticeVector::dot)
           // note that cross is a template member function
           //.def("cross", &PyReciprocalLatticeVector::template cross<dim>);
-          .def("cross", &PyReciprocalLatticeVector::cross);
+          //.def("cross", &PyReciprocalLatticeVector::cross);
+          .def("cross",
+               [](const PyReciprocalLatticeVector& self,
+                  const PyReciprocalLatticeVector& other) {
+               return self.cross(other);
+               }
+              );
     }
 
 }
