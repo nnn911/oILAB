@@ -49,56 +49,71 @@ public:
   IntScalarType dot(const ReciprocalLatticeDirection<dim> &other) const;
   VectorDimD cartesian() const;
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 2, ReciprocalLatticeDirection<dm>>::type
-  cross(const LatticeVector<dm> &other) const {
+  ReciprocalLatticeDirection<dim>
+  cross(const LatticeVector<dim> &other) const requires (dim == 2) {
     assert(&lattice == &other.lattice &&
            "LatticeVectors belong to different Lattices.");
-    return ReciprocalLatticeDirection<dm>(ReciprocalLatticeVector<dm>(
+    return ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(
         (VectorDimI() << 0, 0).finished(), lattice));
   }
-  template <int dm = dim>
-  typename std::enable_if<dm == 3, ReciprocalLatticeDirection<dm>>::type
-  cross(const LatticeVector<dm> &other) const {
+  ReciprocalLatticeDirection<dim>
+  cross(const LatticeVector<dim> &other) const requires (dim == 3) {
     assert(&lattice == &other.lattice &&
            "LatticeVectors belong to different Lattices.");
-    return ReciprocalLatticeDirection<dm>(ReciprocalLatticeVector<dm>(
+    return ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(
         static_cast<VectorDimI>(*this).cross(static_cast<VectorDimI>(other)),
         lattice));
   }
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 2, ReciprocalLatticeDirection<dm>>::type
-  cross() const {
-    return ReciprocalLatticeDirection<dm>(ReciprocalLatticeVector<dm>(
+  ReciprocalLatticeDirection<dim>
+  cross() const requires (dim == 2) {
+    return ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(
         (VectorDimI() << -(*this)(1), (*this)(0)).finished(), lattice));
   }
-  template <int dm = dim>
-  typename std::enable_if<dm == 3, ReciprocalLatticeDirection<dm>>::type
-  cross() const {
-    return ReciprocalLatticeDirection<dm>(ReciprocalLatticeVector<dm>(
+  ReciprocalLatticeDirection<dim>
+  cross() const requires (dim == 3) {
+    return ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(
         (VectorDimI() << -(*this)(1), (*this)(0), 0).finished(), lattice));
   }
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 2, void>::type static modulo(
+  static void modulo(
       LatticeVector<dim> &input, const std::vector<LatticeVector<dim>> &basis,
-      const VectorDimD &shift = VectorDimD::Zero());
+      const VectorDimD &shift = VectorDimD::Zero()) requires (dim == 2 || dim == 3) {
+    if constexpr (dim == 3) {
+      double det = (basis[0].cross(basis[1])).dot(basis[2]);
+      assert(abs(det) > FLT_EPSILON);
+      auto normal = basis[1].cross(basis[2]);
+      input = input - floor((double)input.dot(normal) / basis[0].dot(normal) - shift(0)) * basis[0];
+      assert((double)(input.dot(normal)) / basis[0].dot(normal) <= shift(0) + 1.0 &&
+             (double)(input.dot(normal)) / basis[0].dot(normal) >= shift(0));
+      normal = basis[2].cross(basis[0]);
+      input = input - floor((double)input.dot(normal) / basis[1].dot(normal) - shift(1)) * basis[1];
+      assert((double)(input.dot(normal)) / basis[1].dot(normal) <= shift(1) + 1.0 &&
+             (double)(input.dot(normal)) / basis[1].dot(normal) >= shift(1));
+      normal = basis[0].cross(basis[1]);
+      input = input - floor((double)input.dot(normal) / basis[2].dot(normal) - shift(2)) * basis[2];
+      assert((double)(input.dot(normal)) / basis[2].dot(normal) <= shift(2) + 1.0 &&
+             (double)(input.dot(normal)) / basis[2].dot(normal) >= shift(2));
+    } else {
+      auto normal = basis[1].cross();
+      input = input - input.dot(normal) / basis[0].dot(normal) * basis[0];
+      normal = basis[0].cross();
+      input = input - input.dot(normal) / basis[1].dot(normal) * basis[1];
+    }
+  }
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 2, void>::type static modulo(
+  static void modulo(
       VectorDimD &input, const std::vector<LatticeVector<dim>> &basis,
-      const VectorDimD &shift = VectorDimD::Zero());
-
-  template <int dm = dim>
-  typename std::enable_if<dm == 3, void>::type static modulo(
-      LatticeVector<dim> &input, const std::vector<LatticeVector<dim>> &basis,
-      const VectorDimD &shift = VectorDimD::Zero());
-
-  template <int dm = dim>
-  typename std::enable_if<dm == 3, void>::type static modulo(
-      VectorDimD &input, const std::vector<LatticeVector<dim>> &basis,
-      const VectorDimD &shift = VectorDimD ::Zero());
+      const VectorDimD &shift = VectorDimD::Zero()) requires (dim == 2 || dim == 3) {
+    if constexpr (dim == 3) {
+      Eigen::Matrix3d L;
+      L.col(0) = basis[0].cartesian();
+      L.col(1) = basis[1].cartesian();
+      L.col(2) = basis[2].cartesian();
+      Eigen::Vector3d inputCoordinates = ((L.inverse() * input).array() - shift.array()).floor();
+      input = input - L * inputCoordinates;
+    }
+  }
 
     };
 
@@ -108,4 +123,7 @@ public:
     template<int dim>
     LatticeVector<dim> operator*(const int& scalar, const LatticeVector<dim>& L);
     } // namespace oILAB
+
+#include "LatticeVectorImplementation.h"
+
 #endif

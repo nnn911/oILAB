@@ -25,25 +25,23 @@ public:
       const Eigen::array<Eigen::Index, dim> &n,
       const Eigen::Matrix<double, Eigen::Dynamic, dim> &_basisVectors);
 
-  template <typename T, typename = T, typename = T, int dm = dim,
-            typename = std::enable_if_t<dm == 1>>
+  template <typename T>
   LatticeFunction(
       const Eigen::array<Eigen::Index, dim> &n,
       const Eigen::Matrix<double, Eigen::Dynamic, dim> &_basisVectors,
-      const Function<T, Scalar> &fun);
+      const Function<T, Scalar> &fun) requires (dim == 1);
 
-  template <typename T, typename = T, int dm = dim,
-            typename = std::enable_if_t<dm == 2>>
+  template <typename T>
   LatticeFunction(
       const Eigen::array<Eigen::Index, dim> &n,
       const Eigen::Matrix<double, Eigen::Dynamic, dim> &_basisVectors,
-      const Function<T, Scalar> &fun);
+      const Function<T, Scalar> &fun) requires (dim == 2);
 
-  template <typename T, int dm = dim, typename = std::enable_if_t<dm == 3>>
+  template <typename T>
   LatticeFunction(
       const Eigen::array<Eigen::Index, dim> &n,
       const Eigen::Matrix<double, Eigen::Dynamic, dim> &_basisVectors,
-      const Function<T, Scalar> &fun);
+      const Function<T, Scalar> &fun) requires (dim == 3);
 
   std::complex<double>
   dot(const LatticeFunction<std::complex<double>, dim> &other) const;

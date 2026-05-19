@@ -9,9 +9,9 @@
 #ifndef model_BicrystalActor_cpp_
 #define model_BicrystalActor_cpp_
 
-#include <iostream>
 #include <deque>
 #include <string>
+#include "../../include/IO/Logger.h"
 
 
 #include <vtkVersion.h>
@@ -191,7 +191,7 @@ BicrystalActor::BicrystalActor(vtkGenericOpenGLRenderWindow *const renWin,
         /**********************************************************************/
         void BicrystalActor::updateConfiguration(const std::shared_ptr<BiCrystal<3>>& bc)
         {// https://stackoverflow.com/questions/6878263/remove-individual-points-from-vtkpoints
-            std::cout<<"Updating BiCrystal..."<<std::flush;
+            Logger::info() << "Updating BiCrystal...";
             const auto t0= std::chrono::system_clock::now();
 //
             vtkSmartPointer<vtkPoints> aPoints(vtkSmartPointer<vtkPoints>::New());
@@ -262,7 +262,7 @@ BicrystalActor::BicrystalActor(vtkGenericOpenGLRenderWindow *const renWin,
 //            velocityPolyData->Modified();
             renderer->ResetCamera();
             renderWindow->Render();
-            std::cout<<magentaColor<<" ["<<(std::chrono::duration<double>(std::chrono::system_clock::now()-t0)).count()<<" sec]"<<defaultColor<<std::endl;
+            Logger::info() << "[" << (std::chrono::duration<double>(std::chrono::system_clock::now()-t0)).count() << " sec]";
         }
         
         /**********************************************************************/

@@ -32,4 +32,7 @@ public:
 
     };
     } // namespace oILAB
+
+#include "GbShiftsImplementation.h"
+
 #endif //OILAB_MESOSTATE_H

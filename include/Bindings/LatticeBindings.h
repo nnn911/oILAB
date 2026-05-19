@@ -14,9 +14,9 @@ namespace pyoilab {
     template<int dim>
     void bind_Lattice(py::module_ &m) {
       using Lattice = oILAB::Lattice<dim>;
-      using PyLatticeVector = PyLatticeVector<dim>;
-      using PyReciprocalLatticeDirection = PyReciprocalLatticeDirection<dim>;
-      using PyLatticeDirection = PyLatticeDirection<dim>;
+      using PyLatticeVector = pyoilab::PyLatticeVector<dim>;
+      using PyReciprocalLatticeDirection = pyoilab::PyReciprocalLatticeDirection<dim>;
+      using PyLatticeDirection = pyoilab::PyLatticeDirection<dim>;
       using LatticeVector = oILAB::LatticeVector<dim>;
 
       using MatrixDimD = Eigen::Matrix<double, dim, dim>;

@@ -21,9 +21,7 @@
 #include <regex>
 #include <Eigen/Dense>
 
-
-
-#include "TerminalColors.h"
+#include "Logger.h"
 
 namespace oILAB {
 
@@ -33,9 +31,8 @@ struct StringToScalar
     
     static T toScalar(const std::string& key)
     {
-        throw std::runtime_error("Unknown conversion from std::string "+key+" to "+typeid(T).name()+".");
-        //            std::cout<<"Unknown conversion from std::string "<<key<<" to "<< typeid(T).name()<<". Exiting."<<std::endl;
-        //            exit(EXIT_FAILURE);
+      throw std::runtime_error("Unknown conversion from std::string " + key +
+                               " to " + typeid(T).name() + ".");
     }
 };
 
@@ -284,7 +281,9 @@ public:
     std::string readString(const std::string& key,const bool&verbose=false)
     {
         const std::pair<std::string,std::string> strPair(readKey(key)[0]);
-        if(verbose) std::cout<<cyanColor<<key<<"="<<strPair.first<<" "<<strPair.second<<defaultColor<<std::endl;
+        if (verbose)
+          Logger::debug() << key << "=" << strPair.first << " "
+                          << strPair.second;
         return strPair.first;
     }
     
@@ -295,16 +294,15 @@ public:
     }
     
     /**********************************************************************/
-    template<typename Scalar>
-    Scalar readScalar(const std::string& key,const bool&verbose=false)
-    {
-        if(verbose) std::cout<<cyanColor<<key<<"="<<std::flush;
-        const std::pair<std::string,std::string> strPair(readKey(key)[0]);
-        const Scalar read(StringToScalar<Scalar>::toScalar(strPair.first));
-        if(verbose) std::cout<<read<<" "<<strPair.second<<defaultColor<<std::endl;
-        return read;
+    template <typename Scalar>
+    Scalar readScalar(const std::string &key, const bool &verbose = false) {
+      const std::pair<std::string, std::string> strPair(readKey(key)[0]);
+      const Scalar read(StringToScalar<Scalar>::toScalar(strPair.first));
+      if (verbose)
+        Logger::debug() << key << "=" << read << " " << strPair.second;
+      return read;
     }
-    
+
     /**********************************************************************/
     template<typename Scalar>
     std::set<Scalar> readSet(const std::string& key,const bool&verbose=false)
@@ -317,12 +315,11 @@ public:
         }
         if(verbose)
         {
-            std::cout<<cyanColor<<key<<"=";
-            for(const auto& val : tempS)
-            {
-                std::cout<<" "<<val;
-            }
-            std::cout<<"; "<<defaultColor<<std::endl;
+          auto s = Logger::debug();
+          s << key << "=";
+          for (const auto &val : tempS)
+            s << " " << val;
+          s << ";";
         }
         return tempS;
     }
@@ -411,13 +408,11 @@ public:
         
         if(verbose)
         {
-            std::cout<<cyanColor<<key<<"=";
-            for(const auto& val : array)
-            {
-                std::cout<<" "<<val;
-            }
-            std::cout<<"; "<<comment<<defaultColor<<std::endl;
-            
+          auto s = Logger::debug();
+          s << key << "=";
+          for (const auto &val : array)
+            s << " " << val;
+          s << "; " << comment;
         }
         
         return array;
@@ -431,17 +426,18 @@ public:
         const std::vector<Scalar> array=readArray<Scalar>(key,false);
         if(array.size()!=rows*cols)
         {
-            throw std::runtime_error("Error in reading matrix "+key+": array.size="+std::to_string(array.size())+" is not equal to rows x cols ("+std::to_string(rows)+"x"+std::to_string(cols)+").");
-            //                std::cout<<"Error in reading matrix "<<key<<std::endl;
-            //                std::cout<<"array.size="<<array.size()<<", is not equal to rows x cols ("<<rows<<"x"<<cols<<"). EXITING"<<std::endl;
-            //                exit(EXIT_FAILURE);
+          throw std::runtime_error(
+              "Error in reading matrix " + key + ": array.size=" +
+              std::to_string(array.size()) + " is not equal to rows x cols (" +
+              std::to_string(rows) + "x" + std::to_string(cols) + ").");
         }
         
         EigenMapType<Scalar> em(array.data(), rows, cols, Eigen::Stride<Eigen::Dynamic,Eigen::Dynamic>(1, cols));
-        if(verbose) std::cout<<cyanColor<<key<<"=\n"<<em<<defaultColor<<std::endl;
+        if (verbose)
+          Logger::debug() << key << "=\n" << em;
         return  Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>(em);
     }
-    
+
     /**********************************************************************/
     template<typename Scalar,int rows,int cols>
     Eigen::Matrix<Scalar,rows,cols> readMatrix(const std::string& key,const bool&verbose=false)
@@ -457,17 +453,18 @@ public:
         const std::vector<Scalar> array=readArray<Scalar>(key,false);
         if(array.size()%cols!=0)
         {
-            throw std::runtime_error("Error in reading matrix "+key+": array.size="+std::to_string(array.size())+" is not a multiple of cols ("+std::to_string(cols)+").");
-            //                std::cout<<"Error in reading matrix "<<key<<std::endl;
-            //                std::cout<<"array.size="<<array.size()<<", is not a multiple of cols ("<<cols<<"). EXITING"<<std::endl;
-            //                exit(EXIT_FAILURE);
+          throw std::runtime_error(
+              "Error in reading matrix " + key +
+              ": array.size=" + std::to_string(array.size()) +
+              " is not a multiple of cols (" + std::to_string(cols) + ").");
         }
         const size_t rows(array.size()/cols);
         EigenMapType<Scalar> em(array.data(), rows, cols, Eigen::Stride<Eigen::Dynamic,Eigen::Dynamic>(1, cols));
-        if(verbose) std::cout<<cyanColor<<key<<"=\n"<<em<<defaultColor<<std::endl;
+        if (verbose)
+          Logger::debug() << key << "=\n" << em;
         return  Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>(em);
     }
-    
+
     /**********************************************************************/
     template<typename Scalar>
     Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic> readMatrixRows(const std::string& key,const size_t& rows,const bool&verbose=false)
@@ -476,15 +473,15 @@ public:
         const std::vector<Scalar> array=readArray<Scalar>(key,false);
         if(array.size()%rows!=0)
         {
-            throw std::runtime_error("Error in reading matrix "+key+": array.size="+std::to_string(array.size())+" is not a multiple of rows ("+std::to_string(rows)+").");
-            
-            //                std::cout<<"Error in reading matrix "<<key<<std::endl;
-            //                std::cout<<"array.size="<<array.size()<<", is not a multiple of rows ("<<rows<<"). EXITING"<<std::endl;
-            //                exit(EXIT_FAILURE);
+          throw std::runtime_error(
+              "Error in reading matrix " + key +
+              ": array.size=" + std::to_string(array.size()) +
+              " is not a multiple of rows (" + std::to_string(rows) + ").");
         }
         const size_t cols(array.size()/rows);
         EigenMapType<Scalar> em(array.data(), rows, cols, Eigen::Stride<Eigen::Dynamic,Eigen::Dynamic>(1, cols));
-        if(verbose) std::cout<<cyanColor<<key<<"=\n"<<em<<defaultColor<<std::endl;
+        if (verbose)
+          Logger::debug() << key << "=\n" << em;
         return  Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>(em);
     }
     

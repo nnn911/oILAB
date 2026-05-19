@@ -279,7 +279,7 @@ public:
     const IntValueType XDYA((X * D * Y - A).squaredNorm());
 
     if (UAVD != 0 || XDYA != 0) {
-      throw std::runtime_error("Smith decomposition failed\n");
+      throw std::runtime_error("Smith decomposition failed");
     }
   }
 

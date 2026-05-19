@@ -5,6 +5,8 @@
 #ifndef OILAB_GBMESOSTATEENSEMBLEIMPLEMENTATION_H
 #define OILAB_GBMESOSTATEENSEMBLEIMPLEMENTATION_H
 
+#include "GbMesoStateEnsemble.h"
+#include "../IO/Logger.h"
 #include "../Utilities/randomInteger.h"
 
 namespace oILAB {
@@ -21,19 +23,14 @@ GbMesoStateEnsemble<dim>::GbMesoStateEnsemble(
       ensembleCslVectors(ensembleCslVectors),
       bicrystalConfig(getBicrystalConfig((const GbShifts<dim> &)*this,
                                          ensembleCslVectors)) {
-  std::cout << "--------------------GBMesoStateEnsemble class construction "
-               "---------------------------"
-            << std::endl;
-  std::cout << "Forming mesostate ensemble with material parameters: ";
-  std::cout << "lambda = " << GbMaterialTensors::lambda;
-  std::cout << "; mu = " << GbMaterialTensors::mu << std::endl;
-  std::cout << std::endl;
-
-  std::cout << "Ensemble CSL vectors:" << std::endl;
+  Logger::info() << "--------------------GBMesoStateEnsemble class "
+                    "construction---------------------------";
+  Logger::info()
+      << "Forming mesostate ensemble with material parameters: lambda = "
+      << GbMaterialTensors::lambda << "; mu = " << GbMaterialTensors::mu;
+  Logger::info() << "Ensemble CSL vectors:";
   for (const auto &latticeVector : ensembleCslVectors)
-    std::cout << latticeVector.cartesian().transpose() << std::endl;
-  std::cout << std::endl;
-
+    Logger::info() << latticeVector.cartesian().transpose();
     }
 
     /*-------------------------------------*/
@@ -79,9 +76,9 @@ GbMesoStateEnsemble<dim>::GbMesoStateEnsemble(
     std::map<typename GbMesoStateEnsemble<dim>::Constraints,GbMesoState<dim>> GbMesoStateEnsemble<dim>::collectMesoStates(const std::string& filename) const
     {
         std::deque<Constraints> constraintsEnsemble(enumerateConstraints( (const GbShifts<dim>&) *this));
-        std::cout << "Number of mesostates in the ensemble = " << constraintsEnsemble.size() << std::endl;
-        std::cout << std::endl;
-        std::cout << "------------------------------" << std::endl;
+        Logger::info() << "Number of mesostates in the ensemble = "
+                       << constraintsEnsemble.size();
+        Logger::info() << "------------------------------";
         std::map<Constraints,GbMesoState<dim>> mesoStates;
 
         int count= -1;
@@ -92,15 +89,17 @@ GbMesoStateEnsemble<dim>::GbMesoStateEnsemble(
                 //mesoStates.emplace_back(constructMesoState(constraints));
                 mesoStates.emplace(constraints,constructMesoState(constraints));
                 count++;
-                std::cout << "Constructing mesostate " << count << " of " << constraintsEnsemble.size() << std::endl;
-                std::cout << "Mesostate signature:  " << constraints.transpose() << std::endl;
+                Logger::info() << "Constructing mesostate " << count << " of "
+                               << constraintsEnsemble.size();
+                Logger::info()
+                    << "Mesostate signature:  " << constraints.transpose();
                 if (!filename.empty())
                     //mesoStates.back().box(filename + std::to_string(count));
                     mesoStates.at(constraints).box(filename + std::to_string(count));
             }
             catch(std::runtime_error& e)
             {
-                std::cout << e.what() << std::endl;
+              Logger::warn() << e.what();
             }
 
         }

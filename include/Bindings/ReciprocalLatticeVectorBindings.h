@@ -92,16 +92,20 @@ namespace pyoilab {
             return rlv.closestPlaneIndexOfPoint(p);
         }
 
-        template<int dm=dim>
-        typename std::enable_if<dm==2,PyLatticeDirection<dm>>::type
-        cross(const PyReciprocalLatticeVector<dm>& other){
+        PyLatticeDirection<dim>
+        cross(const PyReciprocalLatticeVector<dim>& other) const requires (dim==2 || dim==3) {
             return PyLatticeDirection(rlv.cross(other.rlv));
         }
-        template<int dm=dim>
-        typename std::enable_if<dm==3,PyLatticeDirection<dm>>::type
-        cross(const PyReciprocalLatticeVector<dm>& other){
+        /*
+        PyLatticeDirection<dim>
+        cross(const PyReciprocalLatticeVector<dim>& other) requires (dim==2) {
             return PyLatticeDirection(rlv.cross(other.rlv));
         }
+        PyLatticeDirection<dim>
+        cross(const PyReciprocalLatticeVector<dim>& other) requires (dim==3) {
+            return PyLatticeDirection(rlv.cross(other.rlv));
+        }
+        */
     };
 
     template<int dim>
@@ -120,7 +124,7 @@ namespace pyoilab {
       using VectorDimD = Eigen::Matrix<double, dim, 1>;
       using VectorDimI = Eigen::Matrix<IntScalarType, dim, 1>;
       using MatrixDimI = Eigen::Matrix<IntScalarType, dim, dim>;
-      using PyReciprocalLatticeVector = PyReciprocalLatticeVector<dim>;
+      using PyReciprocalLatticeVector = pyoilab::PyReciprocalLatticeVector<dim>;
 
       py::class_<PyReciprocalLatticeVector>(
           m, ("ReciprocalLatticeVector" + std::to_string(dim) + "D").c_str())
@@ -147,7 +151,14 @@ namespace pyoilab {
           .def(py::self += py::self)
           .def("dot", &PyReciprocalLatticeVector::dot)
           // note that cross is a template member function
-          .def("cross", &PyReciprocalLatticeVector::template cross<dim>);
+          //.def("cross", &PyReciprocalLatticeVector::template cross<dim>);
+          //.def("cross", &PyReciprocalLatticeVector::cross);
+          .def("cross",
+               [](const PyReciprocalLatticeVector& self,
+                  const PyReciprocalLatticeVector& other) {
+               return self.cross(other);
+               }
+              );
     }
 
 }

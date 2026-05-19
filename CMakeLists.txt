@@ -4,19 +4,27 @@ project(oILAB VERSION 1.0 LANGUAGES C CXX)
 # ---------- C++ standard ----------
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_BUILD_TYPE Release)
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
 if(MSVC)
-    add_compile_options(/bigobj /MP)
+    add_compile_options(/bigobj)
 endif()
 
 # ---------- Dependencies ----------
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
+# ---------- Library type ----------
+option(BUILD_SHARED_LIBS "Build oILAB as a shared library" ON)
+
 # ---------- Subdirectories ----------
 add_subdirectory(src)
-add_subdirectory(examples)
-add_subdirectory(userExamples)
+option(ENABLE_EXAMPLES "Build examples" ON)
+if(ENABLE_EXAMPLES)
+    add_subdirectory(examples)
+    add_subdirectory(userExamples)
+endif()
 
 # ---------- Testing (optional) ----------
 option(ENABLE_TESTING "Build tests" OFF)
@@ -47,6 +55,7 @@ configure_package_config_file(
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/oILAB
 )
 
+set(OILAB_VERSION_NUMBER "${PROJECT_VERSION}")
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/oILABConfigVersion.cmake
     VERSION ${PROJECT_VERSION}

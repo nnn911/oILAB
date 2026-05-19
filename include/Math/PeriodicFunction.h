@@ -6,6 +6,7 @@
 #define OILAB_PERIODICFUNCTION_H
 
 #include "Eigen/Dense"
+#include "Function.h"
 #include "unsupported/Eigen/CXX11/Tensor"
 #include <iomanip>
 
@@ -28,22 +29,20 @@ public:
 
   // generates a periodic function from a function centered at the center of a
   // lattice
-  template <typename T, typename = T, typename = T, int dm = dim,
-            typename = std::enable_if_t<dm == 1>>
+  template <typename T>
   PeriodicFunction(const Eigen::array<Eigen::Index, dim> &n,
                    const Eigen::Matrix<double, Eigen::Dynamic, dim> &_unitCell,
-                   const Function<T, Scalar> &fun);
+                   const Function<T, Scalar> &fun) requires (dim == 1);
 
-  template <typename T, typename = T, int dm = dim,
-            typename = std::enable_if_t<dm == 2>>
+  template <typename T>
   PeriodicFunction(const Eigen::array<Eigen::Index, dim> &n,
                    const Eigen::Matrix<double, Eigen::Dynamic, dim> &_unitCell,
-                   const Function<T, Scalar> &fun);
+                   const Function<T, Scalar> &fun) requires (dim == 2);
 
-  template <typename T, int dm = dim, typename = std::enable_if_t<dm == 3>>
+  template <typename T>
   PeriodicFunction(const Eigen::array<Eigen::Index, dim> &n,
                    const Eigen::Matrix<double, Eigen::Dynamic, dim> &_unitCell,
-                   const Function<T, Scalar> &fun);
+                   const Function<T, Scalar> &fun) requires (dim == 3);
 
   LatticeFunction<dcomplex, dim> fft() const;
 
@@ -54,8 +53,8 @@ public:
   kernelConvolution(const Function<T, Scalar> &kernel);
     };
 
-    template<typename Scalar, int dim, typename = std::enable_if_t<dim==2>>
-    std::basic_ostream<char>& operator<<(std::basic_ostream<char>& s, const PeriodicFunction<Scalar, dim>& fun)
+    template<typename Scalar, int dim>
+    std::basic_ostream<char>& operator<<(std::basic_ostream<char>& s, const PeriodicFunction<Scalar, dim>& fun) requires (dim==2)
     {
         auto n = fun.values.dimensions();
         assert(n.size() == dim);
@@ -73,8 +72,8 @@ public:
         return s;
     }
 
-    template<typename Scalar, int dim, typename T, typename = std::enable_if_t<dim==3>>
-    std::basic_ostream<char>& operator<<(std::basic_ostream<char>& s, const PeriodicFunction<Scalar, dim>& fun)
+    template<typename Scalar, int dim, typename T>
+    std::basic_ostream<char>& operator<<(std::basic_ostream<char>& s, const PeriodicFunction<Scalar, dim>& fun) requires (dim==3)
     {
         auto n = fun.values.dimensions();
         assert(n.size() == dim);

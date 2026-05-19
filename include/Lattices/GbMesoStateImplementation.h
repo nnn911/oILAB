@@ -6,7 +6,7 @@
 #define OILAB_GBMESOSTATEIMPLEMENTATION_H
 
 #include "../IO/Lammps.h"
-#include <iostream>
+#include "../IO/Logger.h"
 //#include <Python.h>
 #include "../Math/PeriodicFunctionImplementation.h"
 
@@ -34,7 +34,8 @@ GbMesoState<dim>::GbMesoState(
   }
     catch(std::runtime_error& e)
     {
-        //throw(std::runtime_error("GB Mesostate construction failed"));
+      Logger::debug() << e.what();
+      throw(std::runtime_error("GB Mesostate construction failed"));
     }
 
 
@@ -242,9 +243,7 @@ GbMesoState<dim>::GbMesoState(
  */
 
  template<int dim>
- //template<int dm=dim>
- typename std::enable_if<dim==3,void>::type
- GbMesoState<dim>::box(const std::string& name) const
+ void GbMesoState<dim>::box(const std::string& name) const requires (dim==3)
  {
      const auto& config= this->bicrystalConfig;
      std::vector<LatticeVector<3>> boxVectors;

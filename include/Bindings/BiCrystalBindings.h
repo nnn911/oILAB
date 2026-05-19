@@ -13,8 +13,8 @@ namespace py = pybind11;
 namespace pyoilab {
     template<int dim>
     void bind_BiCrystal(py::module_ &m) {
-        using PyLatticeVector = PyLatticeVector<dim>;
-        using PyReciprocalLatticeVector = PyReciprocalLatticeVector<dim>;
+        using PyLatticeVector = pyoilab::PyLatticeVector<dim>;
+        using PyReciprocalLatticeVector = pyoilab::PyReciprocalLatticeVector<dim>;
         using BiCrystal = oILAB::BiCrystal<dim>;
         using Lattice = oILAB::Lattice<dim>;
         using LatticeVector = oILAB::LatticeVector<dim>;

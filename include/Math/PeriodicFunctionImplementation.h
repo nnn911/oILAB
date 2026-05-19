@@ -3,8 +3,8 @@
 //
 #ifndef OILAB_PERIODICFUNCTIONIMPLEMENTATION_H
 #define OILAB_PERIODICFUNCTIONIMPLEMENTATION_H
-//#include <PeriodicFunction.h>
 #include "FFT.h"
+#include "PeriodicFunction.h"
 
 namespace oILAB {
 template <typename Scalar, int dim>
@@ -16,46 +16,41 @@ PeriodicFunction<Scalar, dim>::PeriodicFunction(
     }
 
     template<typename Scalar, int dim>
-    template<typename T, typename, typename, int dm, typename>
+    template<typename T>
     PeriodicFunction<Scalar,dim>::PeriodicFunction(const Eigen::array<Eigen::Index,dim>& n,
                      const Eigen::Matrix<double,Eigen::Dynamic,dim>&  _unitCell,
-                     const Function<T,Scalar>& fun) :
+                     const Function<T,Scalar>& fun) requires (dim == 1) :
             values(n), unitCell(_unitCell)
     {
-        //Eigen::Vector<double,Eigen::Dynamic> center= unitCell.col(0)/2;
-        Eigen::Vector<double,Eigen::Dynamic> center= unitCell.col(0)/2;
         for (int i = 0; i < n[0]; i++)
         {
             Eigen::Vector<double,Eigen::Dynamic> x=i*unitCell.col(0)/n[0];
-            //values(i)= fun(x-center);
             values(i)= fun(x);
         }
     }
 
     template<typename Scalar, int dim>
-    template<typename T, typename, int dm, typename>
+    template<typename T>
     PeriodicFunction<Scalar,dim>::PeriodicFunction(const Eigen::array<Eigen::Index,dim>& n,
                      const Eigen::Matrix<double,Eigen::Dynamic,dim>&  _unitCell,
-                     const Function<T,Scalar>& fun) :
+                     const Function<T,Scalar>& fun) requires (dim == 2) :
             values(n), unitCell(_unitCell)
     {
-        //Eigen::Vector<double,Eigen::Dynamic> center= unitCell.col(0)/2 + unitCell.col(1)/2;
         for (int i = 0; i < n[0]; i++)
         {
             for (int j = 0; j < n[1]; j++)
             {
                 Eigen::Vector<double,Eigen::Dynamic> x=i*unitCell.col(0)/n[0] + j*unitCell.col(1)/n[1];
-                //values(i,j)= fun(x-center);
                 values(i,j)= fun(x);
             }
         }
     }
 
     template<typename Scalar, int dim>
-    template<typename T, int dm, typename>
+    template<typename T>
     PeriodicFunction<Scalar,dim>::PeriodicFunction(const Eigen::array<Eigen::Index,dim>& n,
                      const Eigen::Matrix<double,Eigen::Dynamic,dim>&  _unitCell,
-                     const Function<T,Scalar>& fun) :
+                     const Function<T,Scalar>& fun) requires (dim == 3) :
             values(n), unitCell(_unitCell)
     {
         //Eigen::Vector<double,Eigen::Dynamic> center=unitCell.col(0)/2 + unitCell.col(1)/2 + unitCell.col(2)/2;

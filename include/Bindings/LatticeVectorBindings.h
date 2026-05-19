@@ -21,7 +21,7 @@ namespace pyoilab{
     class PyLatticeVector {
       using Lattice = oILAB::Lattice<dim>;
       using LatticeVector = oILAB::LatticeVector<dim>;
-      using PyReciprocalLatticeDirection = PyReciprocalLatticeDirection<dim>;
+      using PyReciprocalLatticeDirection = pyoilab::PyReciprocalLatticeDirection<dim>;
 
       using IntScalarType = long long int;
       using MatrixDimD = Eigen::Matrix<double, dim, dim>;
@@ -81,32 +81,42 @@ namespace pyoilab{
             return lv.dot(other.rlv);
         }
 
-        template<int dm=dim>
-        typename std::enable_if<dm==2,PyReciprocalLatticeDirection>::type
-        cross(const PyLatticeVector<dim>& other) const
+
+        PyReciprocalLatticeDirection
+        cross(const PyLatticeVector<dim>& other) const requires (dim==2 || dim==3)
         {
             return PyReciprocalLatticeDirection(lv.cross(other.lv));
         }
 
-        template<int dm=dim>
-        typename std::enable_if<dm==3,PyReciprocalLatticeDirection>::type
-        cross(const PyLatticeVector<dm>& other) const
+        PyReciprocalLatticeDirection
+        cross() const requires (dim==2 || dim==3)
+        {
+            return PyReciprocalLatticeDirection(lv.cross());
+        }
+        /*
+        PyReciprocalLatticeDirection
+        cross(const PyLatticeVector<dim>& other) const requires (dim==2)
         {
             return PyReciprocalLatticeDirection(lv.cross(other.lv));
         }
 
-        template<int dm=dim>
-        typename std::enable_if<dm==2,PyReciprocalLatticeDirection>::type
-        cross() const
+        PyReciprocalLatticeDirection
+        cross(const PyLatticeVector<dim>& other) const requires (dim==3)
+        {
+            return PyReciprocalLatticeDirection(lv.cross(other.lv));
+        }
+
+        PyReciprocalLatticeDirection
+        cross() const requires (dim==2)
         {
             return PyReciprocalLatticeDirection(lv.cross());
         }
-        template<int dm=dim>
-        typename std::enable_if<dm==3,PyReciprocalLatticeDirection>::type
-        cross() const
+        PyReciprocalLatticeDirection
+        cross() const requires (dim==3)
         {
             return PyReciprocalLatticeDirection(lv.cross());
         }
+        */
 
     };
 
@@ -124,8 +134,8 @@ namespace pyoilab{
       using VectorDimD = Eigen::Matrix<double, dim, 1>;
       using VectorDimI = Eigen::Matrix<IntScalarType, dim, 1>;
       using MatrixDimI = Eigen::Matrix<IntScalarType, dim, dim>;
-      using PyLatticeVector = PyLatticeVector<dim>;
-      using PyReciprocalLatticeDirection = PyReciprocalLatticeDirection<dim>;
+      using PyLatticeVector = pyoilab::PyLatticeVector<dim>;
+      using PyReciprocalLatticeDirection = pyoilab::PyReciprocalLatticeDirection<dim>;
 
       py::class_<PyLatticeVector>(
           m, ("LatticeVector" + std::to_string(dim) + "D").c_str(),
@@ -165,12 +175,27 @@ namespace pyoilab{
               py::is_operator())
           .def(py::self -= py::self)
           .def(py::self += py::self)
+
+          .def("cross",
+               [](const PyLatticeVector& self,
+                  const PyLatticeVector& other) {
+                    return self.cross(other); 
+                    }
+              )
+          .def("cross",
+               [](const PyLatticeVector& self) {
+                    return self.cross();
+                    }
+              );
+
+      /*
           .def("cross",
                static_cast<PyReciprocalLatticeDirection (PyLatticeVector::*)(
                    const PyLatticeVector &) const>(&PyLatticeVector::cross))
           .def("cross",
                static_cast<PyReciprocalLatticeDirection (PyLatticeVector::*)()
                                const>(&PyLatticeVector::cross));
+                               */
     }
 }
 #endif //OILAB_LATTICEVECTORBINDINGS_H

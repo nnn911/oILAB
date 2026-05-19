@@ -4,7 +4,7 @@
 
 #ifndef OILAB_RANDOM_H
 #define OILAB_RANDOM_H
-#include <iostream>
+
 #include <random>
 
 namespace oILAB {
@@ -18,7 +18,7 @@ template <typename T> T random(const T &a, const T &b) {
     std::uniform_real_distribution<> distrib(a, b);
     return distrib(gen);
   } else {
-    throw(std::runtime_error("Unknown type\n"));
+    throw(std::runtime_error("Unknown type"));
   }
     }
     } // namespace oILAB

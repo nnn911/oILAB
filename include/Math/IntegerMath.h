@@ -7,12 +7,12 @@
 #ifndef gbLAB_IntegerMath_h_
 #define gbLAB_IntegerMath_h_
 
-#include <numeric>
+#include "../IO/Logger.h"
 #include <Eigen/Dense>
-#include <vector>
-#include <iostream>
 #include <algorithm>
 #include <deque>
+#include <numeric>
+#include <vector>
 
 namespace oILAB {
 template <typename IntScalarType> struct IntegerMath {
@@ -33,7 +33,7 @@ template <typename IntScalarType> struct IntegerMath {
   static IntScalarType gcd(const Eigen::MatrixBase<T> &a) {
     switch (a.size()) {
     case 0: {
-      throw std::runtime_error("gcd: array size is zero\n");
+      throw std::runtime_error("gcd: array size is zero");
       return 0;
       break;
     }
@@ -70,7 +70,7 @@ template <typename IntScalarType> struct IntegerMath {
   static IntScalarType lcm(const Eigen::MatrixBase<T> &a) {
     switch (a.size()) {
     case 0: {
-      throw std::runtime_error("lcm: array size is zero\n");
+      throw std::runtime_error("lcm: array size is zero");
       return 0;
       break;
     }
@@ -182,9 +182,9 @@ template <typename IntScalarType> struct IntegerMath {
     IntScalarType g = extended_gcd(a, b, x, y);
 
     if (c % g != 0) {
-      std::cout << a << "  " << b << "  " << c << "   " << g << std::endl;
-      puts("Impossible");
-      exit(0);
+      Logger::debug() << a << "  " << b << "  " << c << "   " << g;
+      throw std::runtime_error(
+          "Unexpected error in integerGramSchmidt::solveDiophantine2vars");
     }
 
     c /= g;
