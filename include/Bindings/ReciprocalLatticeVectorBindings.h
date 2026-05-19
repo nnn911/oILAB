@@ -145,7 +145,8 @@ namespace pyoilab {
           .def(py::self += py::self)
           .def("dot", &PyReciprocalLatticeVector::dot)
           // note that cross is a template member function
-          .def("cross", &PyReciprocalLatticeVector::template cross<dim>);
+          //.def("cross", &PyReciprocalLatticeVector::template cross<dim>);
+          .def("cross", &PyReciprocalLatticeVector::cross);
     }
 
 }

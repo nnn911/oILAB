@@ -94,7 +94,7 @@ std::vector<LatticeVector<dim>> Gb<dim>::box(const std::vector<LatticeVector<dim
         rotation = Rotation<dim>(orthogonalVectors);
     }
     // assert((rotation*rotation.transpose()).template isApprox(Eigen::Matrix<double,dim,dim>::Identity())
-    assert((rotation * rotation.transpose()).isApprox(Eigen::Matrix<double, dim, dim>::Identity()) &&
+    assert((rotation * rotation.transpose()).isApprox(Eigen::Matrix<double, dim, dim>::Identity(),1e-10) &&
            "Cannot orient the grain boundary. The GB plane box vectors are not orthogonal.");
 
     if(!filename.empty()) {
