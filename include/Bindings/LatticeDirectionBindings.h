@@ -64,8 +64,8 @@ namespace pyoilab{
         using LatticeDirection = oILAB::LatticeDirection<dim>;
         using LatticeVector = oILAB::LatticeVector<dim>;
 
-        using PyLatticeDirection = PyLatticeDirection<dim>;
-        using PyLatticeVector = PyLatticeVector<dim>;
+        using PyLatticeDirection = pyoilab::PyLatticeDirection<dim>;
+        using PyLatticeVector = pyoilab::PyLatticeVector<dim>;
 
         py::class_<PyLatticeDirection>(m, ("LatticeDirection" + std::to_string(dim) + "D").c_str())
                 .def(py::init<const PyLatticeVector&>())

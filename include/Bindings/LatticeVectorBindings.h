@@ -21,7 +21,7 @@ namespace pyoilab{
     class PyLatticeVector {
       using Lattice = oILAB::Lattice<dim>;
       using LatticeVector = oILAB::LatticeVector<dim>;
-      using PyReciprocalLatticeDirection = PyReciprocalLatticeDirection<dim>;
+      using PyReciprocalLatticeDirection = pyoilab::PyReciprocalLatticeDirection<dim>;
 
       using IntScalarType = long long int;
       using MatrixDimD = Eigen::Matrix<double, dim, dim>;
@@ -120,8 +120,8 @@ namespace pyoilab{
       using VectorDimD = Eigen::Matrix<double, dim, 1>;
       using VectorDimI = Eigen::Matrix<IntScalarType, dim, 1>;
       using MatrixDimI = Eigen::Matrix<IntScalarType, dim, dim>;
-      using PyLatticeVector = PyLatticeVector<dim>;
-      using PyReciprocalLatticeDirection = PyReciprocalLatticeDirection<dim>;
+      using PyLatticeVector = pyoilab::PyLatticeVector<dim>;
+      using PyReciprocalLatticeDirection = pyoilab::PyReciprocalLatticeDirection<dim>;
 
       py::class_<PyLatticeVector>(
           m, ("LatticeVector" + std::to_string(dim) + "D").c_str(),

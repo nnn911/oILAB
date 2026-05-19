@@ -118,7 +118,7 @@ namespace pyoilab {
       using VectorDimD = Eigen::Matrix<double, dim, 1>;
       using VectorDimI = Eigen::Matrix<IntScalarType, dim, 1>;
       using MatrixDimI = Eigen::Matrix<IntScalarType, dim, dim>;
-      using PyReciprocalLatticeVector = PyReciprocalLatticeVector<dim>;
+      using PyReciprocalLatticeVector = pyoilab::PyReciprocalLatticeVector<dim>;
 
       py::class_<PyReciprocalLatticeVector>(
           m, ("ReciprocalLatticeVector" + std::to_string(dim) + "D").c_str())

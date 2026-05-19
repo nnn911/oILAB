@@ -70,8 +70,8 @@ namespace pyoilab{
             oILAB::ReciprocalLatticeDirection<dim>;
         using LatticeVector = oILAB::LatticeVector<dim>;
 
-        using PyReciprocalLatticeDirection = PyReciprocalLatticeDirection<dim>;
-        using PyReciprocalLatticeVector = PyReciprocalLatticeVector<dim>;
+        using PyReciprocalLatticeDirection = pyoilab::PyReciprocalLatticeDirection<dim>;
+        using PyReciprocalLatticeVector = pyoilab::PyReciprocalLatticeVector<dim>;
 
         py::class_<PyReciprocalLatticeDirection>(m, ("ReciprocalLatticeDirection" + std::to_string(dim) + "D").c_str())
                 .def(py::init<const PyReciprocalLatticeVector&>())

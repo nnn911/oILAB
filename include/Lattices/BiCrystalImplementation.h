@@ -16,6 +16,7 @@
 #include "../Math/RLLL.h"
 #include "../Utilities/Rotation.h"
 #include <bitset>
+#include <optional>
 
 namespace oILAB {
 
