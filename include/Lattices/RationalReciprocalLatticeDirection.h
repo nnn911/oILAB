@@ -56,4 +56,6 @@ public:
     RationalReciprocalLatticeDirection<dim> operator*(const typename RationalReciprocalLatticeDirection<dim>::IntScalarType& scalar, const RationalReciprocalLatticeDirection<dim>& L);
 
     } // namespace oILAB
+
+#include "RationalReciprocalLatticeDirectionImplementation.h"
 #endif

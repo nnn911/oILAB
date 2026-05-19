@@ -38,6 +38,6 @@ public:
     };
 
     } // namespace oILAB
+
+#include "RationalMatrixImplementation.h"
 #endif
-
-

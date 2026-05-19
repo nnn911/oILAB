@@ -53,4 +53,6 @@ struct ReciprocalLatticeDirection :
     operator<<(std::basic_ostream<char> &s,
                const ReciprocalLatticeDirection<dim> &m);
     } // namespace oILAB
+
+#include "ReciprocalLatticeDirectionImplementation.h"
 #endif

@@ -7,13 +7,10 @@
 #ifndef gbLAB_BiCrystal_h_
 #define gbLAB_BiCrystal_h_
 
-#include "../Math/LLL.h"
-#include "../Math/RLLL.h"
 #include "../Math/RationalMatrix.h"
 #include "../Math/SmithDecomposition.h"
-#include "../Utilities/Rotation.h"
 #include "LatticeModule.h"
-#include <unordered_set>
+#include <map>
 
 namespace oILAB {
     /*!Class template that computes the coincident-site-lattice (CSL) of two
@@ -48,7 +45,27 @@ namespace oILAB {
                                        const MatrixDimI& N);
 
     public:
+        template<IntScalarType keyScale>
+        class GBKey
+        {
+        public:
+            GBKey(const Gb<dim>& gb) : _referenceVector(gb.nA.cartesian().normalized()) {}
 
+            [[nodiscard]] IntScalarType operator()(const Gb<dim>& gb) const noexcept
+            {
+                const double cosAngle = gb.nA.cartesian().normalized().dot(_referenceVector);
+                return (std::clamp(cosAngle, -1.0, 1.0) + 1.0) * keyScale;
+            }
+
+            [[nodiscard]] constexpr static IntScalarType minKey() noexcept { return 0; };
+            [[nodiscard]] constexpr static IntScalarType maxKey() noexcept { return 2 * keyScale; };
+            [[nodiscard]] constexpr static IntScalarType numKeys() noexcept { return maxKey() + 1; };
+
+        private:
+            ReciprocalLatticeVector<dim>::VectorDimD _referenceVector;
+        };
+
+    public:
         const Lattice<dim>& A;
         const Lattice<dim>& B;
 
@@ -219,6 +236,17 @@ namespace oILAB {
         std::map<IntScalarType,Gb<dim>>
         generateGrainBoundaries(const LatticeDirection<dim>& d, int div=30) const requires (dim==2 || dim==3);
 
+        /*!
+         * \brief Given a tilt axis \f$\textbf d\f$, that belongs to lattices \f$\mathcal A\f$ or \f$\mathcal B\f$, this
+         * function generate a set of tilt GBs. CURRENTLY ONLY WORDS FOR DIMENSION 3
+         * @param d - LatticeDirection that describes the tilt axis
+         * @param div - parameter to span the GBs
+         * @param callback - callback function that is called for each GB
+         */
+        template<typename Callback>
+        void generateGrainBoundaries(const LatticeDirection<dim>& d, int div = 30, Callback&& callback = {}) const
+            requires(dim == 2 || dim == 3);
+
         void
         updateBoxVectors(std::vector<LatticeVector<dim>>& boxVectors,
                               const double& orthogonality=0.0) const requires (dim==2 || dim==3);
@@ -247,5 +275,8 @@ namespace oILAB {
     
     
 } // end namespace
+
+#include "BiCrystalImplementation.h"
+
 #endif
 

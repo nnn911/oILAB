@@ -6,6 +6,7 @@
 #define OILAB_PERIODICFUNCTION_H
 
 #include "Eigen/Dense"
+#include "Function.h"
 #include "unsupported/Eigen/CXX11/Tensor"
 #include <iomanip>
 

@@ -339,4 +339,7 @@ public:
  * Full code:
  */
 } // namespace oILAB
+
+#include "LatticeImplementation.h"
+
 #endif

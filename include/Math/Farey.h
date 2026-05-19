@@ -21,4 +21,5 @@ struct Fraction {
 
     } // namespace oILAB
 
+#include "FareyImplementation.h"
 #endif

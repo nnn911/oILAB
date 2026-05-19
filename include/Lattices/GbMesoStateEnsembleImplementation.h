@@ -5,6 +5,7 @@
 #ifndef OILAB_GBMESOSTATEENSEMBLEIMPLEMENTATION_H
 #define OILAB_GBMESOSTATEENSEMBLEIMPLEMENTATION_H
 
+#include "GbMesoStateEnsemble.h"
 #include "../IO/Logger.h"
 #include "../Utilities/randomInteger.h"
 

@@ -15,13 +15,14 @@ template <int dim> class Gb {
   using VectorDimD = typename LatticeCore<dim>::VectorDimD;
   using MatrixDimD = typename LatticeCore<dim>::MatrixDimD;
   using MatrixDimI = typename LatticeCore<dim>::MatrixDimI;
-  using IntScalarType = typename LatticeCore<dim>::IntScalarType;
 
 private:
   MatrixDimI getBasisT(const BiCrystal<dim> &bc,
                        const ReciprocalLatticeDirection<dim> &n);
 
 public:
+  using IntScalarType = typename LatticeCore<dim>::IntScalarType;
+
   /*!
    * Bicrystal formed by two lattices, say \f$\mathcal A\f$ and \f$\mathcal B\f$
    */
@@ -240,4 +241,6 @@ public:
  */
     } // namespace oILAB
 
-#endif //OILAB_GB_H
+#include "GbImplementation.h"
+
+#endif  // OILAB_GB_H
