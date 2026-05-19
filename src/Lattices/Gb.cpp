@@ -5,6 +5,7 @@
 #define OILAB_GB_CPP
 
 #include "../../include/Lattices/Gb.h"
+#include "../../include/IO/Logger.h"
 
 namespace oILAB {
 template <int dim>
@@ -30,7 +31,7 @@ Gb<dim>::Gb(const BiCrystal<dim> &bc,
     }
     catch(std::runtime_error& e)
     {
-        std::cout << e.what() << std::endl;
+        Logger::error() << e.what();
         throw(std::runtime_error("GB construction failed. "));
     }
 

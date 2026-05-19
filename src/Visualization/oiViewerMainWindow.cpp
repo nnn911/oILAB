@@ -9,9 +9,8 @@
 #ifndef model_oiViewerMainWindow_cpp_
 #define model_oiViewerMainWindow_cpp_
 
-#include <iostream>
-
 #include "../../include/Visualization/oiViewerMainWindow.h"
+#include "../../include/IO/Logger.h"
 #include <QMenu>
 #include <QMenuBar>
 
@@ -42,7 +41,7 @@ oiViewerMainWindow::oiViewerMainWindow()
         }
         catch(const std::exception& e)
         {
-            std::cout<<e.what()<<std::endl;
+            Logger::error() << e.what();
         }
     }
 

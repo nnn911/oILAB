@@ -8,6 +8,7 @@
 #define gbLAB_RLLL_cpp_
 
 #include "../../include/Math/RLLL.h"
+#include "../../include/IO/Logger.h"
 #include <vector>
 
 namespace oILAB {
@@ -168,14 +169,17 @@ void RLLL::update(VectorType &H, MatrixType &M, const int &k) {
             }
 
             if (err > FLT_EPSILON) {
-                std::cout << "RLLL relative error= " << std::setprecision(15) << std::scientific << err << " > "
-                          << FLT_EPSILON << std::endl;
-                throw std::runtime_error("Relative error too large. RLLL failed.\n");
+              Logger::debug()
+                  << "RLLL relative error= " << std::setprecision(15)
+                  << std::scientific << err << " > " << FLT_EPSILON;
+              throw std::runtime_error(
+                  "Relative error too large. RLLL failed.");
             }
 
             if (fabs(absDetU - 1.0) > FLT_EPSILON) {
-                std::cout << "|det(U)|= " << std::setprecision(15) << std::scientific << absDetU << std::endl;
-                throw std::runtime_error("U is not unimodular. RLLL failed.\n");
+              Logger::debug() << "|det(U)|= " << std::setprecision(15)
+                              << std::scientific << absDetU;
+              throw std::runtime_error("U is not unimodular. RLLL failed.");
             }
 
         }

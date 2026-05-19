@@ -7,6 +7,7 @@
 #ifndef gbLAB_BiCrystal_cpp_
 #define gbLAB_BiCrystal_cpp_
 
+#include "../../include/IO/Logger.h"
 #include "../../include/Lattices/LatticeModule.h"
 #include <numbers>
 
@@ -113,7 +114,7 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
         const auto C2(B.latticeBasis*(sd.matrixV()*N).template cast<double>());
         if ((C1-C2).norm()/C1.norm()>FLT_EPSILON || (C1-C2).norm()/C2.norm()>FLT_EPSILON)
         {
-            throw std::runtime_error("CSL calculation failed.\n");
+          throw std::runtime_error("CSL calculation failed.");
         }
 
         /*
@@ -141,7 +142,7 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
         const auto D2(B.latticeBasis*sd.matrixV().template cast<double>()*M.template cast<double>().inverse());
         if ((D1-D2).norm()/D1.norm()>FLT_EPSILON || (D1-D2).norm()/D2.norm()>FLT_EPSILON)
         {
-            throw std::runtime_error("DSCL calculation failed.\n");
+          throw std::runtime_error("DSCL calculation failed.");
         }
         /*
         if(useRLLL)
@@ -189,14 +190,14 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
             if ((tempA-tempA.array().round().matrix()).norm()/tempA.norm()>FLT_EPSILON)
             {
                 //std::cout << (tempA-tempA.array().round().matrix()).norm()/tempA.norm() << std::endl;
-                throw std::runtime_error("CSL is not a multiple of lattice A.\n");
+                throw std::runtime_error("CSL is not a multiple of lattice A.");
             }
 
             const MatrixDimD tempB(B.reciprocalBasis.transpose()*csl.latticeBasis);
             if ((tempB-tempB.array().round().matrix()).norm()/tempB.norm()>FLT_EPSILON)
             {
                 //std::cout << (tempB-tempB.array().round().matrix()).norm()/tempB.norm() << std::endl;
-                throw std::runtime_error("CSL is not a multiple of lattice B\n");
+                throw std::runtime_error("CSL is not a multiple of lattice B");
             }
         }
 
@@ -207,14 +208,16 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
             if ((tempA-tempA.array().round().matrix()).norm()/tempA.norm()>FLT_EPSILON)
             {
                 //std::cout << (tempA-tempA.array().round().matrix()).norm()/tempA.norm() << std::endl;
-                throw std::runtime_error("Lattice A is not a multiple of the DSCL\n");
+                throw std::runtime_error(
+                    "Lattice A is not a multiple of the DSCL");
             }
 
             const MatrixDimD tempB(dscl.reciprocalBasis.transpose()*B.latticeBasis);
             if ((tempB-tempB.array().round().matrix()).norm()/tempB.norm()>FLT_EPSILON)
             {
                 //std::cout << (tempB-tempB.array().round().matrix()).norm()/tempB.norm() << std::endl;
-                throw std::runtime_error("Lattice B is not a multiple of the DSCL\n");
+                throw std::runtime_error(
+                    "Lattice B is not a multiple of the DSCL");
             }
         }
 
@@ -222,7 +225,7 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
         {//verify LambdaA + LambdaB = I
             if (!(LambdaA+LambdaB).isIdentity())
             {
-                throw std::runtime_error("LambdaA + LambdaB != I\n");
+              throw std::runtime_error("LambdaA + LambdaB != I");
             }
         }
 
@@ -230,8 +233,8 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
 
     catch(std::runtime_error& e)
     {
-        std::cout << e.what() << std::endl;
-        throw(std::runtime_error("Bicrystal construction failed. "));
+      Logger::error() << e.what();
+      throw(std::runtime_error("Bicrystal construction failed."));
     }
 
     template<int dim>
@@ -466,7 +469,8 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
     BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int div) const
     {
         if (&d.lattice != &A && &d.lattice != &B)
-            throw std::runtime_error("The tilt axis does not belong to lattices A and B  \n");
+          throw std::runtime_error(
+              "The tilt axis does not belong to lattices A and B  ");
         std::vector<Gb<dm>> gbVec;
         double epsilon=1e-8;
         int count= -1;
@@ -488,9 +492,10 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
                     }
                     catch(std::runtime_error& e)
                     {
-                        std::cout << e.what() << std::endl;
-                        std::cout << "Unable to form GB with normal = " << rv << std::endl;
-                        std::cout << "moving on to next inclination" << std::endl;
+                      Logger::warn() << e.what();
+                      Logger::warn()
+                          << "Unable to form GB with normal = " << rv;
+                      Logger::warn() << "moving on to next inclination";
                     }
                 }
             }

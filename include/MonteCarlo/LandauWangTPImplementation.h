@@ -5,10 +5,10 @@
 #ifndef OILAB_LANDAUWANGTPIMPLEMENTATION_H
 #define OILAB_LANDAUWANGTPIMPLEMENTATION_H
 
-#include <iostream>
-#include <numeric>
+#include "../IO/Logger.h"
 #include "../Lattices/GbMesoState.h"
 #include <iomanip>
+#include <numeric>
 
 namespace oILAB {
 /* ---------------------------------------------------*/
@@ -40,20 +40,22 @@ namespace oILAB {
             mask(getMask(numberOfEnergyStates,numberOfDensityStates)),
             theta(getTheta(mask,f))
     {
-        std::cout << "Number of the mask-free histogram bins= " << histogram.size()-mask.template cast<int>().sum() << std::endl;
-        spectrumFile.open("energyDensityLW.txt",std::ios_base::app);
+      Logger::info() << "Number of the mask-free histogram bins= "
+                     << histogram.size() - mask.template cast<int>().sum();
+      spectrumFile.open("energyDensityLW.txt", std::ios_base::app);
     }
     catch(std::runtime_error& e)
     {
-        std::cout << e.what() << std::endl;
-        exit(0);
+      Logger::debug() << e.what();
+      throw(std::runtime_error("Landau Wang TP construction failed"));
+      // exit(0);
     }
     template<typename StateType, typename SystemType>
     double LandauWangTP<StateType,SystemType>::probability(const std::pair<StateType,SystemType>& proposedStateSystem,
                                                            const std::pair<StateType,SystemType>& currentStateSystem)
     {
         countLW++;
-        std::cout << countLW << ") ";
+        Logger::info() << countLW << ")";
         const auto& currentState= currentStateSystem.first;
         const auto& currentSystem= currentStateSystem.second;
         const auto& proposedState= proposedStateSystem.first;
@@ -66,7 +68,7 @@ namespace oILAB {
             //currentDensity= temp.first;
             currentDensity= currentState.density();
             currentEnergy= std::get<1>(temp);
-            std::cout << currentState;
+            Logger::info() << currentState;
             stateDensityEnergyMap[currentState]= std::make_pair(std::get<0>(temp),std::get<1>(temp));
             spectrumFile << currentDensity << " " << currentEnergy << " " << currentState << std::endl;
         }
@@ -79,19 +81,23 @@ namespace oILAB {
         // Compute proposed state properties
         double proposedEnergy, proposedDensity;
         if (stateDensityEnergyMap.find(proposedState) != stateDensityEnergyMap.end()) {
-            std::cout << "found. Proposed state = " << proposedState << std::endl;
-            proposedDensity= stateDensityEnergyMap.at(proposedState).first;
-            proposedEnergy = stateDensityEnergyMap.at(proposedState).second;
-            std::cout << "proposedDensity =  " << proposedDensity << "; proposedEnergy = " << proposedEnergy << std::endl;
+          Logger::info() << "found. Proposed state = " << proposedState;
+          proposedDensity = stateDensityEnergyMap.at(proposedState).first;
+          proposedEnergy = stateDensityEnergyMap.at(proposedState).second;
+          Logger::info() << "proposedDensity =  " << proposedDensity
+                         << "; proposedEnergy = " << proposedEnergy;
         }
         else {
-            std::cout << "new" << std::endl;
-            const auto& temp= proposedSystem.densityEnergy(lmpLocation, potentialName, false);
-            //proposedDensity= temp.first;
-            proposedDensity= proposedState.density();
-            proposedEnergy= std::get<1>(temp);
-            stateDensityEnergyMap[proposedState]= std::make_pair(std::get<0>(temp),std::get<1>(temp));
-            spectrumFile << proposedDensity << " " << proposedEnergy << " " << proposedState << std::endl;
+          Logger::info() << "new";
+          const auto &temp =
+              proposedSystem.densityEnergy(lmpLocation, potentialName, false);
+          // proposedDensity= temp.first;
+          proposedDensity = proposedState.density();
+          proposedEnergy = std::get<1>(temp);
+          stateDensityEnergyMap[proposedState] =
+              std::make_pair(std::get<0>(temp), std::get<1>(temp));
+          spectrumFile << proposedDensity << " " << proposedEnergy << " "
+                       << proposedState << std::endl;
         }
 
         auto [currentEnergyIndex,currentDensityIndex,currentInSpectrum]= spectrumIndex(currentEnergy,currentDensity,energyLimits,densityLimits);
@@ -115,32 +121,30 @@ namespace oILAB {
         theta = theta / thetaNorm;
 
         // output histogram
-        //std::cout << "current density = " << currentDensity
+        // std::cout << "current density = " << currentDensity
         //          << ", energy = " << currentEnergy << std::endl;
-        for(int i=0; i<histogram.rows(); ++i)
         {
-            for(int j=0; j<histogram.cols(); ++j)
-            {
-                if(!mask(i,j))
-                    std::cout << histogram(i,j) << " ";
-            }
+          auto s = Logger::debug();
+          for (int i = 0; i < histogram.rows(); ++i)
+            for (int j = 0; j < histogram.cols(); ++j)
+              if (!mask(i, j))
+                s << histogram(i, j) << " ";
         }
-        std::cout << std::endl;
 
         // update f
         if (exponentialRegime) {
             if (histogramIsFlat(0.8)) {
-                std::cout << "Histogram is flat: f = " << f << std::endl;
-                // reset the histogram
-                histogram.setZero();
-                // exponential regime
-                f = sqrt(f);
+              Logger::info() << "Histogram is flat: f = " << f;
+              // reset the histogram
+              histogram.setZero();
+              // exponential regime
+              f = sqrt(f);
             }
             if (f < exp(1.0 / (countLW + 1))) {
-                std::cout << "Beginning non-exponential regime." << std::endl;
-                exponentialRegime = false;
-                // non-exponential regime
-                f = exp(1.0 / (countLW + 1));
+              Logger::info() << "Beginning non-exponential regime.";
+              exponentialRegime = false;
+              // non-exponential regime
+              f = exp(1.0 / (countLW + 1));
             }
         } else
             f = exp(1.0 / (countLW + 1));
@@ -176,7 +180,7 @@ namespace oILAB {
 
         double nonFlatness= *std::max_element(flatnessMeasure.begin(), flatnessMeasure.end())*size/c;
         //if (*std::max_element(flatnessMeasure.begin(), flatnessMeasure.end()) < c / histogram.size())
-        std::cout << "Flatness measure = " << nonFlatness << std::endl;
+        Logger::info() << "Flatness measure = " << nonFlatness;
 
         if (nonFlatness<1)
             return true;
@@ -214,7 +218,7 @@ namespace oILAB {
         file.open("mask.txt");
         std::string line;
         if (!file)
-            std::cout << "File mask.txt not found.";
+          Logger::warn() << "File mask.txt not found.";
         else{
             int i= 0;
             while(std::getline(file,line)) {
@@ -224,8 +228,7 @@ namespace oILAB {
                 ++i;
             }
         }
-        std::cout << "mask = " << std::endl;
-        std::cout << output << std::endl;
+        Logger::info() << "mask =\n" << output;
         return output;
     }
 
@@ -260,7 +263,7 @@ namespace oILAB {
         for (const auto& [key,value]: output)
             std::cout <<  value.first << " " << value.second << " " << key << std::endl;
          */
-        std::cout << "Number of pre-computed states = " << output.size() << std::endl;
+        Logger::info() << "Number of pre-computed states = " << output.size();
         file.close();
         return output;
     }
@@ -274,8 +277,9 @@ namespace oILAB {
         file.open("theta.txt");
         std::string line;
         if (!file) {
-            std::cout << "File theta.txt not found. Setting a uniform distribution for theta";
-            outputTheta.setOnes();
+          Logger::warn() << "File theta.txt not found. Setting a uniform "
+                            "distribution for theta";
+          outputTheta.setOnes();
         }
         else {
             outputTheta.setZero();
@@ -315,9 +319,8 @@ namespace oILAB {
             }
         }
         outputTheta= outputTheta/outputThetaNorm;
-        std::cout << "f = " << f << std::endl;
-        std::cout << "theta = " << std::endl;
-        std::cout << outputTheta << std::endl;
+        Logger::info() << "f = " << f;
+        Logger::info() << "theta =\n" << outputTheta;
         return outputTheta;
     }
 

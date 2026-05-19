@@ -6,7 +6,7 @@
 #define OILAB_GBMESOSTATEIMPLEMENTATION_H
 
 #include "../IO/Lammps.h"
-#include <iostream>
+#include "../IO/Logger.h"
 //#include <Python.h>
 #include "../Math/PeriodicFunctionImplementation.h"
 
@@ -34,7 +34,8 @@ GbMesoState<dim>::GbMesoState(
   }
     catch(std::runtime_error& e)
     {
-        //throw(std::runtime_error("GB Mesostate construction failed"));
+      Logger::debug() << e.what();
+      throw(std::runtime_error("GB Mesostate construction failed"));
     }
 
 

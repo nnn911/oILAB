@@ -8,11 +8,11 @@
 #define gbLAB_RationalMatrix_cpp_
 
 #include "../../include/Math/RationalMatrix.h"
+#include "../../include/IO/Logger.h"
 #include "../../include/Math/BestRationalApproximation.h"
 #include "../../include/Math/IntegerMath.h"
 #include <cfloat> // FLT_EPSILON
 #include <iomanip>
-#include <iostream>
 
 namespace oILAB {
 
@@ -46,15 +46,13 @@ RationalMatrix<dim>::compute(const RationalMatrix<dim>::MatrixDimD &R) {
   const double error =
       (im.template cast<double>() / sigma - R).norm() / (dim * dim);
   if (error > FLT_EPSILON) {
-    std::cout << "error=" << error << std::endl;
-    std::cout << "maxDen=" << maxDen << std::endl;
-    std::cout << "im=\n"
-              << std::setprecision(15) << std::scientific
-              << im.template cast<double>() / sigma << std::endl;
-    std::cout << "= 1/" << sigma << "*\n"
-              << std::setprecision(15) << std::scientific << im << std::endl;
-    std::cout << "R=\n"
-              << std::setprecision(15) << std::scientific << R << std::endl;
+    Logger::debug() << "maxDen=" << maxDen;
+    Logger::debug() << "im=\n"
+                    << std::setprecision(15) << std::scientific
+                    << im.template cast<double>() / sigma;
+    Logger::debug() << "= 1/" << sigma << "*\n"
+                    << std::setprecision(15) << std::scientific << im;
+    Logger::debug() << "R=\n" << std::setprecision(15) << std::scientific << R;
     throw std::runtime_error("Rational Matrix failed, check maxDen");
   }
 
@@ -89,14 +87,15 @@ RationalMatrix<dim>::compute(const RationalMatrix<dim>::MatrixDimD &R) {
             }
         }
         if (IntegerMath<IntScalarType>::gcd(IntegerMath<IntScalarType>::gcd(im.cwiseAbs()), sigma) != 1) {
-            std::cout << Rn << std::endl;
-            std::cout << Rd << std::endl;
-            std::cout << RnReduced << std::endl;
-            std::cout << RdReduced << std::endl;
-            std::cout << im << std::endl;
-            std::cout << sigma <<std::endl;
+          Logger::debug() << Rn;
+          Logger::debug() << Rd;
+          Logger::debug() << RnReduced;
+          Logger::debug() << RdReduced;
+          Logger::debug() << im;
+          Logger::debug() << sigma;
+          throw std::runtime_error(
+              "RationalMatrix<dim>::reduce failed: gcd!=1");
         }
-        assert(IntegerMath<IntScalarType>::gcd(IntegerMath<IntScalarType>::gcd(im.cwiseAbs()), sigma) == 1);
         return std::make_pair(im, sigma);
     }
     /**********************************************************************/
@@ -117,8 +116,8 @@ RationalMatrix<dim>::compute(const RationalMatrix<dim>::MatrixDimD &R) {
     }
     catch(std::runtime_error& e)
     {
-        std::cout << e.what() << std::endl;
-        throw(std::runtime_error("Rational Matrix construction failed. "));
+      Logger::error() << e.what();
+      throw(std::runtime_error("Rational Matrix construction failed. "));
     }
     template <int dim>
     RationalMatrix<dim>::RationalMatrix(const MatrixDimI& Rn,const IntScalarType& Rd) :
