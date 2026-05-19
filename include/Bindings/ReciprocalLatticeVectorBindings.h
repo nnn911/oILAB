@@ -92,14 +92,12 @@ namespace pyoilab {
             return rlv.closestPlaneIndexOfPoint(p);
         }
 
-        template<int dm=dim>
-        typename std::enable_if<dm==2,PyLatticeDirection<dm>>::type
-        cross(const PyReciprocalLatticeVector<dm>& other){
+        PyLatticeDirection<dim>
+        cross(const PyReciprocalLatticeVector<dim>& other) requires (dim==2) {
             return PyLatticeDirection(rlv.cross(other.rlv));
         }
-        template<int dm=dim>
-        typename std::enable_if<dm==3,PyLatticeDirection<dm>>::type
-        cross(const PyReciprocalLatticeVector<dm>& other){
+        PyLatticeDirection<dim>
+        cross(const PyReciprocalLatticeVector<dim>& other) requires (dim==3) {
             return PyLatticeDirection(rlv.cross(other.rlv));
         }
     };

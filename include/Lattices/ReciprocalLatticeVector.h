@@ -51,19 +51,15 @@ public:
   IntScalarType planeIndexOfPoint(const VectorDimD &P) const;
   IntScalarType planeIndexOfPoint(const LatticeVector<dim> &P) const;
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 2, LatticeDirection<dim>>::type
-  cross(const ReciprocalLatticeVector<dim> &other) const;
+  LatticeDirection<dim>
+  cross(const ReciprocalLatticeVector<dim> &other) const requires (dim == 2);
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 2, LatticeDirection<dim>>::type cross() const;
+  LatticeDirection<dim> cross() const requires (dim == 2);
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 3, LatticeDirection<dim>>::type
-  cross(const ReciprocalLatticeVector<dim> &other) const;
+  LatticeDirection<dim>
+  cross(const ReciprocalLatticeVector<dim> &other) const requires (dim == 3);
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 3, LatticeDirection<dim>>::type cross() const;
+  LatticeDirection<dim> cross() const requires (dim == 3);
     };
     
     template<int dim>

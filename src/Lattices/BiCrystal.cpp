@@ -464,19 +464,19 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
         return LatticeVector<dim>((LambdaB*d).eval(),d.lattice);
     }
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==2 || dm==3,std::map<typename BiCrystal<dim>::IntScalarType,Gb<dm>>>::type
-    BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int div) const
+    template<int dim>
+    std::map<typename BiCrystal<dim>::IntScalarType,Gb<dim>>
+    BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int div) const requires (dim==2 || dim==3)
     {
         if (&d.lattice != &A && &d.lattice != &B)
           throw std::runtime_error(
               "The tilt axis does not belong to lattices A and B  ");
-        std::vector<Gb<dm>> gbVec;
+        std::vector<Gb<dim>> gbVec;
         double epsilon=1e-8;
         int count= -1;
         IntScalarType keyScale= 1e6;
         auto basis= d.lattice.directionOrthogonalReciprocalLatticeBasis(d,true);
-        if (dm==3)
+        if (dim==3)
         {
             for (int i = -div; i <= div; ++i)
             {
@@ -484,10 +484,10 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
                 {
                     if (i==0 && j==0) continue;
                     count++;
-                    ReciprocalLatticeVector<dm> rv = i * basis[1].reciprocalLatticeVector() + j * basis[2].reciprocalLatticeVector();
+                    ReciprocalLatticeVector<dim> rv = i * basis[1].reciprocalLatticeVector() + j * basis[2].reciprocalLatticeVector();
                     try
                     {
-                        Gb<dm> gb(*this, rv);
+                        Gb<dim> gb(*this, rv);
                         gbVec.push_back(gb);
                     }
                     catch(std::runtime_error& e)
@@ -500,12 +500,12 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
                 }
             }
         }
-        else if(dm==2)
+        else if(dim==2)
         {
             auto rv= basis[0].reciprocalLatticeVector();
-            gbVec.push_back(Gb<dm>(*this, rv));
+            gbVec.push_back(Gb<dim>(*this, rv));
         }
-        std::map<IntScalarType,Gb<dm>> gbSet;
+        std::map<IntScalarType,Gb<dim>> gbSet;
         for(const Gb<dim>& gb:gbVec)
         {
             double cosAngle;
@@ -515,15 +515,15 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
 
             double angle= acos(cosAngle);
             IntScalarType key= angle*keyScale;
-            gbSet.insert(std::pair<IntScalarType,Gb<dm>>(key,gb));
+            gbSet.insert(std::pair<IntScalarType,Gb<dim>>(key,gb));
         }
         return gbSet;
     }
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==2 || dm==3,void>::type
+    template<int dim>
+    void
     BiCrystal<dim>::updateBoxVectors(std::vector<LatticeVector<dim>>& boxVectors,
-                                          const double& orthogonality) const
+                                          const double& orthogonality) const requires (dim==2 || dim==3)
     {
         assert(orthogonality<=1.0 &&
            "The \"orthogonality\" parameter should be between 0.0 and 1.0");
@@ -580,12 +580,12 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
         boxVectors[0]=boxVectorUpdated;
     }
 
-    template<int dim> template<int dm>
-    typename std::enable_if<dm==2 || dm==3,std::vector<LatticeVector<dim>>>::type
+    template<int dim>
+    std::vector<LatticeVector<dim>>
     BiCrystal<dim>::box(const std::vector<LatticeVector<dim>>& boxVectors,
                         const int& dsclFactor,
                         std::string filename,
-                        bool orient) const
+                        bool orient) const requires (dim==2 || dim==3)
     {
         assert(dsclFactor>=0 &&
                "The \"dsclFactor\" should be non-negative integer.");
@@ -723,25 +723,7 @@ BiCrystal<dim>::getM(const RationalMatrix<dim> &rm,
 
 //    template class BiCrystal<1>;
     template class BiCrystal<2>;
-    template std::map<BiCrystal<2>::IntScalarType, Gb<2>>
-        BiCrystal<2>::generateGrainBoundaries<2>(const LatticeDirection<2> &d, int div) const;
-    template std::vector<LatticeVector<2>>
-            BiCrystal<2>::box<2>(const std::vector<LatticeVector<2>> &boxVectors,
-                                 const int &dsclFactor,
-                                 std::string filename, bool orient) const;
-    template void BiCrystal<2>::updateBoxVectors<2>(std::vector<LatticeVector<2>>& boxVectors,
-                                                   const double& orthogonality) const;
-
     template class BiCrystal<3>;
-    template std::map<BiCrystal<3>::IntScalarType, Gb<3>>
-        BiCrystal<3>::generateGrainBoundaries<3>(const LatticeDirection<3> &d, int div) const;
-    template std::vector<LatticeVector<3>>
-    BiCrystal<3>::box<3>(const std::vector<LatticeVector<3>> &boxVectors,
-                         const int &dsclFactor,
-                         std::string filename, bool orient) const;
-    template void BiCrystal<3>::updateBoxVectors<3>(std::vector<LatticeVector<3>>& boxVectors,
-                                                   const double& orthogonality) const;
-
     template class BiCrystal<4>;
     template class BiCrystal<5>;
 

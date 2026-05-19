@@ -1,5 +1,5 @@
 //
-// Created by Nikhil Chandra Admal on 7/14/23.
+// Created by Nikhil Chandra Adimal on 7/14/23.
 //
 
 #ifndef OILAB_DIFF_H
@@ -26,12 +26,10 @@ public:
       assert(order >= 0);
   }
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 1, void>::type perform_op(const double *x_in,
-                                                          double *y_out) const {
-    Eigen::TensorMap<const Eigen::Tensor<double, dm>> xReal(x_in, n);
-    const Eigen::Tensor<dcomplex, dm> x = xReal.template cast<dcomplex>();
-    Eigen::TensorMap<Eigen::Tensor<double, dm>> y(y_out, n);
+  void perform_op(const double *x_in, double *y_out) const requires (dim == 1) {
+    Eigen::TensorMap<const Eigen::Tensor<double, dim>> xReal(x_in, n);
+    const Eigen::Tensor<dcomplex, dim> x = xReal.template cast<dcomplex>();
+    Eigen::TensorMap<Eigen::Tensor<double, dim>> y(y_out, n);
 
     // if d=0 y_out= x_in and return
     int totalOrder = 0;
@@ -44,16 +42,16 @@ public:
     }
 
     // Compute y = Lx using FFT
-    Eigen::Tensor<dcomplex, dm> xhat(n);
+    Eigen::Tensor<dcomplex, dim> xhat(n);
     xhat.setZero();
     FFT::fft(x, xhat);
 
-    Eigen::Tensor<dcomplex, dm> d2fhat(n);
+    Eigen::Tensor<dcomplex, dim> d2fhat(n);
     d2fhat.setZero();
 
     // only part which is dimension dependent
     for (int i = 0; i < n[0]; ++i) {
-      ReciprocalLatticeVector<dm> r(L);
+      ReciprocalLatticeVector<dim> r(L);
       dcomplex factor(1, 0);
       for (int k = 0; k < dim; ++k) {
         if (d[k] == 0)
@@ -70,15 +68,13 @@ public:
     }
 
     // Laplacian Lf
-    Eigen::Tensor<dcomplex, dm> Lf(n);
+    Eigen::Tensor<dcomplex, dim> Lf(n);
     Lf.setZero();
     FFT::ifft(d2fhat, Lf);
     y = Lf.real();
   }
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 2, void>::type perform_op(const double *x_in,
-                                                          double *y_out) const {
+  void perform_op(const double *x_in, double *y_out) const requires (dim == 2) {
     Eigen::TensorMap<const Eigen::Tensor<double, 2>> xReal(x_in, n);
     const Eigen::Tensor<dcomplex, 2> x = xReal.cast<dcomplex>();
     Eigen::TensorMap<Eigen::Tensor<double, 2>> y(y_out, n);
@@ -129,12 +125,10 @@ public:
     y = Lf.real();
   }
 
-  template <int dm = dim>
-  typename std::enable_if<dm == 3, void>::type perform_op(const double *x_in,
-                                                          double *y_out) const {
-    Eigen::TensorMap<const Eigen::Tensor<double, dm>> xReal(x_in, n);
-    const Eigen::Tensor<dcomplex, dm> x = xReal.template cast<dcomplex>();
-    Eigen::TensorMap<Eigen::Tensor<double, dm>> y(y_out, n);
+  void perform_op(const double *x_in, double *y_out) const requires (dim == 3) {
+    Eigen::TensorMap<const Eigen::Tensor<double, dim>> xReal(x_in, n);
+    const Eigen::Tensor<dcomplex, dim> x = xReal.template cast<dcomplex>();
+    Eigen::TensorMap<Eigen::Tensor<double, dim>> y(y_out, n);
 
     // if d=0 y_out= x_in and return
     int totalOrder = 0;
@@ -147,20 +141,20 @@ public:
     }
 
     // Compute y = Lx using FFT
-    Eigen::Tensor<dcomplex, dm> xhat(n);
+    Eigen::Tensor<dcomplex, dim> xhat(n);
     xhat.setZero();
     FFT::fft(x, xhat);
 
-    Eigen::Tensor<dcomplex, dm> d2fhat(n);
+    Eigen::Tensor<dcomplex, dim> d2fhat(n);
     d2fhat.setZero();
 
     // only part which is dimension dependent
     for (int i = 0; i < n[0]; ++i) {
       for (int j = 0; j < n[1]; ++j) {
         for (int k = 0; k < n[2]; ++k) {
-          ReciprocalLatticeVector<dm> r(L);
+          ReciprocalLatticeVector<dim> r(L);
           dcomplex factor(1, 0);
-          for (int l = 0; l < dm; ++l) {
+          for (int l = 0; l < dim; ++l) {
             if (d[l] == 0)
               continue;
             else if (d[l] % 2 == 0)
@@ -181,7 +175,7 @@ public:
     }
 
     // Laplacian Lf
-    Eigen::Tensor<dcomplex, dm> Lf(n);
+    Eigen::Tensor<dcomplex, dim> Lf(n);
     Lf.setZero();
     FFT::ifft(d2fhat, Lf);
     y = Lf.real();

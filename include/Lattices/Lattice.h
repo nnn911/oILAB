@@ -129,27 +129,24 @@ public:
   /*! This function generates rotations (about a given axis) that result in a
    * coincident site lattice. It is specialized to dim=3
    *
-   * @tparam dm dimension (int)
    * @param rd axis (Reciprocal lattice direction)
    * @param maxDen  integer parameter that determines the resolution for the
    * search of rotations
    * @param N integer parameter that determines the maximum size of the CSL
    * @return A set of rotations that result in CSLs.
    */
-  template <int dm = dim>
-  typename std::enable_if<dm == 3, std::vector<MatrixDimD>>::type
+  std::vector<MatrixDimD>
   generateCoincidentLattices(const ReciprocalLatticeDirection<dim> &rd,
                              const double &maxDen = 100,
-                             const int &N = 100) const;
+                             const int &N = 100) const requires (dim == 3);
 
   /*! This function generates deformations \f$\mathbf F\f$ such that the
    * deformations of *this lattice share moire supercells with the undeformed
    * *this lattice
    */
-  template <int dm = dim>
-  typename std::enable_if<dm == 2, std::vector<MatrixDimD>>::type
+  std::vector<MatrixDimD>
   generateCoincidentLattices(const double &maxStrain, const int &maxDen = 50,
-                             const int &N = 30) const;
+                             const int &N = 30) const requires (dim == 2);
 
   /*! This function generates deformations \f$\mathbf F\f$ such that the
    * deformations of *this lattice share moire supercells with a given
@@ -166,7 +163,6 @@ public:
    * q_1\f$ and \f$\mathbf r_1\f$ of lattice \f$\mathcal B\f$.
    *
    * @tparam undeformedLattice underformed lattice
-   * @tparam dm dimension (int)
    * @param maxStrain maximum strain
    * @param maxDen  integer parameter that determines the resolution for the
    * search of rotations
@@ -174,39 +170,34 @@ public:
    * @return A set of deformation gradients of *this lattice that result in
    * moire superlattices with the undeformed lattice
    */
-  template <int dm = dim>
-  typename std::enable_if<dm == 2, std::vector<MatrixDimD>>::type
+  std::vector<MatrixDimD>
   generateCoincidentLattices(const Lattice<dim> &undeformedLattice,
                              const double &maxStrain, const int &maxDen = 50,
-                             const int &N = 30) const;
+                             const int &N = 30) const requires (dim == 2);
 
   /*! This function outputs/prints lattice points within a box bounded by the
    * input box vectors. The box vectors have to be linearly independent lattice
    * vectors. This function is specialized to dim=3.
    *
-   * @tparam dm dimension (int)
    * @param boxVectors three linearly independent lattice vectors
    * @param filename (optional) name of the output file
    * @return Lattice points bounded by the box vectors
    */
-  template <int dm = dim>
-  typename std::enable_if<dm == 3, std::vector<LatticeVector<dim>>>::type
+  std::vector<LatticeVector<dim>>
   box(const std::vector<LatticeVector<dim>> &boxVectors,
-      const std::string &filename = "") const;
+      const std::string &filename = "") const requires (dim == 3);
 
   /*! This function outputs/prints lattice points within a box bounded by the
    * optional input box vectors. The box vectors have to be linearly independent
    * lattice vectors. This function is specialized to dim=2.
    *
-   * @tparam dm dimension (int)
    * @param boxVectors two linearly independent lattice vectors
    * @param filename (optional) name of the output file
    * @return Lattice points bounded by the box vectors
    */
-  template <int dm = dim>
-  typename std::enable_if<dm == 2, std::vector<LatticeVector<dim>>>::type
+  std::vector<LatticeVector<dim>>
   box(const std::vector<LatticeVector<dim>> &boxVectors,
-      const std::string &filename = "") const;
+      const std::string &filename = "") const requires (dim == 2);
 };
 /*! @example testPlaneParallelLatticeDirections.cpp
  *  This example demonstrates the computation of plane-parallel lattice basis and direction-orthogonal reciprocal
