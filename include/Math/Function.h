@@ -13,9 +13,9 @@
 
 namespace oILAB {
 
-template <typename Scalar, int dim> class LatticeFunction;
+template <typename Scalar, int dim, int ambientDim = dim> class LatticeFunction;
 
-template <typename Scalar, int dim> class PeriodicFunction;
+template <typename Scalar, int dim, int ambientDim = dim> class PeriodicFunction;
 
 template <typename Derived, typename Scalar> class Function {
   using dcomplex = std::complex<double>;

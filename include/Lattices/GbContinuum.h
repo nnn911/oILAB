@@ -46,20 +46,15 @@ public:
     template<int dim>
     class GbContinuum {
         using VectorDimD= typename LatticeCore<dim>::VectorDimD;
-        using FunctionFFTPair= typename std::pair<std::vector<PeriodicFunction<double,dim-1>>,
-                                                  std::vector<LatticeFunction<std::complex<double>,dim-1>>>;
-        using GbLatticeFunctions= typename std::vector<LatticeFunction<std::complex<double>,dim-1>> ;
+        using FunctionFFTPair= typename std::pair<std::vector<PeriodicFunction<double,dim-1,dim>>,
+                                                  std::vector<LatticeFunction<std::complex<double>,dim-1,dim>>>;
+        using GbLatticeFunctions= typename std::vector<LatticeFunction<std::complex<double>,dim-1,dim>> ;
 
     private:
 
         static thread_local  GbLatticeFunctions HhatInvComponents;
-        //static FunctionFFTPair pipihat;
-        static thread_local std::map<OrderedTuplet<dim+1>,PeriodicFunction<double, dim - 1>> piPeriodicFunctions;
-        static thread_local std::map<OrderedTuplet<dim+1>,LatticeFunction<std::complex<double>, dim - 1>> pihatLatticeFunctions;
-        // GBMesostateEnsemble should generate the bicrystal (member variable <OrderedTuplet,VectorDimD>) and pass it as a reference to each mesostate
-        // pipihat should be map from OrderedTuplet to FunctionFFTPair. should be computed once in calculateb
-        // at the same time, compute pipihat once
-        // change xuPairs type to <Tiplet,VectorDimD>
+        static thread_local std::map<OrderedTuplet<dim+1>,PeriodicFunction<double, dim - 1, dim>> piPeriodicFunctions;
+        static thread_local std::map<OrderedTuplet<dim+1>,LatticeFunction<std::complex<double>, dim - 1, dim>> pihatLatticeFunctions;
 
         FunctionFFTPair bbhat;
         static FunctionFFTPair calculateb(const Eigen::Matrix<double, dim,dim-1>& domain,
@@ -68,12 +63,12 @@ public:
                                           const std::map<OrderedTuplet<dim+1>,VectorDimD>& points);
         static GbLatticeFunctions getHhatInvComponents(const Eigen::Matrix<double, dim,dim-1>& domain,
                                                        const std::array<Eigen::Index,dim-1>& n);
-        static PeriodicFunction<double,dim-1>get_pi(const Eigen::Matrix<double,dim,dim-1>& domain,
-                                                    const std::array<Eigen::Index,dim-1>& n,
-                                                    const VectorDimD& point);
-        static LatticeFunction<std::complex<double>,dim-1>get_pihat(const Eigen::Matrix<double,dim,dim-1>& domain,
-                                                                    const std::array<Eigen::Index,dim-1>& n,
-                                                                    const VectorDimD& point);
+        static PeriodicFunction<double,dim-1,dim> get_pi(const Eigen::Matrix<double,dim,dim-1>& domain,
+                                                         const std::array<Eigen::Index,dim-1>& n,
+                                                         const VectorDimD& point);
+        static LatticeFunction<std::complex<double>,dim-1,dim> get_pihat(const Eigen::Matrix<double,dim,dim-1>& domain,
+                                                                          const std::array<Eigen::Index,dim-1>& n,
+                                                                          const VectorDimD& point);
 
     public:
 
@@ -81,9 +76,9 @@ public:
         const Eigen::Matrix<double,dim,dim-1> gbDomain;
         const std::map<OrderedTuplet<dim+1>,VectorDimD> xuPairs;
         std::array<Eigen::Index,dim-1> n;
-        std::vector<PeriodicFunction<double,dim-1>> b;
+        std::vector<PeriodicFunction<double,dim-1,dim>> b;
 
-        std::vector<LatticeFunction<std::complex<double>,dim-1>> bhat;
+        std::vector<LatticeFunction<std::complex<double>,dim-1,dim>> bhat;
         std::map<OrderedTuplet<dim+1>,VectorDimD> atoms;
         VectorDimD uAverage;
 
@@ -114,25 +109,21 @@ public:
         std::vector<PeriodicFunction<double,dim-1>> get_alpha() const;
 
         static void reset(){
-            std::map<OrderedTuplet<dim+1>,PeriodicFunction<double, dim - 1>>().swap(piPeriodicFunctions);
-            std::map<OrderedTuplet<dim+1>,LatticeFunction<std::complex<double>, dim - 1>>().swap(pihatLatticeFunctions);
+            std::map<OrderedTuplet<dim+1>,PeriodicFunction<double, dim - 1, dim>>().swap(piPeriodicFunctions);
+            std::map<OrderedTuplet<dim+1>,LatticeFunction<std::complex<double>, dim - 1, dim>>().swap(pihatLatticeFunctions);
             GbLatticeFunctions().swap(HhatInvComponents);
-
-            //HhatInvComponents.clear();
-            //piPeriodicFunctions.clear();
-            //pihatLatticeFunctions.clear();
         }
     };
 
 
     template<int dim>
-    thread_local std::vector<LatticeFunction<std::complex<double>,dim-1>> GbContinuum<dim>::HhatInvComponents;
+    thread_local std::vector<LatticeFunction<std::complex<double>,dim-1,dim>> GbContinuum<dim>::HhatInvComponents;
 
     template<int dim>
-    thread_local std::map<OrderedTuplet<dim+1>,PeriodicFunction<double, dim - 1>> GbContinuum<dim>::piPeriodicFunctions;
+    thread_local std::map<OrderedTuplet<dim+1>,PeriodicFunction<double, dim - 1, dim>> GbContinuum<dim>::piPeriodicFunctions;
 
     template<int dim>
-    thread_local std::map<OrderedTuplet<dim+1>,LatticeFunction<std::complex<double>, dim - 1>> GbContinuum<dim>::pihatLatticeFunctions;
+    thread_local std::map<OrderedTuplet<dim+1>,LatticeFunction<std::complex<double>, dim - 1, dim>> GbContinuum<dim>::pihatLatticeFunctions;
 
     } // namespace oILAB
 

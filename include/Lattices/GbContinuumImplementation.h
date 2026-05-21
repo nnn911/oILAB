@@ -110,25 +110,22 @@ GbContinuum<dim>::GbContinuum(
     }
 
     template<int dim>
-    PeriodicFunction<double,dim-1>
+    PeriodicFunction<double,dim-1,dim>
     GbContinuum<dim>::get_pi(const Eigen::Matrix<double,dim,dim-1>& domain,
                              const std::array<Eigen::Index,dim-1>& n,
                              const VectorDimD& point)
     {
-        Eigen::Matrix<double,dim,dim-1> basisVectors(domain.transpose().completeOrthogonalDecomposition().pseudoInverse());
         VectorDimD normal(domain.col(0).cross(domain.col(1)));
         normal.normalize();
 
-        //DisplacementKernel f(normal,10);
-        // change 1e6 entry
         DisplacementKernel f(normal);
         Shift<DisplacementKernel,double> piFunction(point, (const Function<DisplacementKernel,double>&) f);
-        return PeriodicFunction<double,dim-1>(n,domain,piFunction);
+        return PeriodicFunction<double,dim-1,dim>(n,domain,piFunction);
     }
 
 
     template<int dim>
-    LatticeFunction<std::complex<double>,dim-1>
+    LatticeFunction<std::complex<double>,dim-1,dim>
     GbContinuum<dim>::get_pihat(const Eigen::Matrix<double,dim,dim-1>& domain,
                                 const std::array<Eigen::Index,dim-1>& n,
                                 const VectorDimD& point)
@@ -137,11 +134,8 @@ GbContinuum<dim>::GbContinuum(
         VectorDimD normal(domain.col(0).cross(domain.col(1)));
         normal.normalize();
 
-        std::vector<LatticeFunction<std::complex<double>,dim-1>> pihat;
-        //DisplacementKernel f(normal,10);
-
         ShiftedDisplacementKernelFT pihatFunction(point,normal);
-        return LatticeFunction<std::complex<double>,dim-1> (n,basisVectors,pihatFunction);
+        return LatticeFunction<std::complex<double>,dim-1,dim>(n,basisVectors,pihatFunction);
     }
 
    template<int dim>
@@ -154,15 +148,15 @@ GbContinuum<dim>::GbContinuum(
        if (HhatInvComponents.size() ==0 ) HhatInvComponents= getHhatInvComponents(domain,n);
        Eigen::Matrix<double,dim,dim-1> basisVectors(domain.transpose().completeOrthogonalDecomposition().pseudoInverse());
        // lb0 - read as "local b0"
-       std::vector<PeriodicFunction<double,dim-1>> lb0, lb;
-       std::vector<LatticeFunction<std::complex<double>,dim-1>> lb0hat;
+       std::vector<PeriodicFunction<double,dim-1,dim>> lb0, lb;
+       std::vector<LatticeFunction<std::complex<double>,dim-1,dim>> lb0hat;
        for(int i=0; i<dim; ++i)
        {
-           lb0.push_back(PeriodicFunction<double,dim-1>(n,domain));
-           lb.push_back(PeriodicFunction<double,dim-1>(n,domain));
-           lb0hat.push_back(LatticeFunction<std::complex<double>,dim-1>(n,basisVectors));
+           lb0.push_back(PeriodicFunction<double,dim-1,dim>(n,domain));
+           lb.push_back(PeriodicFunction<double,dim-1,dim>(n,domain));
+           lb0hat.push_back(LatticeFunction<std::complex<double>,dim-1,dim>(n,basisVectors));
        }
-       std::vector<LatticeFunction<std::complex<double>,dim-1>> lbhat(lb0hat);
+       std::vector<LatticeFunction<std::complex<double>,dim-1,dim>> lbhat(lb0hat);
 
 
        if(piPeriodicFunctions.empty()) {
@@ -187,25 +181,6 @@ GbContinuum<dim>::GbContinuum(
                }
                piPeriodicFunctions.insert({key, get_pi(domain, n, perturbedValue)});
                pihatLatticeFunctions.insert({key, get_pihat(domain, n, perturbedValue)});
-
-               /*
-               if(abs(value.dot(normal)) < FLT_EPSILON && key(dim)==1) // belongs to lattice 1 and on the GB
-               {
-                   VectorDimD perturbedValue= value - (value.dot(normal) + FLT_EPSILON) * normal;
-                   piPeriodicFunctions.insert({key, get_pi(domain, n, perturbedValue)});
-                   pihatLatticeFunctions.insert({key, get_pihat(domain, n, perturbedValue)});
-               }
-               else if(abs(value.dot(normal)) < FLT_EPSILON && key(dim)==2) // belongs to lattice 2 and on the GB
-               {
-                   VectorDimD perturbedValue= value - (value.dot(normal) - FLT_EPSILON) * normal;
-                   piPeriodicFunctions.insert({key, get_pi(domain, n, perturbedValue)});
-                   pihatLatticeFunctions.insert({key, get_pihat(domain, n, perturbedValue)});
-               }
-               else {
-                   piPeriodicFunctions.insert({key, get_pi(domain, n, value)});
-                   pihatLatticeFunctions.insert({key, get_pihat(domain, n, value)});
-               }
-                */
            }
        }
 
@@ -228,7 +203,6 @@ GbContinuum<dim>::GbContinuum(
        for(const auto& [xi,ui] : xuPairs)
        {
            row++;
-           //uMatrix.row(row)= ui;
            uMatrix.row(row)= ui-uAverage;
            int col= -1;
            for(const auto& [xj,uj] : xuPairs)
@@ -312,10 +286,10 @@ GbContinuum<dim>::GbContinuum(
 
        auto lmMatrix= lm.reshaped(numberOfCslPoints,dim);
        // temp = \sum_k p_k * lm_k
-       std::vector<LatticeFunction<std::complex<double>,dim-1>> temp;
+       std::vector<LatticeFunction<std::complex<double>,dim-1,dim>> temp;
 
        for (int i=0; i<dim; ++i) {
-           temp.push_back(LatticeFunction<std::complex<double>, dim - 1>(n, basisVectors));
+           temp.push_back(LatticeFunction<std::complex<double>, dim - 1, dim>(n, basisVectors));
            int k= -1;
            for (const auto& [xk,uk] : xuPairs) {
                k++;
@@ -338,7 +312,6 @@ GbContinuum<dim>::GbContinuum(
        for (int i=0; i<dim; ++i)
            lb[i].values = lbhat[i].ifft().values.real();
 
-       //return std::make_pair(lb,lbhat);
        return std::make_pair(lb,lbhat);
    }
 
@@ -365,36 +338,32 @@ GbContinuum<dim>::GbContinuum(
         VectorDimD normal(gbDomain.col(0).cross(gbDomain.col(1)));
         normal.normalize();
 
-
         ShiftedDisplacementKernelFT pihatFunction(t,normal);
-        auto  lf= LatticeFunction<std::complex<double>,dim-1> (n,basisVectors,pihatFunction);
+        auto lf= LatticeFunction<std::complex<double>,dim-1,dim>(n,basisVectors,pihatFunction);
 
         // u = f \star b
         for(int i=0; i<dim; ++i) {
             u(i) = bhat[i].dot(lf).real();
-            //assert(abs(bhat[i].dot(lf).imag()) < FLT_EPSILON);
         }
-
-
 
         return u;
 
     }
 
     template<int dim>
-    std::vector<LatticeFunction<std::complex<double>,dim-1>>
+    std::vector<LatticeFunction<std::complex<double>,dim-1,dim>>
     GbContinuum<dim>::getHhatInvComponents(const Eigen::Matrix<double, dim,dim-1>& domain,
                                            const std::array<Eigen::Index,dim-1>& n)
     {
-        Eigen::Matrix<double,Eigen::Dynamic,dim-1> basisVectors(domain.transpose().completeOrthogonalDecomposition().pseudoInverse());
-        std::vector<LatticeFunction<std::complex<double>,dim-1>> output;
+        Eigen::Matrix<double,dim,dim-1> basisVectors(domain.transpose().completeOrthogonalDecomposition().pseudoInverse());
+        std::vector<LatticeFunction<std::complex<double>,dim-1,dim>> output;
 
-        output.push_back(LatticeFunction<std::complex<double>,dim-1>(n,basisVectors,HhatInvFunction(0,0,domain)));
-        output.push_back(LatticeFunction<std::complex<double>,dim-1>(n,basisVectors,HhatInvFunction(1,1,domain)));
-        output.push_back(LatticeFunction<std::complex<double>,dim-1>(n,basisVectors,HhatInvFunction(2,2,domain)));
-        output.push_back(LatticeFunction<std::complex<double>,dim-1>(n,basisVectors,HhatInvFunction(1,2,domain)));
-        output.push_back(LatticeFunction<std::complex<double>,dim-1>(n,basisVectors,HhatInvFunction(0,2,domain)));
-        output.push_back(LatticeFunction<std::complex<double>,dim-1>(n,basisVectors,HhatInvFunction(0,1,domain)));
+        output.push_back(LatticeFunction<std::complex<double>,dim-1,dim>(n,basisVectors,HhatInvFunction(0,0,domain)));
+        output.push_back(LatticeFunction<std::complex<double>,dim-1,dim>(n,basisVectors,HhatInvFunction(1,1,domain)));
+        output.push_back(LatticeFunction<std::complex<double>,dim-1,dim>(n,basisVectors,HhatInvFunction(2,2,domain)));
+        output.push_back(LatticeFunction<std::complex<double>,dim-1,dim>(n,basisVectors,HhatInvFunction(1,2,domain)));
+        output.push_back(LatticeFunction<std::complex<double>,dim-1,dim>(n,basisVectors,HhatInvFunction(0,2,domain)));
+        output.push_back(LatticeFunction<std::complex<double>,dim-1,dim>(n,basisVectors,HhatInvFunction(0,1,domain)));
         return output;
     }
 

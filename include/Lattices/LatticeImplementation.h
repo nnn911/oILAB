@@ -186,7 +186,7 @@ std::array<LatticeDirection<dim>, dim> Lattice<dim>::planeParallelLatticeBasis(c
 
     if(!useRLLL) return out;
 
-    Eigen::MatrixXd planeParallelLatticeBasisCartesian(dim, dim - 1);
+    Eigen::Matrix<double, dim, dim-1> planeParallelLatticeBasisCartesian;
     for(int i = 1; i < dim; ++i) {
         planeParallelLatticeBasisCartesian.col(i - 1) = out[i].cartesian();
     }
@@ -212,7 +212,7 @@ std::array<LatticeDirection<dim>, dim> Lattice<dim>::planeParallelLatticeBasis(c
      */
 
     // (A^T A)^{-1} A^T
-    Eigen::MatrixXd pseudoInverse(dim - 1, dim);
+    Eigen::Matrix<double, dim-1, dim> pseudoInverse;
     pseudoInverse = (planeParallelLatticeBasisCartesian.transpose() * planeParallelLatticeBasisCartesian).inverse() *
                     (planeParallelLatticeBasisCartesian.transpose());
 
@@ -248,7 +248,7 @@ std::array<ReciprocalLatticeDirection<dim>, dim> Lattice<dim>::directionOrthogon
     }
     if(!useRLLL) return out;
 
-    Eigen::MatrixXd directionOrthogonalReciprocalLatticeBasisCartesian(dim, dim - 1);
+    Eigen::Matrix<double, dim, dim-1> directionOrthogonalReciprocalLatticeBasisCartesian;
     for(int i = 1; i < dim; ++i) {
         directionOrthogonalReciprocalLatticeBasisCartesian.col(i - 1) = out[i].cartesian();
     }
@@ -263,7 +263,7 @@ std::array<ReciprocalLatticeDirection<dim>, dim> Lattice<dim>::directionOrthogon
             out[i] = ReciprocalLatticeDirection<dim>(directionOrthogonalReciprocalLatticeBasisIntegerCoords.col(i - 1), *this);
     }
 
-    Eigen::MatrixXd pseudoInverse(dim - 1, dim);
+    Eigen::Matrix<double, dim-1, dim> pseudoInverse;
     pseudoInverse =
         (directionOrthogonalReciprocalLatticeBasisCartesian.transpose() * directionOrthogonalReciprocalLatticeBasisCartesian).inverse() *
         (directionOrthogonalReciprocalLatticeBasisCartesian.transpose());

@@ -187,9 +187,9 @@ GbMesoState<dim>::GbMesoState(
             for (int j=0; j<n[1]; ++j) {
                 for (int k = 0; k < n[2]; ++k)
                 {
-                    Eigen::Vector<double,Eigen::Dynamic> x= i*rho.unitCell.col(0)/n[0] +
-                                                            j*rho.unitCell.col(1)/n[1] +
-                                                            k*rho.unitCell.col(2)/n[2];
+                    Eigen::Vector<double,dim> x= i*rho.unitCell.col(0)/n[0] +
+                                                 j*rho.unitCell.col(1)/n[1] +
+                                                 k*rho.unitCell.col(2)/n[2];
                     // rho(i,j,k) is the density at point x
                     // calculate rho by first reading the relaxed configuration
 
