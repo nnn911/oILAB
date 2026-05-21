@@ -27,30 +27,38 @@ const typename ReciprocalLatticeVector<dim>::BaseType& ReciprocalLatticeVector<d
 }
 
 template<int dim>
+ReciprocalLatticeVector<dim>::ReciprocalLatticeVector()
+    : /* init */ BaseType(VectorDimI::Zero()),
+      /* init */ lattice(nullptr)
+{
+}
+
+template<int dim>
 ReciprocalLatticeVector<dim>::ReciprocalLatticeVector(const Lattice<dim>& lat)
     : /* init */ BaseType(VectorDimI::Zero()),
-      /* init */ lattice(lat)
+      /* init */ lattice(&lat)
 {
 }
 
 template<int dim>
 ReciprocalLatticeVector<dim>::ReciprocalLatticeVector(const VectorDimD& d, const Lattice<dim>& lat)
     : /* init */ BaseType(LatticeCore<dim>::integerCoordinates(d, lat.latticeBasis.transpose())),
-      /* init */ lattice(lat)
+      /* init */ lattice(&lat)
 {
 }
 
 template<int dim>
 ReciprocalLatticeVector<dim>::ReciprocalLatticeVector(const VectorDimI& other, const Lattice<dim>& lat)
     : /* init base */ BaseType(other),
-      /* init base */ lattice(lat)
+      /* init base */ lattice(&lat)
 {
 }
 
 template<int dim>
 ReciprocalLatticeVector<dim>& ReciprocalLatticeVector<dim>::operator=(const ReciprocalLatticeVector<dim>& other)
 {
-    assert(&lattice == &other.lattice && "ReciprocalLatticeVector<dim> belong to different Lattices.");
+    if(lattice == nullptr) lattice = other.lattice;
+    else assert(lattice == other.lattice && "ReciprocalLatticeVector<dim> belong to different Lattices.");
     base() = other.base();
     return *this;
 }
@@ -58,7 +66,8 @@ ReciprocalLatticeVector<dim>& ReciprocalLatticeVector<dim>::operator=(const Reci
 template<int dim>
 ReciprocalLatticeVector<dim>& ReciprocalLatticeVector<dim>::operator=(ReciprocalLatticeVector<dim>&& other)
 {
-    assert(&lattice == &other.lattice && "LatticeVectors belong to different Lattices.");
+    if(lattice == nullptr) lattice = other.lattice;
+    else assert(lattice == other.lattice && "LatticeVectors belong to different Lattices.");
     base() = other.base();
     return *this;
 }
@@ -66,15 +75,15 @@ ReciprocalLatticeVector<dim>& ReciprocalLatticeVector<dim>::operator=(Reciprocal
 template<int dim>
 ReciprocalLatticeVector<dim> ReciprocalLatticeVector<dim>::operator+(const ReciprocalLatticeVector<dim>& other) const
 {
-    assert(&lattice == &other.lattice && "LatticeVectors belong to different Lattices.");
+    assert(lattice == other.lattice && "LatticeVectors belong to different Lattices.");
     VectorDimI temp = static_cast<VectorDimI>(*this) + static_cast<VectorDimI>(other);
-    return ReciprocalLatticeVector<dim>(temp, lattice);
+    return ReciprocalLatticeVector<dim>(temp, *lattice);
 }
 
 template<int dim>
 ReciprocalLatticeVector<dim>& ReciprocalLatticeVector<dim>::operator+=(const ReciprocalLatticeVector<dim>& other)
 {
-    assert(&lattice == &other.lattice && "LatticeVectors belong to different Lattices.");
+    assert(lattice == other.lattice && "LatticeVectors belong to different Lattices.");
     base() += other.base();
     return *this;
 }
@@ -82,15 +91,15 @@ ReciprocalLatticeVector<dim>& ReciprocalLatticeVector<dim>::operator+=(const Rec
 template<int dim>
 ReciprocalLatticeVector<dim> ReciprocalLatticeVector<dim>::operator-(const ReciprocalLatticeVector<dim>& other) const
 {
-    assert(&lattice == &other.lattice && "LatticeVectors belong to different Lattices.");
+    assert(lattice == other.lattice && "LatticeVectors belong to different Lattices.");
     VectorDimI temp = static_cast<VectorDimI>(*this) - static_cast<VectorDimI>(other);
-    return ReciprocalLatticeVector<dim>(temp, lattice);
+    return ReciprocalLatticeVector<dim>(temp, *lattice);
 }
 
 template<int dim>
 ReciprocalLatticeVector<dim>& ReciprocalLatticeVector<dim>::operator-=(const ReciprocalLatticeVector<dim>& other)
 {
-    assert(&lattice == &other.lattice && "LatticeVectors belong to different Lattices.");
+    assert(lattice == other.lattice && "LatticeVectors belong to different Lattices.");
     base() -= other.base();
     return *this;
 }
@@ -99,27 +108,27 @@ template<int dim>
 ReciprocalLatticeVector<dim> ReciprocalLatticeVector<dim>::operator*(const IntScalarType& scalar) const
 {
     VectorDimI temp = static_cast<VectorDimI>(*this) * scalar;
-    return ReciprocalLatticeVector<dim>(temp, lattice);
+    return ReciprocalLatticeVector<dim>(temp, *lattice);
 }
 
 template<int dim>
 typename ReciprocalLatticeVector<dim>::IntScalarType ReciprocalLatticeVector<dim>::dot(const LatticeVector<dim>& other) const
 {
-    assert(&lattice == &other.lattice && "LatticeVectors belong to different Lattices.");
+    assert(lattice == other.lattice && "LatticeVectors belong to different Lattices.");
     return static_cast<VectorDimI>(*this).dot(static_cast<VectorDimI>(other));
 }
 
 template<int dim>
 typename ReciprocalLatticeVector<dim>::IntScalarType ReciprocalLatticeVector<dim>::dot(const LatticeDirection<dim>& other) const
 {
-    assert(&lattice == &other.lattice && "LatticeVectors belong to different Lattices.");
+    assert(lattice == other.lattice && "LatticeVectors belong to different Lattices.");
     return dot(other.latticeVector());
 }
 
 template<int dim>
 typename ReciprocalLatticeVector<dim>::VectorDimD ReciprocalLatticeVector<dim>::cartesian() const
 {
-    return lattice.reciprocalBasis * this->template cast<double>();
+    return lattice->reciprocalBasis * this->template cast<double>();
 }
 
 template<int dim>
@@ -183,29 +192,29 @@ template<int dim>
 LatticeDirection<dim> ReciprocalLatticeVector<dim>::cross(const ReciprocalLatticeVector<dim>& other) const
     requires(dim == 2)
 {
-    assert(&lattice == &other.lattice && "LatticeVectors belong to different Lattices.");
-    return LatticeDirection<dim>(LatticeVector<dim>((VectorDimI() << 0, 0).finished(), lattice));
+    assert(lattice == other.lattice && "LatticeVectors belong to different Lattices.");
+    return LatticeDirection<dim>(LatticeVector<dim>((VectorDimI() << 0, 0).finished(), *lattice));
 }
 
 template<int dim>
 LatticeDirection<dim> ReciprocalLatticeVector<dim>::cross() const
     requires(dim == 2)
 {
-    return LatticeDirection<dim>(LatticeVector<dim>((VectorDimI() << -(*this)(1), (*this)(0)).finished(), lattice));
+    return LatticeDirection<dim>(LatticeVector<dim>((VectorDimI() << -(*this)(1), (*this)(0)).finished(), *lattice));
 }
 
 template<int dim>
 LatticeDirection<dim> ReciprocalLatticeVector<dim>::cross(const ReciprocalLatticeVector<dim>& other) const
     requires(dim == 3)
 {
-    assert(&lattice == &other.lattice && "LatticeVectors belong to different Lattices.");
-    return LatticeDirection<dim>(LatticeVector<dim>(static_cast<VectorDimI>(*this).cross(static_cast<VectorDimI>(other)), lattice));
+    assert(lattice == other.lattice && "LatticeVectors belong to different Lattices.");
+    return LatticeDirection<dim>(LatticeVector<dim>(static_cast<VectorDimI>(*this).cross(static_cast<VectorDimI>(other)), *lattice));
 }
 template<int dim>
 LatticeDirection<dim> ReciprocalLatticeVector<dim>::cross() const
     requires(dim == 3)
 {
-    return LatticeDirection<dim>(LatticeVector<dim>((VectorDimI() << -(*this)(1), (*this)(0), 0).finished(), lattice));
+    return LatticeDirection<dim>(LatticeVector<dim>((VectorDimI() << -(*this)(1), (*this)(0), 0).finished(), *lattice));
 }
 
 }  // namespace oILAB

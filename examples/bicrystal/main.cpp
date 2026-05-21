@@ -32,13 +32,13 @@ int main(int argc, char** argv)
             BiCrystal<2> bc(L1,L2);
             std::cout<<"sigma="<<bc.sigma<<std::endl;
 
-            std::vector<LatticeVector<2>> boxVectors;
             Eigen::Matrix<IntScalarType,2,2> U;
             U = RLLL(bc.csl.latticeBasis, 0.75).unimodularMatrix();
             Eigen::Vector<IntScalarType,2> temp(U.col(0));
-            boxVectors.push_back(LatticeVector<2>(temp,bc.csl));
+            std::array<LatticeVector<2>, 2> boxVectors;
+            boxVectors[0] = LatticeVector<2>(temp,bc.csl);
             temp= U.col(1);
-            boxVectors.push_back(LatticeVector<2>(temp,bc.csl));
+            boxVectors[1] = LatticeVector<2>(temp,bc.csl);
 
             bc.updateBoxVectors(boxVectors,0.6);
             bc.box(boxVectors,2,"bc.txt",true);

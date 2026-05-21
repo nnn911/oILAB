@@ -17,7 +17,7 @@ namespace oILAB {
 template<int dim>
 ReciprocalLatticeDirection<dim>::ReciprocalLatticeDirection(const ReciprocalLatticeVector<dim>& v)
     : /* init */ ReciprocalLatticeVector<dim>(((v.squaredNorm() == 0) ? v : (v / abs(IntegerMath<IntScalarType>::gcd(v))).eval()),
-                                              v.lattice)
+                                              *v.lattice)
 {
 }
 
@@ -42,7 +42,7 @@ double ReciprocalLatticeDirection<dim>::planeSpacing() const
 template<int dim>
 int ReciprocalLatticeDirection<dim>::stacking() const
 {
-    RLLL rlll((*this).lattice.latticeBasis, 0.75);
+    RLLL rlll(this->lattice->latticeBasis, 0.75);
     auto structureMatrix = rlll.reducedBasis();
     auto U = rlll.unimodularMatrix();
 

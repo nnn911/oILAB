@@ -14,11 +14,14 @@ template <int dim>
 GbMesoStateEnsemble<dim>::GbMesoStateEnsemble(
     const Gb<dim> &gb, const ReciprocalLatticeVector<dim> &axis,
     // const Eigen::Vector<int,dim>& scales) :
-    std::vector<LatticeVector<dim>> &ensembleCslVectors, const double &bhalfMax)
+    std::array<LatticeVector<dim>, dim> &ensembleCslVectors, const double &bhalfMax)
     : GbShifts<dim>(
           gb, axis,
-          std::vector<LatticeVector<dim>>(ensembleCslVectors.begin() + 1,
-                                          ensembleCslVectors.end()),
+          [&]{
+              std::array<LatticeVector<dim>, dim-1> gbCsl;
+              for(int i = 0; i < dim-1; ++i) gbCsl[i] = ensembleCslVectors[i+1];
+              return gbCsl;
+          }(),
           bhalfMax),
       ensembleCslVectors(ensembleCslVectors),
       bicrystalConfig(getBicrystalConfig((const GbShifts<dim> &)*this,
@@ -37,7 +40,7 @@ GbMesoStateEnsemble<dim>::GbMesoStateEnsemble(
     template<int dim>
     typename GbMesoStateEnsemble<dim>::BicrystalLatticeVectors
     GbMesoStateEnsemble<dim>::getBicrystalConfig(const GbShifts<dim>& gbs,
-                                                 std::vector<LatticeVector<dim>>& ensembleCslVectors)
+                                                 std::array<LatticeVector<dim>, dim>& ensembleCslVectors)
     {
         //auto allLatticeVectors= gbs.gb.bc.box(ensembleCslVectors,1,1,"bc.txt");
         auto allLatticeVectors= gbs.gb.bc.box(ensembleCslVectors,1,"bc.txt");
@@ -45,7 +48,7 @@ GbMesoStateEnsemble<dim>::GbMesoStateEnsemble(
 
         // include only lattice vectors in A and B
         for (const auto& latticeVector : allLatticeVectors) {
-            if (&latticeVector.lattice == &gbs.gb.bc.A || &latticeVector.lattice == &gbs.gb.bc.B)
+            if (latticeVector.lattice == &gbs.gb.bc.A || latticeVector.lattice == &gbs.gb.bc.B)
                 output.push_back(latticeVector);
         }
 

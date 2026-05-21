@@ -19,6 +19,7 @@ template <int dim> struct LatticeDirection : protected LatticeVector<dim> {
   using IntScalarType = typename LatticeCore<dim>::IntScalarType;
   using VectorDimI = typename LatticeCore<dim>::VectorDimI;
 
+  LatticeDirection() = default;
   LatticeDirection(const LatticeVector<dim> &v);
   LatticeDirection(const LatticeDirection<dim> &other) = default;
 

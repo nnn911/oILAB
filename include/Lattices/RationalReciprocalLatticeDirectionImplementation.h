@@ -73,10 +73,10 @@ template<int dim>
 RationalReciprocalLatticeDirection<dim> RationalReciprocalLatticeDirection<dim>::operator+(
     const RationalReciprocalLatticeDirection<dim>& other) const
 {
-    assert(&dir.lattice == &other.dir.lattice && "Rational Lattice Vector Type belong to different Lattices.");
+    assert(dir.lattice == other.dir.lattice && "Rational Lattice Vector Type belong to different Lattices.");
     const VectorDimI temp(rat.n * other.rat.d * dir.reciprocalLatticeVector() + other.rat.n * rat.d * other.dir.reciprocalLatticeVector());
     const IntScalarType gcd(IntegerMath<IntScalarType>::gcd(temp));
-    const ReciprocalLatticeVector<dim> v((temp / gcd).eval(), dir.lattice);
+    const ReciprocalLatticeVector<dim> v((temp / gcd).eval(), *dir.lattice);
     return RationalReciprocalLatticeDirection<dim>(Rational(gcd, rat.d * other.rat.d), ReciprocalLatticeDirection<dim>(v));
 }
 
@@ -85,10 +85,10 @@ template<int dim>
 RationalReciprocalLatticeDirection<dim> RationalReciprocalLatticeDirection<dim>::operator-(
     const RationalReciprocalLatticeDirection<dim>& other) const
 {
-    assert(&dir.lattice == &other.dir.lattice && "ReciprocalLatticeVectorType belong to different Lattices.");
+    assert(dir.lattice == other.dir.lattice && "ReciprocalLatticeVectorType belong to different Lattices.");
     const VectorDimI temp(rat.n * other.rat.d * dir.reciprocalLatticeVector() - other.rat.n * rat.d * other.dir.reciprocalLatticeVector());
     const IntScalarType gcd(IntegerMath<IntScalarType>::gcd(temp));
-    const ReciprocalLatticeVector<dim> v((temp / gcd).eval(), dir.lattice);
+    const ReciprocalLatticeVector<dim> v((temp / gcd).eval(), *dir.lattice);
     return RationalReciprocalLatticeDirection<dim>(Rational(gcd, rat.d * other.rat.d), ReciprocalLatticeDirection<dim>(v));
 }
 
@@ -96,7 +96,7 @@ RationalReciprocalLatticeDirection<dim> RationalReciprocalLatticeDirection<dim>:
 template<int dim>
 RationalReciprocalLatticeDirection<dim> RationalReciprocalLatticeDirection<dim>::operator+(const ReciprocalLatticeVector<dim>& other) const
 {
-    assert(&dir.lattice == &other.lattice && "ReciprocalLatticeVectorType belong to different Lattices.");
+    assert(dir.lattice == other.lattice && "ReciprocalLatticeVectorType belong to different Lattices.");
     const IntScalarType gcd(IntegerMath<IntScalarType>::gcd(other));
     return this->operator+(
         RationalReciprocalLatticeDirection<dim>(Rational<IntScalarType>(gcd, 1), ReciprocalLatticeDirection<dim>(other)));
@@ -106,7 +106,7 @@ RationalReciprocalLatticeDirection<dim> RationalReciprocalLatticeDirection<dim>:
 template<int dim>
 RationalReciprocalLatticeDirection<dim> RationalReciprocalLatticeDirection<dim>::operator-(const ReciprocalLatticeVector<dim>& other) const
 {
-    assert(&dir.lattice == &other.lattice && "ReciprocalLatticeVectorType belong to different Lattices.");
+    assert(dir.lattice == other.lattice && "ReciprocalLatticeVectorType belong to different Lattices.");
     const IntScalarType gcd(IntegerMath<IntScalarType>::gcd(other));
     return this->operator-(
         RationalReciprocalLatticeDirection<dim>(Rational<IntScalarType>(gcd, 1), ReciprocalLatticeDirection<dim>(other)));

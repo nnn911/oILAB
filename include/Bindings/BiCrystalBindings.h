@@ -39,9 +39,9 @@ namespace pyoilab {
         cls.def("updateBoxVectors",[](const BiCrystal& self,
                                               std::vector<PyLatticeVector>& boxPyLatticeVectors,
                                               const double& orthogonality) {
-                          std::vector<LatticeVector> boxLatticeVectors;
-                          for(const auto& v : boxPyLatticeVectors)
-                              boxLatticeVectors.push_back(v.lv);
+                          std::array<LatticeVector, dim> boxLatticeVectors;
+                          for(int i = 0; i < (int)boxPyLatticeVectors.size(); ++i)
+                              boxLatticeVectors[i] = boxPyLatticeVectors[i].lv;
                           self.updateBoxVectors(boxLatticeVectors,
                                                 orthogonality);
                           std::vector<PyLatticeVector> pyLatticeVectors;
@@ -54,9 +54,9 @@ namespace pyoilab {
                           const int& dsclFactor,
                           std::string filename,
                           bool orient){
-            std::vector<LatticeVector> boxLatticeVectors;
-            for(const auto& v : boxPyLatticeVectors)
-                boxLatticeVectors.push_back(v.lv);
+            std::array<LatticeVector, dim> boxLatticeVectors;
+            for(int i = 0; i < (int)boxPyLatticeVectors.size(); ++i)
+                boxLatticeVectors[i] = boxPyLatticeVectors[i].lv;
             auto latticeVectors= self.box(boxLatticeVectors,
                                           dsclFactor,
                                           filename,

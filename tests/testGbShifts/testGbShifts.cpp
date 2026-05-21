@@ -62,18 +62,17 @@ int main() {
         bc.getReciprocalLatticeDirectionInC(gb.nA.reciprocalLatticeVector()),
         true);
 
-    std::vector<LatticeVector<3>> gbCslVectors;
-    gbCslVectors.push_back(gb.getPeriodVector(rAxisA));
+    std::array<LatticeVector<3>, 2> gbCslVectors;
+    gbCslVectors[0] = gb.getPeriodVector(rAxisA);
     std::cout << "length of the period vector"
               << gb.getPeriodVector(rAxisA).cartesian().norm() << std::endl;
-    gbCslVectors.push_back(axisC);
+    gbCslVectors[1] = axisC;
     GbShifts<3> shifts(gb, rAxisA, gbCslVectors, 1.2);
 
     // construct the bicrystal
-    std::vector<LatticeVector<3>> cslVectors;
-    cslVectors.push_back(5 * basis[0].latticeVector());
-    cslVectors.push_back(4 * gbCslVectors[0]);
-    cslVectors.push_back(4 * gbCslVectors[1]);
+    std::array<LatticeVector<3>, 3> cslVectors{5 * basis[0].latticeVector(),
+                                               4 * gbCslVectors[0],
+                                               4 * gbCslVectors[1]};
     gb.bc.updateBoxVectors(cslVectors,0.5);
     auto points = gb.bc.box(cslVectors, 1);
     gb.bc.updateBoxVectors(cslVectors,1.0);
@@ -100,18 +99,18 @@ int main() {
              << (-1 * cslVectors[0].cartesian()).transpose() << "\""
              << std::endl;
       for (auto point : points) {
-        if (&point.lattice == &bc.A)
+        if (point.lattice == &bc.A)
           config << "1 "
                  << (point.cartesian() + pair.first.cartesian() / 2).transpose()
                  << " 0.05" << std::endl;
-        if (&point.lattice == &bc.B)
+        if (point.lattice == &bc.B)
           config << "2 "
                  << (point.cartesian() - pair.first.cartesian() / 2).transpose()
                  << " 0.05" << std::endl;
-        if (&point.lattice == &bc.csl)
+        if (point.lattice == &bc.csl)
           config << "3 " << (point.cartesian() + pair.second).transpose()
                  << " 0.2" << std::endl;
-        if (&point.lattice == &bc.dscl)
+        if (point.lattice == &bc.dscl)
           config << "4 " << point.cartesian().transpose() << " 0.01"
                  << std::endl;
       }

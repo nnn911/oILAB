@@ -6,6 +6,7 @@
 #ifndef gbLAB_LatticeVector_h_
 #define gbLAB_LatticeVector_h_
 
+#include <array>
 #include "LatticeModule.h"
 
 namespace oILAB {
@@ -29,8 +30,9 @@ public:
   typedef typename LatticeCore<dim>::VectorDimI VectorDimI;
   typedef typename LatticeCore<dim>::MatrixDimI MatrixDimI;
 
-  const Lattice<dim> &lattice;
+  const Lattice<dim> *lattice;
 
+  LatticeVector();
   LatticeVector(const Lattice<dim> &lat);
   LatticeVector(const VectorDimD &d, const Lattice<dim> &lat);
   LatticeVector(const VectorDimI &d, const Lattice<dim> &lat);
@@ -51,33 +53,33 @@ public:
 
   ReciprocalLatticeDirection<dim>
   cross(const LatticeVector<dim> &other) const requires (dim == 2) {
-    assert(&lattice == &other.lattice &&
+    assert(lattice == other.lattice &&
            "LatticeVectors belong to different Lattices.");
     return ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(
-        (VectorDimI() << 0, 0).finished(), lattice));
+        (VectorDimI() << 0, 0).finished(), *lattice));
   }
   ReciprocalLatticeDirection<dim>
   cross(const LatticeVector<dim> &other) const requires (dim == 3) {
-    assert(&lattice == &other.lattice &&
+    assert(lattice == other.lattice &&
            "LatticeVectors belong to different Lattices.");
     return ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(
         static_cast<VectorDimI>(*this).cross(static_cast<VectorDimI>(other)),
-        lattice));
+        *lattice));
   }
 
   ReciprocalLatticeDirection<dim>
   cross() const requires (dim == 2) {
     return ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(
-        (VectorDimI() << -(*this)(1), (*this)(0)).finished(), lattice));
+        (VectorDimI() << -(*this)(1), (*this)(0)).finished(), *lattice));
   }
   ReciprocalLatticeDirection<dim>
   cross() const requires (dim == 3) {
     return ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(
-        (VectorDimI() << -(*this)(1), (*this)(0), 0).finished(), lattice));
+        (VectorDimI() << -(*this)(1), (*this)(0), 0).finished(), *lattice));
   }
 
   static void modulo(
-      LatticeVector<dim> &input, const std::vector<LatticeVector<dim>> &basis,
+      LatticeVector<dim> &input, const std::array<LatticeVector<dim>, dim> &basis,
       const VectorDimD &shift = VectorDimD::Zero()) requires (dim == 2 || dim == 3) {
     if constexpr (dim == 3) {
       double det = (basis[0].cross(basis[1])).dot(basis[2]);
@@ -103,7 +105,7 @@ public:
   }
 
   static void modulo(
-      VectorDimD &input, const std::vector<LatticeVector<dim>> &basis,
+      VectorDimD &input, const std::array<LatticeVector<dim>, dim> &basis,
       const VectorDimD &shift = VectorDimD::Zero()) requires (dim == 2 || dim == 3) {
     if constexpr (dim == 3) {
       Eigen::Matrix3d L;

@@ -43,9 +43,9 @@ namespace pyoilab {
               [](const Lattice &lattice,
                  const std::vector<PyLatticeVector> &boxPyLatticeVectors,
                  const std::string &filename) {
-                std::vector<LatticeVector> boxLatticeVectors;
-                for(const auto& v : boxPyLatticeVectors)
-                  boxLatticeVectors.push_back(v.lv);
+                std::array<LatticeVector, dim> boxLatticeVectors;
+                for(int i = 0; i < (int)boxPyLatticeVectors.size(); ++i)
+                  boxLatticeVectors[i] = boxPyLatticeVectors[i].lv;
                 auto latticeVectors= lattice.box(boxLatticeVectors,filename);
 
                 std::vector<PyLatticeVector> pyLatticeVectors;

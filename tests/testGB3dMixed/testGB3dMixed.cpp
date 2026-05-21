@@ -89,8 +89,8 @@ int main() {
     // refines slot [0] (vectorAlongAxisC), never touching the
     // guaranteed-in-plane pair, so the result is always commensurate with
     // the GB plane regardless of how well vectorAlongAxisC starts out.
-    std::vector<LatticeVector<dim>> boxVectors{vectorAlongAxisC, inPlane1,
-                                                inPlane2};
+    std::array<LatticeVector<dim>, dim> boxVectors{vectorAlongAxisC, inPlane1,
+                                                   inPlane2};
     gb.bc.updateBoxVectors(boxVectors, 0.8);
 
     std::cout << "Input box vectors = " << std::endl;

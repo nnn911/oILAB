@@ -15,7 +15,7 @@ template <int dim>
 GbMesoState<dim>::GbMesoState(
     const Gb<dim> &gb, const ReciprocalLatticeVector<dim> &axis,
     const std::deque<std::tuple<LatticeVector<dim>, VectorDimD, int>> &bs,
-    const std::vector<LatticeVector<dim>> &mesoStateCslVectors,
+    const std::array<LatticeVector<dim>, dim> &mesoStateCslVectors,
     const BicrystalLatticeVectors &bicrystalConfig) try
     : GbContinuum
   <dim>(getMesoStateGbDomain(mesoStateCslVectors),
@@ -56,7 +56,7 @@ GbMesoState<dim>::GbMesoState(
     {
         auto normal= gb.nA.cartesian().normalized();
         std::map<OrderedTuplet<dim+1>,VectorDimD> xuPairs;
-        std::vector<LatticeVector<dim>> bicrystalBoxVectors(mesoStateCslVectors);
+        auto bicrystalBoxVectors = mesoStateCslVectors;
         bicrystalBoxVectors[0]= 2*mesoStateCslVectors[0];
         VectorDimD shift;
         shift << -0.5-FLT_EPSILON,-FLT_EPSILON,-FLT_EPSILON;
@@ -148,13 +148,13 @@ GbMesoState<dim>::GbMesoState(
         for(const auto& latticeVector : bicrystalConfig) {
             auto latticeVectorInD= gb.bc.getLatticeVectorInD(latticeVector);
             OrderedTuplet<dim+1> key;
-            if (&latticeVector.lattice == &gb.bc.A) {
+            if (latticeVector.lattice == &gb.bc.A) {
                 if (latticeVector.dot(gb.nA) <= 0)
                     key << latticeVectorInD, 1;
                 else
                     key << latticeVectorInD, -1;
             }
-            else if (&latticeVector.lattice == &gb.bc.B) {
+            else if (latticeVector.lattice == &gb.bc.B) {
                 if (latticeVector.dot(gb.nB) <= 0)
                     key << latticeVectorInD, 2;
                 else
@@ -246,10 +246,9 @@ GbMesoState<dim>::GbMesoState(
  void GbMesoState<dim>::box(const std::string& name) const requires (dim==3)
  {
      const auto& config= this->bicrystalConfig;
-     std::vector<LatticeVector<3>> boxVectors;
-     boxVectors.push_back(this->mesoStateCslVectors[0]);
-     boxVectors.push_back(this->mesoStateCslVectors[1]);
-     boxVectors.push_back(this->mesoStateCslVectors[2]);
+     std::array<LatticeVector<3>, 3> boxVectors{this->mesoStateCslVectors[0],
+                                                this->mesoStateCslVectors[1],
+                                                this->mesoStateCslVectors[2]};
 
      std::vector<VectorDimD> referenceConfigA, deformedConfigA;
      std::vector<VectorDimD> referenceConfigB, deformedConfigB;
@@ -263,14 +262,14 @@ GbMesoState<dim>::GbMesoState(
      for (const auto &latticeVector: config) {
          VectorDimD x;
          OrderedTuplet<dim+1> temp;
-         if (&(latticeVector.lattice) == &(this->gb.bc.A)) {
+         if (latticeVector.lattice == &(this->gb.bc.A)) {
              double height= latticeVector.cartesian().dot(gb.nA.cartesian().normalized());
              if (height<FLT_EPSILON)
                  temp <<  gb.bc.getLatticeVectorInD(latticeVector),1;
              else
                  temp <<  gb.bc.getLatticeVectorInD(latticeVector),-1;
          }
-         else if (&(latticeVector.lattice) == &(this->gb.bc.B)) {
+         else if (latticeVector.lattice == &(this->gb.bc.B)) {
              double height = latticeVector.cartesian().dot(gb.nB.cartesian().normalized());
              if (height<FLT_EPSILON)
                  temp <<  gb.bc.getLatticeVectorInD(latticeVector),2;
@@ -280,10 +279,10 @@ GbMesoState<dim>::GbMesoState(
 
          //x = latticeVector.cartesian() + this->displacement(latticeVector.cartesian());
 
-         if (&(latticeVector.lattice) == &(this->gb.bc.A)) {
+         if (latticeVector.lattice == &(this->gb.bc.A)) {
              x = latticeVector.cartesian() + this->displacement(temp) + this->uAverage;
          }
-         else if (&(latticeVector.lattice) == &(this->gb.bc.B) )
+         else if (latticeVector.lattice == &(this->gb.bc.B) )
              x = latticeVector.cartesian() + this->displacement(temp) - this->uAverage;
          else
              x = latticeVector.cartesian() + this->displacement(temp);
@@ -308,16 +307,16 @@ GbMesoState<dim>::GbMesoState(
          }
 
 
-         if (&(latticeVector.lattice) == &(this->gb.bc.A) && x.dot(this->gb.nA.cartesian().normalized()) <= 1e-6)
-         //if (&(latticeVector.lattice) == &(this->gb.bc.A) && x.dot(this->gb.nA.cartesian().normalized()) <= FLT_EPSILON)
-         //if (&(latticeVector.lattice) == &(this->gb.bc.A))
+         if (latticeVector.lattice == &(this->gb.bc.A) && x.dot(this->gb.nA.cartesian().normalized()) <= 1e-6)
+         //if (latticeVector.lattice == &(this->gb.bc.A) && x.dot(this->gb.nA.cartesian().normalized()) <= FLT_EPSILON)
+         //if (latticeVector.lattice == &(this->gb.bc.A))
          {
              referenceConfigA.push_back(latticeVector.cartesian());
              deformedConfigA.push_back(x);
          }
-         else if (&(latticeVector.lattice) == &(this->gb.bc.B) && x.dot(this->gb.nB.cartesian().normalized()) <= 1e-6)
-         //else if (&(latticeVector.lattice) == &(this->gb.bc.B) && x.dot(this->gb.nB.cartesian().normalized()) <= FLT_EPSILON)
-         //else if (&(latticeVector.lattice) == &(this->gb.bc.B))
+         else if (latticeVector.lattice == &(this->gb.bc.B) && x.dot(this->gb.nB.cartesian().normalized()) <= 1e-6)
+         //else if (latticeVector.lattice == &(this->gb.bc.B) && x.dot(this->gb.nB.cartesian().normalized()) <= FLT_EPSILON)
+         //else if (latticeVector.lattice == &(this->gb.bc.B))
          {
              referenceConfigB.push_back(latticeVector.cartesian());
              deformedConfigB.push_back(x);

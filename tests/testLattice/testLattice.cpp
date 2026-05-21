@@ -117,11 +117,9 @@ int main() {
   /*! [Cross product] */
 
   /*! [Box3] */
-  std::vector<LatticeVector<3>> boxVectors;
-  boxVectors.push_back(LatticeVector<3>(u, L));
-  boxVectors.push_back(LatticeVector<3>(v, L));
-  boxVectors.push_back(
-      LatticeVector<3>(latticeDirectionAlong_s.latticeVector(), L));
+  std::array<LatticeVector<3>, 3> boxVectors{LatticeVector<3>(u, L),
+                                             LatticeVector<3>(v, L),
+                                             LatticeVector<3>(latticeDirectionAlong_s.latticeVector(), L)};
   std::cout << "Outputting a configuration of lattice points bounded by three "
                "box vectors: "
             << std::endl;
@@ -143,7 +141,7 @@ int main() {
             << std::endl;
   std::cout << b1.cartesian().transpose() << std::endl;
   std::cout << b2.cartesian().transpose() << std::endl;
-  L2.box(std::vector<LatticeVector<2>>{-1 * b1, b2}, "lattice2.txt");
+  L2.box(std::array<LatticeVector<2>, 2>{-1 * b1, b2}, "lattice2.txt");
   /*! [Box2] */
 
   return 0;

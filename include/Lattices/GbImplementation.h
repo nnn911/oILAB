@@ -18,14 +18,14 @@ Gb<dim>::Gb(const BiCrystal<dim>& bc, const ReciprocalLatticeDirection<dim>& n)
 try
     : /* init */ bc(bc)
       /* init */,
-      nA(&n.lattice == &(bc.A) ? n : bc.getReciprocalLatticeDirectionInA(-1 * n.reciprocalLatticeVector()))
+      nA(n.lattice == &(bc.A) ? n : bc.getReciprocalLatticeDirectionInA(-1 * n.reciprocalLatticeVector()))
       /* init */,
-      nB(&n.lattice == &(bc.B) ? n : bc.getReciprocalLatticeDirectionInB(-1 * n.reciprocalLatticeVector()))
+      nB(n.lattice == &(bc.B) ? n : bc.getReciprocalLatticeDirectionInB(-1 * n.reciprocalLatticeVector()))
       /* init */,
       basisT(getBasisT(bc, n))
       /* init */,
       T(Lattice<dim>(bc.dscl.latticeBasis * getBasisT(bc, n).template cast<double>())) {
-    if(&n.lattice != &(bc.A) && &n.lattice != &(bc.B))
+    if(n.lattice != &(bc.A) && n.lattice != &(bc.B))
         throw std::runtime_error("The normal does not belong to the reciprocal lattices of A and B  \n");
 }
 catch(std::runtime_error& e) {
@@ -61,22 +61,22 @@ double Gb<dim>::stepHeightB(const LatticeVector<dim>& d) const
 }
 
 template<int dim>
-std::vector<LatticeVector<dim>> Gb<dim>::box(const std::vector<LatticeVector<dim>>& boxVectors,
+std::vector<LatticeVector<dim>> Gb<dim>::box(const std::array<LatticeVector<dim>, dim>& boxVectors,
                                              const int& dsclFactor,
                                              std::string filename,
                                              bool orient) const
     requires(dim == 2 || dim == 3)
 {
-    for(auto iter = std::next(boxVectors.begin()); iter < boxVectors.end(); iter++)
-        assert((*iter).dot(bc.getReciprocalLatticeDirectionInC(nA.reciprocalLatticeVector())) == 0 &&
+    for(int i = 1; i < dim; ++i)
+        assert(boxVectors[i].dot(bc.getReciprocalLatticeDirectionInC(nA.reciprocalLatticeVector())) == 0 &&
                "Box vectors not parallel to the grain boundary.");
 
     auto config = bc.box(boxVectors, dsclFactor);
     std::vector<LatticeVector<dim>> configuration;
     for(const LatticeVector<dim>& latticeVector : config) {
-        if(&(latticeVector.lattice) == &bc.A && latticeVector.dot(nA) <= 0) configuration.push_back(latticeVector);
-        if(&(latticeVector.lattice) == &bc.B && latticeVector.dot(nB) <= 0) configuration.push_back(latticeVector);
-        if(&(latticeVector.lattice) == &bc.csl || &(latticeVector.lattice) == &bc.dscl) configuration.push_back(latticeVector);
+        if(latticeVector.lattice == &bc.A && latticeVector.dot(nA) <= 0) configuration.push_back(latticeVector);
+        if(latticeVector.lattice == &bc.B && latticeVector.dot(nB) <= 0) configuration.push_back(latticeVector);
+        if(latticeVector.lattice == &bc.csl || latticeVector.lattice == &bc.dscl) configuration.push_back(latticeVector);
     }
 
     // form the rotation matrix used to orient the system
@@ -113,11 +113,11 @@ std::vector<LatticeVector<dim>> Gb<dim>::box(const std::vector<LatticeVector<dim
             file << R"(" Properties=atom_types:I:1:pos:R:3:radius:R:1 PBC="F T T" origin=")";
             file << (rotation * origin.cartesian()).transpose() << " 0.0\"" << std::endl;
             for(const auto& vector : configuration)
-                if(&(vector.lattice) == &bc.A)
+                if(vector.lattice == &bc.A)
                     file << 1 << " " << (rotation * vector.cartesian()).transpose() << " " << 0.0 << "  " << 0.05 << std::endl;
-                else if(&(vector.lattice) == &bc.B)
+                else if(vector.lattice == &bc.B)
                     file << 2 << " " << (rotation * vector.cartesian()).transpose() << " " << 0.0 << "  " << 0.05 << std::endl;
-                else if(&(vector.lattice) == &bc.csl)
+                else if(vector.lattice == &bc.csl)
                     file << 3 << " " << (rotation * vector.cartesian()).transpose() << " " << 0.0 << "  " << 0.2 << std::endl;
                 else
                     file << 4 << " " << (rotation * vector.cartesian()).transpose() << " " << 0.0 << "  " << 0.01 << std::endl;
@@ -130,11 +130,11 @@ std::vector<LatticeVector<dim>> Gb<dim>::box(const std::vector<LatticeVector<dim
             file << (rotation * origin.cartesian()).transpose() << "\"" << std::endl;
 
             for(const auto& vector : configuration)
-                if(&(vector.lattice) == &bc.A)
+                if(vector.lattice == &bc.A)
                     file << 1 << " " << (rotation * vector.cartesian()).transpose() << "  " << 0.05 << std::endl;
-                else if(&(vector.lattice) == &bc.B)
+                else if(vector.lattice == &bc.B)
                     file << 2 << " " << (rotation * vector.cartesian()).transpose() << "  " << 0.05 << std::endl;
-                else if(&(vector.lattice) == &bc.csl)
+                else if(vector.lattice == &bc.csl)
                     file << 3 << " " << (rotation * vector.cartesian()).transpose() << "  " << 0.2 << std::endl;
                 else
                     file << 4 << " " << (rotation * vector.cartesian()).transpose() << "  " << 0.01 << std::endl;
@@ -198,7 +198,7 @@ LatticeVector<dim> Gb<dim>::getLatticeVectorInT(const LatticeVector<dim>& v) con
     IntScalarType det = basisT.template cast<double>().determinant();
     //      basisTA
     // T    -------->   dscl
-    if(&(v.lattice) == &(bc.csl) && IntegerMath<IntScalarType>::gcd(v) % 2 == 0) {
+    if(v.lattice == &(bc.csl) && IntegerMath<IntScalarType>::gcd(v) % 2 == 0) {
         VectorDimI integerCoordinates = adj * bc.getLatticeVectorInD(v);
         assert(IntegerMath<IntScalarType>::gcd(integerCoordinates) % det == 0);
         integerCoordinates = integerCoordinates / det;
@@ -216,7 +216,7 @@ ReciprocalLatticeVector<dim> Gb<dim>::getReciprocalLatticeVectorInT(const Recipr
 {
     //      basisTA
     // T    -------->   dscl
-    if(&(v.lattice) == &(bc.dscl))
+    if(v.lattice == &(bc.dscl))
         return ReciprocalLatticeVector<dim>((basisT.transpose() * v).eval(), T);
     else
         throw(std::runtime_error("The input reciprocal lattice vector should belong to the reciprocal lattice of the DSCL"));

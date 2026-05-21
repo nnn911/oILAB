@@ -18,16 +18,16 @@ protected:
   // const ReciprocalLatticeVector<dim>& axis);
   static std::vector<std::pair<LatticeVector<dim>, VectorDimD>>
   getbShiftPairs(const Gb<dim> &gb,
-                 const std::vector<LatticeVector<dim>> &gbCslVectors,
+                 const std::array<LatticeVector<dim>, dim-1> &gbCslVectors,
                  const double &bhalfMax);
 
 public:
   const Gb<dim> &gb;
   const ReciprocalLatticeVector<dim> &axis;
-  const std::vector<LatticeVector<dim>> gbCslVectors;
+  const std::array<LatticeVector<dim>, dim-1> gbCslVectors;
   std::vector<std::pair<LatticeVector<dim>, VectorDimD>> bShiftPairs;
   explicit GbShifts(const Gb<dim> &gb, const ReciprocalLatticeVector<dim> &axis,
-                    const std::vector<LatticeVector<dim>> &gbCslVectors,
+                    const std::array<LatticeVector<dim>, dim-1> &gbCslVectors,
                     const double &bhalfMax = 1);
 
     };

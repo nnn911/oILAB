@@ -29,7 +29,7 @@ template <int dim> class GbMesoState : public GbContinuum<dim> {
    */
   // ensure that the input is of the right dimension
   static Eigen::Matrix<double, dim, dim - 1> getMesoStateGbDomain(
-      const std::vector<LatticeVector<dim>> &mesoStateCslVectors);
+      const std::array<LatticeVector<dim>, dim> &mesoStateCslVectors);
 
   /*!
    * \brief Returns the displacement constraints \f$\textbf u(\textbf
@@ -44,7 +44,7 @@ template <int dim> class GbMesoState : public GbContinuum<dim> {
    */
   static std::map<OrderedTuplet<dim + 1>, VectorDimD> get_xuPairs(
       const Gb<dim> &gb,
-      const std::vector<LatticeVector<dim>> &mesoStateCslVectors,
+      const std::array<LatticeVector<dim>, dim> &mesoStateCslVectors,
       const std::deque<std::tuple<LatticeVector<dim>, VectorDimD, int>> &bs);
 
   /*!
@@ -67,7 +67,7 @@ template <int dim> class GbMesoState : public GbContinuum<dim> {
    * @return an integer array of size \p dim-1
    */
   static std::array<Eigen::Index, dim - 1>
-  discretize(const std::vector<LatticeVector<dim>> &mesoStateCslVectors,
+  discretize(const std::array<LatticeVector<dim>, dim> &mesoStateCslVectors,
              const Gb<dim> &gb);
 
 public:
@@ -87,7 +87,7 @@ public:
    * boundary, while the third vector should be out of the grain boundary plane.
    */
   // need the ensure that the inputs respect the above constraint
-  const std::vector<LatticeVector<dim>> &mesoStateCslVectors;
+  const std::array<LatticeVector<dim>, dim> &mesoStateCslVectors;
 
   /*!
    * Lattice vectors of lattices \f$\mathcal A\f$ and \f$\mathcal B\f$ that are
@@ -110,7 +110,7 @@ public:
   explicit GbMesoState(
       const Gb<dim> &gb, const ReciprocalLatticeVector<dim> &axis,
       const std::deque<std::tuple<LatticeVector<dim>, VectorDimD, int>> &bs,
-      const std::vector<LatticeVector<dim>> &mesoStateCslVectors,
+      const std::array<LatticeVector<dim>, dim> &mesoStateCslVectors,
       const BicrystalLatticeVectors &bicrystalConfig);
 
   /*!

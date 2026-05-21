@@ -17,7 +17,7 @@ namespace oILAB {
 template<int dim>
 GbShifts<dim>::GbShifts(const Gb<dim>& gb,
                         const ReciprocalLatticeVector<dim>& axis,
-                        const std::vector<LatticeVector<dim>>& gbCslVectors,
+                        const std::array<LatticeVector<dim>, dim-1>& gbCslVectors,
                         const double& bhalfMax)
     : gb(gb), axis(axis), gbCslVectors(gbCslVectors), bShiftPairs(getbShiftPairs(gb, gbCslVectors, bhalfMax))
 {
@@ -56,34 +56,30 @@ GbShifts<dim>::GbShifts(const Gb<dim>& gb,
 
 template<int dim>
 std::vector<std::pair<LatticeVector<dim>, typename GbShifts<dim>::VectorDimD>> GbShifts<dim>::getbShiftPairs(
-    const Gb<dim>& gb, const std::vector<LatticeVector<dim>>& gbCslVectors, const double& bhalfMax)
+    const Gb<dim>& gb, const std::array<LatticeVector<dim>, dim-1>& gbCslVectors, const double& bhalfMax)
 {
     std::vector<std::pair<LatticeVector<dim>, VectorDimD>> output;
 
-    assert(gbCslVectors.size() == dim - 1);
     auto nC = gb.bc.getReciprocalLatticeDirectionInC(gb.nB.reciprocalLatticeVector());
 
     // form a CSL cell for modulo operations
     auto gbPlaneParallelCslBasis = gb.bc.csl.planeParallelLatticeBasis(nC, true);
-    std::vector<LatticeVector<dim>> cslSubLatticeVectors;
-    cslSubLatticeVectors.push_back(gbPlaneParallelCslBasis[0].latticeVector());
-    cslSubLatticeVectors.push_back(gbCslVectors[0]);
-    cslSubLatticeVectors.push_back(gbCslVectors[1]);
+    std::array<LatticeVector<dim>, dim> cslSubLatticeVectors;
+    cslSubLatticeVectors[0] = gbPlaneParallelCslBasis[0].latticeVector();
+    for(int i = 0; i < dim-1; ++i) cslSubLatticeVectors[i+1] = gbCslVectors[i];
     auto cslPoints = gb.bc.csl.box(cslSubLatticeVectors);
 
     // form a T lattice cell for exploring translations
     auto nT = gb.getReciprocalLatticeDirectionInT(
         gb.bc.getReciprocalLatticeDirectionInD(gb.nA.reciprocalLatticeVector()).reciprocalLatticeVector());
     auto planeParallelBasisT = gb.T.planeParallelLatticeBasis(nT, true);
-    std::vector<LatticeVector<dim>> latticeVectorsT;
+    std::array<LatticeVector<dim>, dim> latticeVectorsT;
 
     double latticeConstant = gb.bc.A.latticeBasis.col(0).norm();
     for(int i = 0; i < dim; ++i) {
-        // scale the lattice vectors of T based on the bhalfMax parameter
-        // int factor= floor(bhalfMax*latticeConstant/planeParallelBasisT[i].latticeVector().cartesian().norm()+FLT_EPSILON);
         int factor = floor(35 * bhalfMax * latticeConstant / planeParallelBasisT[i].latticeVector().cartesian().norm() + FLT_EPSILON);
         factor = (factor > 0 ? factor : 1);
-        latticeVectorsT.push_back(factor * planeParallelBasisT[i].latticeVector());
+        latticeVectorsT[i] = factor * planeParallelBasisT[i].latticeVector();
     }
     auto points = gb.T.box(latticeVectorsT, "T.txt");
 

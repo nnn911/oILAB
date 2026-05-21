@@ -37,7 +37,7 @@ class GbMesoStateEnsemble
    */
   static BicrystalLatticeVectors
   getBicrystalConfig(const GbShifts<dim> &gbs,
-                     std::vector<LatticeVector<dim>> &ensembleCslVectors);
+                     std::array<LatticeVector<dim>, dim> &ensembleCslVectors);
   // const Eigen::Vector<int,dim>& scales);
 
   static std::deque<std::tuple<LatticeVector<dim>, VectorDimD, int>>
@@ -49,7 +49,7 @@ public:
   /*!
    * CSL vectors that define the ensemble's grain boundary region
    */
-  std::vector<LatticeVector<dim>> ensembleCslVectors;
+  std::array<LatticeVector<dim>, dim> ensembleCslVectors;
 
   /*!
    * A vector of lattice vectors in the ensemble's bicrystal.
@@ -58,7 +58,7 @@ public:
 
   GbMesoStateEnsemble(const Gb<dim> &gb,
                       const ReciprocalLatticeVector<dim> &axis,
-                      std::vector<LatticeVector<dim>> &ensembleCslVectors,
+                      std::array<LatticeVector<dim>, dim> &ensembleCslVectors,
                       const double &bhalfMax);
 
   /*!

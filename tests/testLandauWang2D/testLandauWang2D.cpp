@@ -1,3 +1,4 @@
+#include <array>
 #include "../../include/IO/TextFileParser.h"
 #include "../../include/Lattices/GbMesoStateEnsemble.h"
 #include "../../include/MonteCarlo/LandauWangTP.h"
@@ -95,12 +96,10 @@ int main() {
               << std::endl;
     LatticeVector<3> axisA(gb.bc.A.latticeDirection(axis).latticeVector());
     LatticeVector<3> axisC(gb.bc.getLatticeDirectionInC(axisA).latticeVector());
-    std::vector<LatticeVector<3>> cslVectors;
-    cslVectors.push_back(
-        heightScaling *
-        gb.bc.csl.latticeDirection(gb.nA.cartesian()).latticeVector());
-    cslVectors.push_back(periodScaling * gb.getPeriodVector(rAxisA));
-    cslVectors.push_back(axisScaling * axisC);
+    std::array<LatticeVector<3>, 3> cslVectors{
+        heightScaling * gb.bc.csl.latticeDirection(gb.nA.cartesian()).latticeVector(),
+        periodScaling * gb.getPeriodVector(rAxisA),
+        axisScaling * axisC};
 
     gb.box(cslVectors, 1, "gb.txt");
     /*

@@ -117,7 +117,7 @@ public:
    * (std::vector<LatticeVector<dim>>).
    */
   std::vector<LatticeVector<dim>>
-  box(const std::vector<LatticeVector<dim>> &boxVectors,
+  box(const std::array<LatticeVector<dim>, dim> &boxVectors,
       const int &dsclFactor, std::string filename = "",
       bool orient = false) const requires (dim == 2 || dim == 3);
 

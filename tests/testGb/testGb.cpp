@@ -63,9 +63,8 @@ int main() {
     auto nC =
         gb.bc.getReciprocalLatticeDirectionInC(gb.nA.reciprocalLatticeVector());
     auto planeParallelBasis = bc.csl.planeParallelLatticeBasis(nC, true);
-    std::vector<LatticeVector<2>> boxVectors;
-    boxVectors.push_back(planeParallelBasis[0].latticeVector());
-    boxVectors.push_back(planeParallelBasis[1].latticeVector());
+    std::array<LatticeVector<2>, 2> boxVectors{planeParallelBasis[0].latticeVector(),
+                                               planeParallelBasis[1].latticeVector()};
     gb.bc.updateBoxVectors(boxVectors,0.9);
     gb.box(boxVectors, 1, "gb.txt", true);
 

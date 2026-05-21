@@ -10,6 +10,7 @@
 #include "../Math/RationalMatrix.h"
 #include "../Math/SmithDecomposition.h"
 #include "LatticeModule.h"
+#include <array>
 #include <map>
 
 namespace oILAB {
@@ -283,7 +284,7 @@ namespace oILAB {
          * @param orthogonality - a value in the interval \f$[0,1]\f$.
          */
         void
-        updateBoxVectors(std::vector<LatticeVector<dim>>& boxVectors,
+        updateBoxVectors(std::array<LatticeVector<dim>, dim>& boxVectors,
                               const double& orthogonality=0.0) const requires (dim==2 || dim==3);
 
         /*! This function outputs/prints a 2D bicrystal (two lattices that form the GB and
@@ -302,7 +303,7 @@ namespace oILAB {
          * @return lattice points of the bicrystal (along with the CSL) bounded by the box (std::vector<LatticeVector<2>>).
          */
         std::vector<LatticeVector<dim>>
-        box(const std::vector<LatticeVector<dim>>& boxVectors,
+        box(const std::array<LatticeVector<dim>, dim>& boxVectors,
             const int& dsclFactor,
             std::string filename= "",
             bool orient=false) const requires (dim==2 || dim==3);

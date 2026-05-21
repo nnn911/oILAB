@@ -18,6 +18,7 @@
 #include "LatticeCore.h"
 #include "LatticeModule.h"
 #include <algorithm>
+#include <array>
 #include <fstream>
 #include <map>
 #include <unordered_map>
@@ -89,7 +90,7 @@ public:
    *  \returns  a reciprocal lattice basis \f$[\textbf r_1,\cdots,\textbf
    * r_{dim}]\f$
    * */
-  std::vector<ReciprocalLatticeDirection<dim>>
+  std::array<ReciprocalLatticeDirection<dim>, dim>
   directionOrthogonalReciprocalLatticeBasis(const LatticeDirection<dim> &l,
                                             const bool &useRLLL = false) const;
 
@@ -115,7 +116,7 @@ public:
    * \param[in] l Reciprocal lattice direction
    * \returns   A lattice basis \f$[\textbf b_1,\cdots,\textbf b_{dim}]\f$
    * */
-  std::vector<LatticeDirection<dim>>
+  std::array<LatticeDirection<dim>, dim>
   planeParallelLatticeBasis(const ReciprocalLatticeDirection<dim> &l,
                             const bool &useRLLL = false) const;
 
@@ -184,7 +185,7 @@ public:
    * @return Lattice points bounded by the box vectors
    */
   std::vector<LatticeVector<dim>>
-  box(const std::vector<LatticeVector<dim>> &boxVectors,
+  box(const std::array<LatticeVector<dim>, dim> &boxVectors,
       const std::string &filename = "") const requires (dim == 3);
 
   /*! This function outputs/prints lattice points within a box bounded by the
@@ -196,7 +197,7 @@ public:
    * @return Lattice points bounded by the box vectors
    */
   std::vector<LatticeVector<dim>>
-  box(const std::vector<LatticeVector<dim>> &boxVectors,
+  box(const std::array<LatticeVector<dim>, dim> &boxVectors,
       const std::string &filename = "") const requires (dim == 2);
 };
 /*! @example testPlaneParallelLatticeDirections.cpp

@@ -78,12 +78,10 @@ void runMonteCarlo(const double &a0, const double &temperature,
   std::cout << gb.getPeriodVector(rAxisA).cartesian().transpose() << std::endl;
   LatticeVector<3> axisA(gb.bc.A.latticeDirection(axis).latticeVector());
   LatticeVector<3> axisC(gb.bc.getLatticeDirectionInC(axisA).latticeVector());
-  std::vector<LatticeVector<3>> cslVectors;
-  cslVectors.push_back(
-      heightScaling *
-      gb.bc.csl.latticeDirection(gb.nA.cartesian()).latticeVector());
-  cslVectors.push_back(periodScaling * gb.getPeriodVector(rAxisA));
-  cslVectors.push_back(axisScaling * axisC);
+  std::array<LatticeVector<3>, 3> cslVectors{
+      heightScaling * gb.bc.csl.latticeDirection(gb.nA.cartesian()).latticeVector(),
+      periodScaling * gb.getPeriodVector(rAxisA),
+      axisScaling * axisC};
 
   // material parameter
   // source:

@@ -138,10 +138,7 @@ int main() {
     /*! [axis vector] */
 
     /*! [box vectors] */
-    std::vector<LatticeVector<dim>> boxVectors;
-    boxVectors.push_back(nonParallelC);
-    boxVectors.push_back(periodC);
-    boxVectors.push_back(vectorAlongAxisC);
+    std::array<LatticeVector<dim>, dim> boxVectors{nonParallelC, periodC, vectorAlongAxisC};
     std::cout << "Input box vectors = " << std::endl;
     std::cout << boxVectors[0].cartesian().transpose() << std::endl;
     std::cout << boxVectors[1].cartesian().transpose() << std::endl;

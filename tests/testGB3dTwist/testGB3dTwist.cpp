@@ -91,8 +91,8 @@ int main() {
     // relevant here as it is for tilt/mixed, and safe to call regardless
     // since it only ever writes to slots [0] and [1] while staying exactly
     // in-plane.
-    std::vector<LatticeVector<dim>> boxVectors{vectorAlongAxisC, inPlane1,
-                                                inPlane2};
+    std::array<LatticeVector<dim>, dim> boxVectors{vectorAlongAxisC, inPlane1,
+                                                   inPlane2};
     gb.bc.updateBoxVectors(boxVectors, 1.0);
 
     std::cout << "Input box vectors = " << std::endl;

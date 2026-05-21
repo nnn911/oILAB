@@ -17,6 +17,7 @@ struct ReciprocalLatticeDirection :
   typedef typename LatticeCore<dim>::VectorDimD VectorDimD;
   typedef typename LatticeCore<dim>::VectorDimI VectorDimI;
 
+  ReciprocalLatticeDirection() = default;
   ReciprocalLatticeDirection(const ReciprocalLatticeDirection<dim> &other) =
       default;
   ReciprocalLatticeDirection(const ReciprocalLatticeVector<dim> &v);

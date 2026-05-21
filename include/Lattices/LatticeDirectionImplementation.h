@@ -14,7 +14,7 @@
 namespace oILAB {
 template<int dim>
 LatticeDirection<dim>::LatticeDirection(const LatticeVector<dim>& v)
-    : /* base init */ LatticeVector<dim>(((v.squaredNorm() == 0) ? v : (v / IntegerMath<IntScalarType>::gcd(v)).eval()), v.lattice)
+    : /* base init */ LatticeVector<dim>(((v.squaredNorm() == 0) ? v : (v / IntegerMath<IntScalarType>::gcd(v)).eval()), *v.lattice)
 {
 }
 

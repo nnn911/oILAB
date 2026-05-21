@@ -24,8 +24,9 @@ public:
   typedef typename LatticeCore<dim>::VectorDimI VectorDimI;
   typedef typename LatticeCore<dim>::MatrixDimI MatrixDimI;
 
-  const Lattice<dim> &lattice;
+  const Lattice<dim> *lattice;
 
+  ReciprocalLatticeVector();
   ReciprocalLatticeVector(const Lattice<dim> &lat);
   ReciprocalLatticeVector(const VectorDimD &d, const Lattice<dim> &lat);
   ReciprocalLatticeVector(const VectorDimI &d, const Lattice<dim> &lat);

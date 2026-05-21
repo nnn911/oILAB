@@ -243,9 +243,9 @@ LatticeVector<dim> BiCrystal<dim>::getLatticeVectorInA(const LatticeVector<dim>&
 {
     VectorDimI integerCoordinates;
 
-    if(&(v.lattice) == &(this->A))
+    if(v.lattice == &(this->A))
         return v;
-    else if(&(v.lattice) == &(this->csl))
+    else if(v.lattice == &(this->csl))
         // U*M*csl2cslp*v
         integerCoordinates = this->matrixX() * M * csl2cslp * v;
     else
@@ -262,9 +262,9 @@ LatticeVector<dim> BiCrystal<dim>::getLatticeVectorInB(const LatticeVector<dim>&
 {
     VectorDimI integerCoordinates;
 
-    if(&(v.lattice) == &(this->B))
+    if(v.lattice == &(this->B))
         return v;
-    else if(&(v.lattice) == &(this->csl))
+    else if(v.lattice == &(this->csl))
         // V*N*csl2cslp*v
         integerCoordinates = this->matrixV() * N * csl2cslp * v;
     else
@@ -284,16 +284,16 @@ LatticeVector<dim> BiCrystal<dim>::getLatticeVectorInD(const LatticeVector<dim>&
     MatrixDimI adjX = MatrixDimIExt<IntScalarType, dim>::adjoint(this->matrixX());
     MatrixDimI adjV = MatrixDimIExt<IntScalarType, dim>::adjoint(this->matrixV());
 
-    if(&(v.lattice) == &(this->A))
+    if(v.lattice == &(this->A))
         // N*inv(U)*v
         integerCoordinates = N * adjX * v;
-    else if(&(v.lattice) == &(this->B))
+    else if(v.lattice == &(this->B))
         // M*inv(V)*v
         integerCoordinates = M * adjV * v;
-    else if(&(v.lattice) == &(this->csl))
+    else if(v.lattice == &(this->csl))
         // N*M*csl2cslp*v
         integerCoordinates = N * M * csl2cslp * v;
-    else if(&(v.lattice) == &(this->dscl))
+    else if(v.lattice == &(this->dscl))
         return LatticeVector<dim>(v);
     else
         throw(std::runtime_error("The input lattice vector should belong to one of the four lattices of the bicrystal"));
@@ -319,15 +319,15 @@ LatticeDirection<dim> BiCrystal<dim>::getLatticeDirectionInC(const LatticeVector
     MatrixDimI adjMN = MatrixDimIExt<IntScalarType, dim>::adjoint(M * N);
     MatrixDimI adj_csl2cslp = MatrixDimIExt<IntScalarType, dim>::adjoint(csl2cslp);
 
-    if(&(v.lattice) == &(this->A))
+    if(v.lattice == &(this->A))
         // inv(M)*inv(U)*v
         integerCoordinates = adjM * adjX * v;
-    else if(&(v.lattice) == &(this->B))
+    else if(v.lattice == &(this->B))
         // inv(N)*inv(V)*v
         integerCoordinates = adjN * adjV * v;
-    else if(&(v.lattice) == &(this->csl))
+    else if(v.lattice == &(this->csl))
         return LatticeDirection<dim>(v);
-    else if(&(v.lattice) == &(this->dscl))
+    else if(v.lattice == &(this->dscl))
         integerCoordinates = adjMN * dscl2dsclp * v;
     else
         throw(std::runtime_error(
@@ -354,15 +354,15 @@ ReciprocalLatticeDirection<dim> BiCrystal<dim>::getReciprocalLatticeDirectionInA
     MatrixDimI adj_csl2cslp = MatrixDimIExt<IntScalarType, dim>::adjoint(csl2cslp);
     MatrixDimI adj_dscl2dsclp = MatrixDimIExt<IntScalarType, dim>::adjoint(dscl2dsclp);
 
-    if(&(rv.lattice) == &(this->A))
+    if(rv.lattice == &(this->A))
         return ReciprocalLatticeDirection<dim>(rv);
-    else if(&(rv.lattice) == &(this->B))
+    else if(rv.lattice == &(this->B))
         // U^-T*inverse(M)*N*V^T
         integerCoordinates = adjX.transpose() * adjM * N * (this->matrixV()).transpose() * rv;
-    else if(&(rv.lattice) == &(this->csl))
+    else if(rv.lattice == &(this->csl))
         // U^-T*inverse(M) * csl2cslp^{-T}
         integerCoordinates = adjX.transpose() * adjM * adj_csl2cslp.transpose() * rv;
-    else if(&(rv.lattice) == &(this->dscl))
+    else if(rv.lattice == &(this->dscl))
         // U^-T*N*rv * dscl2dsclp^{-T}
         integerCoordinates = adjX.transpose() * N * adj_dscl2dsclp.transpose() * rv;
     else
@@ -385,15 +385,15 @@ ReciprocalLatticeDirection<dim> BiCrystal<dim>::getReciprocalLatticeDirectionInB
     MatrixDimI adj_csl2cslp = MatrixDimIExt<IntScalarType, dim>::adjoint(csl2cslp);
     MatrixDimI adj_dscl2dsclp = MatrixDimIExt<IntScalarType, dim>::adjoint(dscl2dsclp);
 
-    if(&(rv.lattice) == &(this->A))
+    if(rv.lattice == &(this->A))
         // V^-T*inverse(N)*M*U^T
         integerCoordinates = adjV.transpose() * adjN * M * (this->matrixX()).transpose() * rv;
-    else if(&(rv.lattice) == &(this->B))
+    else if(rv.lattice == &(this->B))
         return ReciprocalLatticeDirection<dim>(rv);
-    else if(&(rv.lattice) == &(this->csl))
+    else if(rv.lattice == &(this->csl))
         // V^-T*inverse(N)*rv*cslp2csl^T
         integerCoordinates = adjV.transpose() * adjN * adj_csl2cslp.transpose() * rv;
-    else if(&(rv.lattice) == &(this->dscl))
+    else if(rv.lattice == &(this->dscl))
         // V^-T*M*rv*dsclp2dscl^T
         integerCoordinates = adjV.transpose() * M * adj_dscl2dsclp.transpose() * rv;
     else
@@ -410,15 +410,15 @@ ReciprocalLatticeDirection<dim> BiCrystal<dim>::getReciprocalLatticeDirectionInC
     VectorDimI integerCoordinates;
     MatrixDimI adj_dscl2dsclp = MatrixDimIExt<IntScalarType, dim>::adjoint(dscl2dsclp);
 
-    if(&(rv.lattice) == &(this->A))
+    if(rv.lattice == &(this->A))
         // M*U^T*rv
         integerCoordinates = M * this->matrixX().transpose() * rv;
-    else if(&(rv.lattice) == &(this->B))
+    else if(rv.lattice == &(this->B))
         // N*V^T*rv
         integerCoordinates = N * this->matrixV().transpose() * rv;
-    else if(&(rv.lattice) == &(this->csl))
+    else if(rv.lattice == &(this->csl))
         return ReciprocalLatticeDirection<dim>(rv);
-    else if(&(rv.lattice) == &(this->dscl))
+    else if(rv.lattice == &(this->dscl))
         // M*N*rv
         integerCoordinates = M * N * adj_dscl2dsclp.transpose() * rv;
     else
@@ -439,11 +439,11 @@ ReciprocalLatticeDirection<dim> BiCrystal<dim>::getReciprocalLatticeDirectionInD
     MatrixDimI adjM = MatrixDimIExt<IntScalarType, dim>::adjoint(M);
     MatrixDimI adjN = MatrixDimIExt<IntScalarType, dim>::adjoint(N);
 
-    if(&(rv.lattice) == &(this->A))
+    if(rv.lattice == &(this->A))
         integerCoordinates = adjN * (this->matrixX().transpose()) * rv;
-    else if(&(rv.lattice) == &(this->B))
+    else if(rv.lattice == &(this->B))
         integerCoordinates = adjM * (this->matrixV().transpose()) * rv;
-    else if(&(rv.lattice) == &(this->csl))
+    else if(rv.lattice == &(this->csl))
         integerCoordinates = adjN * adjM * adj_csl2cslp.transpose() * rv;
     else
         throw(std::runtime_error(
@@ -458,15 +458,15 @@ ReciprocalLatticeDirection<dim> BiCrystal<dim>::getReciprocalLatticeDirectionInD
 template<int dim>
 LatticeVector<dim> BiCrystal<dim>::shiftTensorA(const LatticeVector<dim>& d) const
 {
-    if(&d.lattice != &this->dscl) throw(std::runtime_error("Input vector is not a DSCL vectors"));
-    return LatticeVector<dim>((LambdaA * d).eval(), d.lattice);
+    if(d.lattice != &this->dscl) throw(std::runtime_error("Input vector is not a DSCL vectors"));
+    return LatticeVector<dim>((LambdaA * d).eval(), *d.lattice);
 }
 
 template<int dim>
 LatticeVector<dim> BiCrystal<dim>::shiftTensorB(const LatticeVector<dim>& d) const
 {
-    if(&d.lattice != &this->dscl) throw(std::runtime_error("Input vector is not a DSCL vectors"));
-    return LatticeVector<dim>((LambdaB * d).eval(), d.lattice);
+    if(d.lattice != &this->dscl) throw(std::runtime_error("Input vector is not a DSCL vectors"));
+    return LatticeVector<dim>((LambdaB * d).eval(), *d.lattice);
 }
 
 template<int dim>
@@ -474,7 +474,7 @@ template<typename Callback>
 void BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int div, GBCharacter character, Callback&& callback) const
     requires(dim == 2 || dim == 3)
 {
-    if(&d.lattice != &A && &d.lattice != &B) throw std::runtime_error("The axis does not belong to lattices A and B  ");
+    if(d.lattice != &A && d.lattice != &B) throw std::runtime_error("The axis does not belong to lattices A and B  ");
 
     constexpr IntScalarType keyScale = 1e6;
     std::optional<GBKey<keyScale>> gbKey;
@@ -500,13 +500,13 @@ void BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int
         return coords;
     };
 
-    const auto basis = d.lattice.directionOrthogonalReciprocalLatticeBasis(d, true);
+    const auto basis = d.lattice->directionOrthogonalReciprocalLatticeBasis(d, true);
 
     // Reciprocal direction parallel to the axis, expressed in d's own lattice (A or B, whichever the
     // caller supplied) - consistent with basis[1]/basis[2], which are also d.lattice-based. Used to build
     // Twist/Mixed candidate normals (basis[0] itself is NOT parallel to d - its only defining property is
     // basis[0].dot(d) == 1, a Bezout/duality normalization, not parallelism).
-    const auto axisReciprocal = d.lattice.reciprocalLatticeDirection(d.cartesian());
+    const auto axisReciprocal = d.lattice->reciprocalLatticeDirection(d.cartesian());
 
     // The same axis, but pinned to lattice A specifically (regardless of whether d.lattice is A or B),
     // since Gb::nA is always expressed in A's dual. Used only by the Mixed-branch Tilt/Twist filter below,
@@ -627,13 +627,12 @@ std::map<typename BiCrystal<dim>::IntScalarType, Gb<dim>> BiCrystal<dim>::genera
 }
 
 template<int dim>
-void BiCrystal<dim>::updateBoxVectors(std::vector<LatticeVector<dim>>& boxVectors, const double& orthogonality) const
+void BiCrystal<dim>::updateBoxVectors(std::array<LatticeVector<dim>, dim>& boxVectors, const double& orthogonality) const
     requires(dim == 2 || dim == 3)
 {
     assert(orthogonality <= 1.0 && "The \"orthogonality\" parameter should be between 0.0 and 1.0");
-    assert(boxVectors.size() == dim);
     for(const auto& boxVector : boxVectors) {
-        assert(&csl == &boxVector.lattice && "Box vectors do not belong to the CSL.");
+        assert(&csl == boxVector.lattice && "Box vectors do not belong to the CSL.");
     }
 
     // Orthogonalize boxVectors[1] against the fixed boxVectors[2] (dim==3 only - in 2D there is a
@@ -663,7 +662,7 @@ void BiCrystal<dim>::updateBoxVectors(std::vector<LatticeVector<dim>>& boxVector
         v1 << 1, 0;  // == boxVectors[1], by construction
         LatticeVector<dim - 1> v2(inPlaneBc.csl);
         v2 << 0, 1;  // == boxVectors[2], fixed reference
-        std::vector<LatticeVector<dim - 1>> boxVectors2D{v1, v2};
+        std::array<LatticeVector<dim - 1>, dim - 1> boxVectors2D{v1, v2};
         inPlaneBc.updateBoxVectors(boxVectors2D, orthogonality);
 
         // boxVectors2D[0]'s integer coordinates (a,b) are exactly the combination a*boxVectors[1] +
@@ -712,16 +711,15 @@ void BiCrystal<dim>::updateBoxVectors(std::vector<LatticeVector<dim>>& boxVector
 }
 
 template<int dim>
-std::vector<LatticeVector<dim>> BiCrystal<dim>::box(const std::vector<LatticeVector<dim>>& boxVectors,
+std::vector<LatticeVector<dim>> BiCrystal<dim>::box(const std::array<LatticeVector<dim>, dim>& boxVectors,
                                                     const int& dsclFactor,
                                                     std::string filename,
                                                     bool orient) const
     requires(dim == 2 || dim == 3)
 {
     assert(dsclFactor >= 0 && "The \"dsclFactor\" should be non-negative integer.");
-    assert(boxVectors.size() == dim);
     for(const auto& boxVector : boxVectors) {
-        assert(&csl == &boxVector.lattice && "Box vectors do not belong to the CSL.");
+        assert(&csl == boxVector.lattice && "Box vectors do not belong to the CSL.");
     }
 
     // Form the box lattice
@@ -757,12 +755,12 @@ std::vector<LatticeVector<dim>> BiCrystal<dim>::box(const std::vector<LatticeVec
     std::vector<LatticeVector<dim>> configurationA, configurationB, configurationC, configurationD;
     std::vector<LatticeVector<dim>> configuration;
 
-    std::vector<LatticeVector<dim>> boxVectorsInA, boxVectorsInB, boxVectorsInD;
+    std::array<LatticeVector<dim>, dim> boxVectorsInA, boxVectorsInB, boxVectorsInD;
     // calculate boxVectors in A, B, and D
-    for(const auto& boxVector : boxVectors) {
-        boxVectorsInA.push_back(getLatticeVectorInA(boxVector));
-        boxVectorsInB.push_back(getLatticeVectorInB(boxVector));
-        boxVectorsInD.push_back(getLatticeVectorInD(boxVector));
+    for(int i = 0; i < dim; ++i) {
+        boxVectorsInA[i] = getLatticeVectorInA(boxVectors[i]);
+        boxVectorsInB[i] = getLatticeVectorInB(boxVectors[i]);
+        boxVectorsInD[i] = getLatticeVectorInD(boxVectors[i]);
     }
 
     // prepare boxVectors for D
@@ -771,8 +769,10 @@ std::vector<LatticeVector<dim>> BiCrystal<dim>::box(const std::vector<LatticeVec
     if(dsclFactor != 0 && abs((dsclFactor * dsclVector).dot(nD)) < abs(boxVectorsInD[0].dot(nD)))
         boxVectorsInD[0] = dsclFactor * dsclVector;
 
-    std::vector<LatticeVector<dim>> boxVectorsForA(boxVectorsInA), boxVectorsForB(boxVectorsInB), boxVectorsForC(boxVectors),
-        boxVectorsForD(boxVectorsInD);
+    auto boxVectorsForA = boxVectorsInA;
+    auto boxVectorsForB = boxVectorsInB;
+    auto boxVectorsForC = boxVectors;
+    auto boxVectorsForD = boxVectorsInD;
     boxVectorsForA[0] = 2 * boxVectorsInA[0];
     boxVectorsForB[0] = 2 * boxVectorsInB[0];
     boxVectorsForC[0] = 2 * boxVectors[0];

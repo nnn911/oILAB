@@ -168,29 +168,27 @@ ReciprocalLatticeVector<dim> Lattice<dim>::reciprocalLatticeVector(const VectorD
 
 /**********************************************************************/
 template<int dim>
-std::vector<LatticeDirection<dim>> Lattice<dim>::planeParallelLatticeBasis(const ReciprocalLatticeDirection<dim>& l,
-                                                                           const bool& useRLLL) const
+std::array<LatticeDirection<dim>, dim> Lattice<dim>::planeParallelLatticeBasis(const ReciprocalLatticeDirection<dim>& l,
+                                                                               const bool& useRLLL) const
 {
-    assert(this == &l.lattice && "Vectors belong to different Lattices.");
+    assert(this == l.lattice && "Vectors belong to different Lattices.");
     auto outOfPlaneVector = IntegerMath<IntScalarType>::solveBezout(l.reciprocalLatticeVector());
     auto matrix = IntegerMath<IntScalarType>::ccum(outOfPlaneVector);
-    std::vector<LatticeDirection<dim>> out;
-    int columnIndex = -1;
+    std::array<LatticeDirection<dim>, dim> out;
+    int columnIndex = 0;
     for(const auto& column : matrix.colwise()) {
-        columnIndex++;
         if(columnIndex != 0)
-            out.push_back(LatticeDirection<dim>(column - column.dot(l.reciprocalLatticeVector()) * matrix.col(0), *this));
+            out[columnIndex] = LatticeDirection<dim>(column - column.dot(l.reciprocalLatticeVector()) * matrix.col(0), *this);
         else
-            out.push_back(LatticeDirection<dim>(column, *this));
+            out[columnIndex] = LatticeDirection<dim>(column, *this);
+        columnIndex++;
     }
 
     if(!useRLLL) return out;
 
     Eigen::MatrixXd planeParallelLatticeBasisCartesian(dim, dim - 1);
-    int index = 0;
-    for(auto it = std::next(out.begin()); it != out.end(); ++it) {
-        planeParallelLatticeBasisCartesian.col(index) = (*it).cartesian();
-        index++;
+    for(int i = 1; i < dim; ++i) {
+        planeParallelLatticeBasisCartesian.col(i - 1) = out[i].cartesian();
     }
 
     if constexpr(dim > 2) {
@@ -229,32 +227,30 @@ std::vector<LatticeDirection<dim>> Lattice<dim>::planeParallelLatticeBasis(const
 
 /**********************************************************************/
 template<int dim>
-std::vector<ReciprocalLatticeDirection<dim>> Lattice<dim>::directionOrthogonalReciprocalLatticeBasis(const LatticeDirection<dim>& l,
-                                                                                                     const bool& useRLLL) const
+std::array<ReciprocalLatticeDirection<dim>, dim> Lattice<dim>::directionOrthogonalReciprocalLatticeBasis(const LatticeDirection<dim>& l,
+                                                                                                         const bool& useRLLL) const
 {
-    assert(this == &l.lattice && "Vectors belong to different Lattices.");
+    assert(this == l.lattice && "Vectors belong to different Lattices.");
     auto nonOrthogonalReciprocalVector = IntegerMath<IntScalarType>::solveBezout(l.latticeVector());
     auto matrix = IntegerMath<IntScalarType>::ccum(nonOrthogonalReciprocalVector);
-    std::vector<ReciprocalLatticeDirection<dim>> out;
-    int columnIndex = -1;
+    std::array<ReciprocalLatticeDirection<dim>, dim> out;
+    int columnIndex = 0;
     for(const auto& column : matrix.colwise()) {
-        columnIndex++;
         if(columnIndex != 0) {
             VectorDimI temp = column - column.dot(l.latticeVector()) * matrix.col(0);
-            out.push_back(ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(temp, *this)));
+            out[columnIndex] = ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(temp, *this));
         }
         else {
             VectorDimI temp = column;
-            out.push_back(ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(temp, *this)));
+            out[columnIndex] = ReciprocalLatticeDirection<dim>(ReciprocalLatticeVector<dim>(temp, *this));
         }
+        columnIndex++;
     }
     if(!useRLLL) return out;
 
     Eigen::MatrixXd directionOrthogonalReciprocalLatticeBasisCartesian(dim, dim - 1);
-    int index = 0;
-    for(auto it = std::next(out.begin()); it != out.end(); ++it) {
-        directionOrthogonalReciprocalLatticeBasisCartesian.col(index) = (*it).cartesian();
-        index++;
+    for(int i = 1; i < dim; ++i) {
+        directionOrthogonalReciprocalLatticeBasisCartesian.col(i - 1) = out[i].cartesian();
     }
 
     if constexpr(dim > 2) {
@@ -295,7 +291,7 @@ std::vector<ReciprocalLatticeDirection<dim>> Lattice<dim>::directionOrthogonalRe
 template<int dim>
 double Lattice<dim>::interPlanarSpacing(const ReciprocalLatticeDirection<dim>& r) const
 {
-    if(&(r.lattice) != this) throw(std::runtime_error("The input reciprocal lattice vectors does not belong to the current lattice."));
+    if(r.lattice != this) throw(std::runtime_error("The input reciprocal lattice vectors does not belong to the current lattice."));
     return 1.0 / r.cartesian().norm();
 }
 
@@ -439,11 +435,11 @@ std::vector<typename Lattice<dim>::MatrixDimD> Lattice<dim>::generateCoincidentL
 }
 
 template<int dim>
-std::vector<LatticeVector<dim>> Lattice<dim>::box(const std::vector<LatticeVector<dim>>& boxVectors, const std::string& filename) const
+std::vector<LatticeVector<dim>> Lattice<dim>::box(const std::array<LatticeVector<dim>, dim>& boxVectors, const std::string& filename) const
     requires(dim == 3)
 {
     for(const LatticeVector<dim>& boxVector : boxVectors) {
-        assert(this == &boxVector.lattice && "Box vectors belong to different lattice.");
+        assert(this == boxVector.lattice && "Box vectors belong to different lattice.");
     }
 
     // Form the box lattice
@@ -540,11 +536,11 @@ std::vector<LatticeVector<dim>> Lattice<dim>::box(const std::vector<LatticeVecto
 }
 
 template<int dim>
-std::vector<LatticeVector<dim>> Lattice<dim>::box(const std::vector<LatticeVector<dim>>& boxVectors, const std::string& filename) const
+std::vector<LatticeVector<dim>> Lattice<dim>::box(const std::array<LatticeVector<dim>, dim>& boxVectors, const std::string& filename) const
     requires(dim == 2)
 {
     for(const LatticeVector<dim>& boxVector : boxVectors) {
-        assert(this == &boxVector.lattice && "Box vectors belong to different lattice.");
+        assert(this == boxVector.lattice && "Box vectors belong to different lattice.");
     }
 
     // Form the box lattice
