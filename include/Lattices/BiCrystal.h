@@ -13,6 +13,13 @@
 #include <map>
 
 namespace oILAB {
+
+    /*! \brief Character of a grain boundary generated relative to a misorientation axis:
+     * Tilt (axis lies in the GB plane), Twist (axis is normal to the GB plane), or
+     * Mixed (axis is at a general angle to the GB plane).
+     */
+    enum class GBCharacter { Tilt, Twist, Mixed };
+
     /*!Class template that computes the coincident-site-lattice (CSL) of two
      * parent lattices using the Smith Normal Form [1].
      *
@@ -227,26 +234,54 @@ namespace oILAB {
         ReciprocalLatticeDirection<dim> getReciprocalLatticeDirectionInD(const ReciprocalLatticeVector<dim>& v) const;
 
         /*!
-         * \brief Given a tilt axis \f$\textbf d\f$, that belongs to lattices \f$\mathcal A\f$ or \f$\mathcal B\f$, this
-         * function generate a set of tilt GBs. CURRENTLY ONLY WORDS FOR DIMENSION 3
-         * @param d - LatticeDirection that describes the tilt axis
-         * @param div - parameter to span the GBs
-         * @return A data structure that stores GBs sorted in increasing order of their inclination angle.
+         * \brief Given an axis \f$\textbf d\f$, that belongs to lattices \f$\mathcal A\f$ or \f$\mathcal B\f$, this
+         * function generates a set of tilt, twist, or mixed GBs, depending on \p character. CURRENTLY ONLY WORDS FOR DIMENSION 3
+         * @param d - LatticeDirection that describes the misorientation axis
+         * @param div - parameter to span the GBs (ignored when character == GBCharacter::Twist)
+         * @param character - GBCharacter::Tilt (default), GBCharacter::Twist, or GBCharacter::Mixed
+         * @return A data structure that stores GBs sorted (primarily) in increasing order of their inclination angle.
          */
         std::map<IntScalarType,Gb<dim>>
-        generateGrainBoundaries(const LatticeDirection<dim>& d, int div=30) const requires (dim==2 || dim==3);
+        generateGrainBoundaries(const LatticeDirection<dim>& d, int div=30, GBCharacter character = GBCharacter::Tilt) const requires (dim==2 || dim==3);
 
         /*!
-         * \brief Given a tilt axis \f$\textbf d\f$, that belongs to lattices \f$\mathcal A\f$ or \f$\mathcal B\f$, this
-         * function generate a set of tilt GBs. CURRENTLY ONLY WORDS FOR DIMENSION 3
-         * @param d - LatticeDirection that describes the tilt axis
-         * @param div - parameter to span the GBs
+         * \brief Given an axis \f$\textbf d\f$, that belongs to lattices \f$\mathcal A\f$ or \f$\mathcal B\f$, this
+         * function generates a set of tilt, twist, or mixed GBs, depending on \p character. CURRENTLY ONLY WORDS FOR DIMENSION 3
+         * @param d - LatticeDirection that describes the misorientation axis
+         * @param div - parameter to span the GBs (ignored when character == GBCharacter::Twist)
+         * @param character - GBCharacter::Tilt (default), GBCharacter::Twist, or GBCharacter::Mixed
          * @param callback - callback function that is called for each GB
          */
         template<typename Callback>
-        void generateGrainBoundaries(const LatticeDirection<dim>& d, int div = 30, Callback&& callback = {}) const
+        void generateGrainBoundaries(const LatticeDirection<dim>& d, int div = 30, GBCharacter character = GBCharacter::Tilt, Callback&& callback = {}) const
             requires(dim == 2 || dim == 3);
 
+        /*!
+         * \brief Refines \p boxVectors in place so that the box they define is as orthogonal as
+         * possible, trading off against \p orthogonality. Every vector remains a CSL lattice
+         * vector; vectors may grow (become a larger, equivalent linear combination) but the
+         * plane/line each one spans together with the others is unchanged, so \p boxVectors
+         * continues to describe the same GB.
+         *
+         * For \p dim==3, \p boxVectors[1] and \p boxVectors[2] are assumed to already span the
+         * GB plane. \p boxVectors[2] is left untouched; \p boxVectors[1] is first replaced by
+         * the in-plane CSL vector that is as orthogonal as possible to \p boxVectors[2] (found
+         * by recursing into this same search one dimension down, on the trivial \f$\Sigma=1\f$
+         * bicrystal of the plane's own 2D CSL).
+         *
+         * In both \p dim==2 and \p dim==3, \p boxVectors[0] is then replaced by the CSL vector
+         * that is as orthogonal as possible to the plane/line spanned by the remaining box
+         * vectors, by searching increasingly larger candidates along that plane's/line's own
+         * reciprocal direction.
+         *
+         * \p orthogonality controls how long each of the two searches above keeps looking for a
+         * more orthogonal candidate before settling: 0 accepts the first (smallest) candidate,
+         * 1 searches the full range the plane's/line's periodicity admits. Larger values can
+         * substantially increase the size of the resulting box.
+         *
+         * @param boxVectors - \p dim linearly independent CSL lattice vectors, modified in place.
+         * @param orthogonality - a value in the interval \f$[0,1]\f$.
+         */
         void
         updateBoxVectors(std::vector<LatticeVector<dim>>& boxVectors,
                               const double& orthogonality=0.0) const requires (dim==2 || dim==3);

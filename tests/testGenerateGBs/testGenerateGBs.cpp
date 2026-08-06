@@ -246,6 +246,65 @@ int main() {
           std::cout << "Moving onto the next inclination" << std::endl;
         }
       }
+
+      // Character-agnostic summary printer, reused for the Twist and Mixed
+      // boundaries below. The glide/Burgers-vector/period/STGB-vs-ATGB
+      // computation used for Tilt above is deliberately not reused here: it is
+      // built from (tilt axis) x (GB normal), which is identically zero for a
+      // Twist boundary (axis parallel to the normal by definition), and
+      // STGB/ATGB is conventionally tilt-only terminology.
+      auto printGbSummary = [&](int count, const Gb<3> &gb, const char *label) {
+        ReciprocalLatticeVector<3> rvInA = gb.nA.reciprocalLatticeVector();
+        ReciprocalLatticeVector<3> rvInCsl =
+            bc.getReciprocalLatticeDirectionInC(rvInA).reciprocalLatticeVector();
+        Eigen::Vector3d nAglobalCoords = gb.nA.cartesian();
+        Eigen::Vector3d nBglobalCoords = rotation.transpose() * gb.nB.cartesian();
+        std::cout << count << ") [" << label << "] nA = " << std::setprecision(20)
+                  << nAglobalCoords.transpose() << std::endl;
+        std::cout << "         nB = " << std::setprecision(20)
+                  << nBglobalCoords.transpose() << std::endl;
+        std::cout << "         CSL plane distance (Height) = "
+                  << std::setprecision(20) << 1.0 / rvInCsl.cartesian().norm()
+                  << std::endl;
+        std::cout << "         Step height of disconnection with Burgers vector d1= "
+                  << std::setprecision(20) << gb.stepHeight(d1) << std::endl;
+        std::cout << "         Step height of disconnection with Burgers vector d2= "
+                  << std::setprecision(20) << gb.stepHeight(d2) << std::endl;
+        std::cout << "         Step height of disconnection with Burgers vector d3= "
+                  << std::setprecision(20) << gb.stepHeight(d3) << std::endl;
+        std::cout << "-----------------------------------------------------------"
+                     "------------------"
+                  << std::endl;
+      };
+
+      std::cout << "Twist GB for this misorientation" << std::endl;
+      auto twistGbSet(bc.generateGrainBoundaries(
+          bc.A.latticeDirection(rv.cartesian()), /* div unused for Twist */ 1,
+          GBCharacter::Twist));
+      {
+        int twistCount = 0;
+        for (const auto &gb : twistGbSet)
+          printGbSummary(++twistCount, gb.second, "Twist");
+      }
+
+      std::cout << "Mixed GBs for this misorientation" << std::endl;
+      // NOTE: Mixed enumerates the full 3-vector integer cube, i.e. O(div^3)
+      // candidates. div=60 (as used for Tilt above) would mean ~1.77 million
+      // candidates; keep div small here unless a denser sampling is needed.
+      auto mixedGbSet(bc.generateGrainBoundaries(
+          bc.A.latticeDirection(rv.cartesian()), 8, GBCharacter::Mixed));
+      {
+        int mixedCount = 0;
+        double heightThreshold = 5.0; // Angstrom
+        for (const auto &gb : mixedGbSet) {
+          ReciprocalLatticeVector<3> rvInCsl =
+              bc.getReciprocalLatticeDirectionInC(
+                    gb.second.nA.reciprocalLatticeVector())
+                  .reciprocalLatticeVector();
+          if (1.0 / rvInCsl.cartesian().norm() < heightThreshold)
+            printGbSummary(++mixedCount, gb.second, "Mixed");
+        }
+      }
     } catch (std::runtime_error &e) {
       std::cout << e.what() << std::endl;
       std::cout << "Moving on the the next misorientation" << std::endl;

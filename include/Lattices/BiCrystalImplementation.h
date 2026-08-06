@@ -17,6 +17,8 @@
 #include "../Utilities/Rotation.h"
 #include <bitset>
 #include <optional>
+#include <set>
+#include <array>
 
 namespace oILAB {
 
@@ -469,43 +471,139 @@ LatticeVector<dim> BiCrystal<dim>::shiftTensorB(const LatticeVector<dim>& d) con
 
 template<int dim>
 template<typename Callback>
-void BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int div, Callback&& callback) const
+void BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int div, GBCharacter character, Callback&& callback) const
     requires(dim == 2 || dim == 3)
 {
-    if(&d.lattice != &A && &d.lattice != &B) throw std::runtime_error("The tilt axis does not belong to lattices A and B  ");
+    if(&d.lattice != &A && &d.lattice != &B) throw std::runtime_error("The axis does not belong to lattices A and B  ");
 
     constexpr IntScalarType keyScale = 1e6;
-
     std::optional<GBKey<keyScale>> gbKey;
 
-    // Mask used to filter duplicates
+    // Tilt dedup: unchanged from the original implementation. The angle-bucket test is exact here
+    // because every Tilt candidate lies on a 1-parameter circle in the plane orthogonal to the axis.
     std::bitset<GBKey<keyScale>::numKeys()> seenGBs;
     seenGBs.reset();
 
+    // Mixed dedup/key: the angle to a single reference vector is not injective over the full sphere of
+    // directions (many directions share one bucket - a whole cone), so an exact integer-direction test is
+    // used for deduplication, and the returned map key is a composite (angle bucket, tie-breaker) so that
+    // std::map::emplace in the non-callback overload below can never silently drop two distinct Mixed GBs
+    // that happen to land in the same angle bucket.
+    std::set<std::array<IntScalarType, dim>> seenNormalsExact;
+    constexpr IntScalarType tieBreakerMultiplier = 1'000'000;
+    IntScalarType tieBreaker = 0;
+
+    auto canonicalCoordinates = [](const Gb<dim>& gb) {
+        std::array<IntScalarType, dim> coords{};
+        const auto& v = gb.nA.reciprocalLatticeVector();
+        for(int k = 0; k < dim; ++k) coords[k] = v(k);
+        return coords;
+    };
+
     const auto basis = d.lattice.directionOrthogonalReciprocalLatticeBasis(d, true);
+
+    // Reciprocal direction parallel to the axis, expressed in d's own lattice (A or B, whichever the
+    // caller supplied) - consistent with basis[1]/basis[2], which are also d.lattice-based. Used to build
+    // Twist/Mixed candidate normals (basis[0] itself is NOT parallel to d - its only defining property is
+    // basis[0].dot(d) == 1, a Bezout/duality normalization, not parallelism).
+    const auto axisReciprocal = d.lattice.reciprocalLatticeDirection(d.cartesian());
+
+    // The same axis, but pinned to lattice A specifically (regardless of whether d.lattice is A or B),
+    // since Gb::nA is always expressed in A's dual. Used only by the Mixed-branch Tilt/Twist filter below,
+    // which compares against gb.nA and would otherwise silently mix vectors from different lattices.
+    const auto dInA = A.latticeDirection(d.cartesian());
+    const auto axisReciprocalInA = A.reciprocalLatticeDirection(d.cartesian());
+
     if constexpr(dim == 3) {
-        for(int i = -div; i <= div; ++i) {
-            for(int j = -div; j <= div; ++j) {
-                if(i == 0 && j == 0) continue;
-                const ReciprocalLatticeVector<dim> rv = i * basis[1].reciprocalLatticeVector() + j * basis[2].reciprocalLatticeVector();
+        switch(character) {
+            case GBCharacter::Tilt: {
+                for(int i = -div; i <= div; ++i) {
+                    for(int j = -div; j <= div; ++j) {
+                        if(i == 0 && j == 0) continue;
+                        const ReciprocalLatticeVector<dim> rv =
+                            i * basis[1].reciprocalLatticeVector() + j * basis[2].reciprocalLatticeVector();
+                        try {
+                            Gb<dim> gb(*this, rv);
+                            if(!gbKey) {
+                                gbKey.emplace(gb);
+                            }
+                            const IntScalarType key = (*gbKey)(gb);
+                            // Filter duplicates
+                            if(seenGBs.test(key)) {
+                                continue;
+                            }
+                            seenGBs.set(key);
+                            std::invoke(callback, key, std::move(gb));
+                        }
+                        catch(std::runtime_error& e) {
+                            Logger::warn() << e.what();
+                            Logger::warn() << "Unable to form GB with normal = " << rv;
+                            Logger::warn() << "moving on to next inclination";
+                        }
+                    }
+                }
+                break;
+            }
+            case GBCharacter::Twist: {
+                // A twist boundary has no inclination freedom for a fixed misorientation: the normal is
+                // forced to be parallel to the axis, i.e. axisReciprocal. div is unused for this character.
+                const ReciprocalLatticeVector<dim> rv = axisReciprocal.reciprocalLatticeVector();
                 try {
                     Gb<dim> gb(*this, rv);
-                    if(!gbKey) {
-                        gbKey.emplace(gb);
-                    }
-                    const IntScalarType key = (*gbKey)(gb);
-                    // Filter duplicates
-                    if(seenGBs.test(key)) {
-                        continue;
-                    }
-                    seenGBs.set(key);
+                    constexpr IntScalarType key = 0;
                     std::invoke(callback, key, std::move(gb));
                 }
                 catch(std::runtime_error& e) {
                     Logger::warn() << e.what();
-                    Logger::warn() << "Unable to form GB with normal = " << rv;
-                    Logger::warn() << "moving on to next inclination";
+                    Logger::warn() << "Unable to form twist GB with normal = " << rv;
                 }
+                break;
+            }
+            case GBCharacter::Mixed: {
+                for(int i = -div; i <= div; ++i) {
+                    for(int j = -div; j <= div; ++j) {
+                        for(int k = -div; k <= div; ++k) {
+                            if(i == 0 && j == 0 && k == 0) continue;
+                            const ReciprocalLatticeVector<dim> rv = i * axisReciprocal.reciprocalLatticeVector() +
+                                                                     j * basis[1].reciprocalLatticeVector() +
+                                                                     k * basis[2].reciprocalLatticeVector();
+                            try {
+                                Gb<dim> gb(*this, rv);
+
+                                // Skip candidates that are actually pure Tilt (axis lies exactly in the GB
+                                // plane: dInA.dot(nA) == 0) or pure Twist (nA parallel to the axis:
+                                // nA x axisReciprocalInA == 0) - both exact integer tests. Those are already
+                                // covered by the Tilt/Twist characters, so Mixed only reports genuinely
+                                // mixed-character boundaries.
+                                if(dInA.dot(gb.nA) == 0) continue;
+                                if(gb.nA.reciprocalLatticeVector()
+                                       .cross(axisReciprocalInA.reciprocalLatticeVector())
+                                       .latticeVector()
+                                       .squaredNorm() == 0)
+                                    continue;
+
+                                if(!gbKey) {
+                                    gbKey.emplace(gb);
+                                }
+                                // Filter duplicates: exact test on the canonicalized (gcd-reduced) normal,
+                                // since candidate normals are no longer confined to a plane.
+                                if(!seenNormalsExact.insert(canonicalCoordinates(gb)).second) {
+                                    continue;
+                                }
+                                assert(tieBreaker < tieBreakerMultiplier &&
+                                       "div too large for Mixed: tie-breaker overflowed its reserved range");
+                                const IntScalarType key = (*gbKey)(gb) * tieBreakerMultiplier + tieBreaker++;
+                                std::invoke(callback, key, std::move(gb));
+                            }
+                            catch(std::runtime_error& e) {
+                                Logger::warn() << e.what();
+                                Logger::warn() << "Unable to form GB with normal = " << rv;
+                                Logger::warn() << "moving on to next candidate";
+                            }
+                        }
+                    }
+                }
+                break;
             }
         }
     }
@@ -519,11 +617,12 @@ void BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d, int
 
 template<int dim>
 std::map<typename BiCrystal<dim>::IntScalarType, Gb<dim>> BiCrystal<dim>::generateGrainBoundaries(const LatticeDirection<dim>& d,
-                                                                                                  int div) const
+                                                                                                  int div,
+                                                                                                  GBCharacter character) const
     requires(dim == 2 || dim == 3)
 {
     std::map<IntScalarType, Gb<dim>> gbSet;
-    generateGrainBoundaries(d, div, [&](IntScalarType key, Gb<dim>&& gb) { gbSet.emplace(key, std::move(gb)); });
+    generateGrainBoundaries(d, div, character, [&](IntScalarType key, Gb<dim>&& gb) { gbSet.emplace(key, std::move(gb)); });
     return gbSet;
 }
 
@@ -535,6 +634,41 @@ void BiCrystal<dim>::updateBoxVectors(std::vector<LatticeVector<dim>>& boxVector
     assert(boxVectors.size() == dim);
     for(const auto& boxVector : boxVectors) {
         assert(&csl == &boxVector.lattice && "Box vectors do not belong to the CSL.");
+    }
+
+    // Orthogonalize boxVectors[1] against the fixed boxVectors[2] (dim==3 only - in 2D there is a
+    // single in-plane vector, nothing to orthogonalize against). Rather than a single one-shot integer
+    // projection (which cannot always escape a tie, and only ever considers the primitive vectors
+    // themselves), reuse the same "scale + RLLL search" algorithm already implemented below for
+    // boxVectors[0], one dimension down: build a trivial BiCrystal<2> of the GB-plane lattice with
+    // itself (Sigma=1, so its csl is exactly that lattice) purely to call its own updateBoxVectors.
+    // boxVectors[2] is never modified; boxVectors[1] may grow in length as a result.
+    if constexpr(dim == 3) {
+        Eigen::Vector3d e1 = boxVectors[2].cartesian().normalized();
+        Eigen::Vector3d e2 = (boxVectors[1].cartesian() - boxVectors[1].cartesian().dot(e1) * e1).normalized();
+
+        // dim-1 (rather than the literal 2) is used throughout this block so that Lattice<dim-1>,
+        // BiCrystal<dim-1>, etc. remain dependent on this function's own template parameter - a
+        // non-dependent Lattice<2> would be looked up (and its instantiation attempted) at the point
+        // BiCrystalImplementation.h is parsed, which is before Lattice.h's full definition is visible
+        // (LatticeModule.h includes BiCrystal.h before Lattice.h); dim-1 defers that to the actual
+        // instantiation site, by which point every header is available.
+        Eigen::Matrix<double, dim - 1, dim - 1> inPlaneBasis;
+        inPlaneBasis.col(0) << boxVectors[1].cartesian().dot(e1), boxVectors[1].cartesian().dot(e2);
+        inPlaneBasis.col(1) << boxVectors[2].cartesian().dot(e1), boxVectors[2].cartesian().dot(e2);
+        Lattice<dim - 1> inPlaneLattice(inPlaneBasis);
+        BiCrystal<dim - 1> inPlaneBc(inPlaneLattice, inPlaneLattice, false);
+
+        LatticeVector<dim - 1> v1(inPlaneBc.csl);
+        v1 << 1, 0;  // == boxVectors[1], by construction
+        LatticeVector<dim - 1> v2(inPlaneBc.csl);
+        v2 << 0, 1;  // == boxVectors[2], fixed reference
+        std::vector<LatticeVector<dim - 1>> boxVectors2D{v1, v2};
+        inPlaneBc.updateBoxVectors(boxVectors2D, orthogonality);
+
+        // boxVectors2D[0]'s integer coordinates (a,b) are exactly the combination a*boxVectors[1] +
+        // b*boxVectors[2] in the original 3D CSL - no Cartesian back-conversion needed.
+        boxVectors[1] = boxVectors2D[0](0) * boxVectors[1] + boxVectors2D[0](1) * boxVectors[2];
     }
 
     // Adjust boxVector[0] such that it is as orthogonal as possible to boxVector[1]
