@@ -86,7 +86,8 @@ std::vector<LatticeVector<dim>> Gb<dim>::box(const std::vector<LatticeVector<dim
     if(orient) {
         if constexpr(dim == 3) {
             orthogonalVectors.col(0) = boxVectors[1].cartesian().normalized();
-            orthogonalVectors.col(1) = boxVectors[2].cartesian().normalized();
+            const Eigen::Vector3d v2 = boxVectors[2].cartesian();
+            orthogonalVectors.col(1) = (v2 - v2.dot(orthogonalVectors.col(0)) * orthogonalVectors.col(0)).normalized();
         }
         else if constexpr(dim == 2)
             orthogonalVectors.col(0) = boxVectors[1].cartesian().normalized();
@@ -95,7 +96,7 @@ std::vector<LatticeVector<dim>> Gb<dim>::box(const std::vector<LatticeVector<dim
     }
     // assert((rotation*rotation.transpose()).template isApprox(Eigen::Matrix<double,dim,dim>::Identity())
     assert((rotation * rotation.transpose()).isApprox(Eigen::Matrix<double, dim, dim>::Identity(),1e-10) &&
-           "Cannot orient the grain boundary. The GB plane box vectors are not orthogonal.");
+           "Cannot orient the grain boundary. boxVectors[1] and boxVectors[2] must be linearly independent to span the GB plane.");
 
     if(!filename.empty()) {
         std::ofstream file;
