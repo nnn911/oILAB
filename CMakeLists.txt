@@ -12,6 +12,17 @@ if(MSVC)
     add_compile_options(/bigobj)
 endif()
 
+# ---------- AddressSanitizer ----------
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
+if(ENABLE_ASAN)
+    if(MSVC)
+        add_compile_options("$<$<CONFIG:Debug>:/fsanitize=address>")
+    else()
+        add_compile_options("$<$<CONFIG:Debug>:-fsanitize=address>" "$<$<CONFIG:Debug>:-fno-omit-frame-pointer>")
+        add_link_options("$<$<CONFIG:Debug>:-fsanitize=address>")
+    endif()
+endif()
+
 # ---------- Dependencies ----------
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
