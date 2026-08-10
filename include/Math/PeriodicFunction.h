@@ -12,7 +12,10 @@
 
 namespace oILAB {
 
-template <typename Scalar, int dim, int ambientDim = dim> class LatticeFunction;
+// NOTE: the default for ambientDim lives on the class definition in
+// LatticeFunction.h -- repeating it here would redefine it whenever both
+// headers are included.
+template <typename Scalar, int dim, int ambientDim> class LatticeFunction;
 
 template <typename Derived, typename Scalar> class Function;
 

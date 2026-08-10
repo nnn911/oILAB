@@ -40,7 +40,7 @@ GbMesoState<dim>::GbMesoState(
 
 
     template<int dim>
-    Eigen::Matrix<double, dim,dim-1> GbMesoState<dim>::getMesoStateGbDomain(const std::vector<LatticeVector<dim>>& mesoStateCslVectors)
+    Eigen::Matrix<double, dim,dim-1> GbMesoState<dim>::getMesoStateGbDomain(const std::array<LatticeVector<dim>, dim>& mesoStateCslVectors)
     {
         Eigen::Matrix<double, dim,dim-1> mesoStateGbDomain;
         for(int i=1; i<dim; ++i)
@@ -51,7 +51,7 @@ GbMesoState<dim>::GbMesoState(
     template<int dim>
     std::map<OrderedTuplet<dim+1>, typename GbMesoState<dim>::VectorDimD>
           GbMesoState<dim>::get_xuPairs(const Gb<dim>& gb,
-                                        const std::vector<LatticeVector<dim>>& mesoStateCslVectors,
+                                        const std::array<LatticeVector<dim>, dim>& mesoStateCslVectors,
                                         const std::deque<std::tuple<LatticeVector<dim>,VectorDimD,int>>& bs)
     {
         auto normal= gb.nA.cartesian().normalized();
@@ -129,7 +129,7 @@ GbMesoState<dim>::GbMesoState(
     }
 
     template<int dim>
-    std::array<Eigen::Index,dim-1> GbMesoState<dim>::discretize(const std::vector<LatticeVector<dim>>& mesoStateCslVectors, const Gb<dim>& gb)
+    std::array<Eigen::Index,dim-1> GbMesoState<dim>::discretize(const std::array<LatticeVector<dim>, dim>& mesoStateCslVectors, const Gb<dim>& gb)
     {
         std::array<Eigen::Index,dim-1> n{};
         for(int i=1; i<dim; ++i)
@@ -292,7 +292,7 @@ GbMesoState<dim>::GbMesoState(
          VectorDimD cslShift;
          cslShift << -0.5, -FLT_EPSILON, -FLT_EPSILON;
          VectorDimD xModulo= x;
-         std::vector<LatticeVector<3>> localBoxVectors(boxVectors);
+         std::array<LatticeVector<3>, 3> localBoxVectors(boxVectors);
          localBoxVectors[0]=5*boxVectors[0];
          LatticeVector<dim>::modulo(xModulo, localBoxVectors, cslShift);
          for(const auto& [b,s, include] : bs) {

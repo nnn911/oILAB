@@ -13,9 +13,12 @@
 
 namespace oILAB {
 
-template <typename Scalar, int dim, int ambientDim = dim> class LatticeFunction;
+// NOTE: the defaults for ambientDim live on the class definitions in
+// LatticeFunction.h / PeriodicFunction.h -- repeating them here would redefine
+// them, since this header is pulled in ahead of both.
+template <typename Scalar, int dim, int ambientDim> class LatticeFunction;
 
-template <typename Scalar, int dim, int ambientDim = dim> class PeriodicFunction;
+template <typename Scalar, int dim, int ambientDim> class PeriodicFunction;
 
 template <typename Derived, typename Scalar> class Function {
   using dcomplex = std::complex<double>;
